@@ -4,7 +4,7 @@ sudo: false
 dart:
 - stable
 - dev
-with_content_shell: false
+with_content_shell: true
 before_install:
   - export DISPLAY=:99.0
   - sh -e /etc/init.d/xvfb start
