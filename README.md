@@ -1,5 +1,7 @@
 # ng2_form_components
 
+[![Build Status](https://travis-ci.org/frankpepermans/ng2_form_components.svg)](https://travis-ci.org/frankpepermans/ng2_form_components)
+
 ___
 
 ## html-text-transform-component
