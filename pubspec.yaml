@@ -11,7 +11,7 @@ dependencies:
   tuple: any
   dorm: any
   ng2_state:
-    path: ../ng2_state
+    git: https://github.com/frankpepermans/ng2_state.git
 dev_dependencies:
   faker: any
 transformers:
