@@ -1,0 +1,44 @@
+.ng2-form-components-auto-complete {
+    background: #fff;
+}
+
+.ng2-form-components-auto-complete .drop-down-header {
+    display: flex;
+    width: 160px;
+    border: 1px solid #aaa;
+    padding: 5px;
+    align-items: center;
+}
+
+.ng2-form-components-auto-complete .drop-down-header .num-selected {
+    font-size: .75em;
+    color: #aaa;
+    margin-right: 4px;
+}
+
+.ng2-form-components-auto-complete .drop-down-header > input {
+    width: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    flex-grow: 1;
+}
+
+.ng2-form-components-auto-complete .drop-down-header > i {
+    color: #333;
+}
+
+.ng2-form-components-auto-complete .drop-down-list {
+    width: 170px;
+    height: 252px;
+    overflow: hidden;
+    position: absolute;
+    z-index: 9999999;
+}
+
+.ng2-form-components-auto-complete .drop-down-list .mask {
+    width: 170px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    position: absolute;
+}

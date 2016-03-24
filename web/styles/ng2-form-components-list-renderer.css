@@ -1,0 +1,46 @@
+.ng2-form-components-list-renderer {
+    max-height: 250px;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.16), 0 2px 8px 0 rgba(0, 0, 0, 0.12);
+}
+
+.ng2-form-components-list-renderer .fixed-pane {
+    border-bottom: 1px solid #aaa;
+}
+
+.ng2-form-components-list-renderer .scroll-pane {
+    overflow: auto;
+    flex-grow: 1;
+}
+
+.ng2-form-components-list-renderer .data-group {
+    background: #fff;
+}
+
+.ng2-form-components-list-renderer .data-group .item {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+
+.ng2-form-components-list-renderer .data-group .item:hover {
+    background: #000;
+    color: #fff;
+}
+
+.ng2-form-components-list-renderer .instance {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ng2-form-components-list-renderer .data-group .selected {
+    background: #add8e6;
+}
+
+.ng2-form-components-list-renderer .data-group .not-selectable {
+    color: #808080;
+    pointer-events: none;
+}

@@ -1,0 +1,27 @@
+.ng2-html-text-transform-buttons {
+    display: flex;
+    background: #ddd;
+    border-bottom: 1px solid black;
+}
+
+.ng2-html-text-transform-buttons .buttons {
+}
+
+.ng2-html-text-transform-buttons .buttons .button {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    background: #eee;
+    margin: 4px;
+    border: 1px solid #aaa;
+}
+
+.ng2-html-text-transform-buttons .button:hover {
+    background: #fff;
+}
+
+.ng2-html-text-transform-text-area {
+    border: 1px solid #aaa;
+    padding: 10px;
+    margin: 10px;
+}

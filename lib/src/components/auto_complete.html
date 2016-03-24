@@ -1,0 +1,23 @@
+<div class="ng2-form-components-auto-complete">
+    <div drop-down-header class="drop-down-header">
+        <input type="text" [placeholder]="headerLabel" (input)="handleInput($event)" (focus)="handleFocus()" [value]="inputValue">
+        <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>
+        <i *ngIf="showLoading" class="fa fa-spinner fa-spin space-right"></i>
+        <i *ngIf="!showLoading" [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
+    </div>
+    <div *ngIf="isOpen && mergedDataProvider?.isNotEmpty" class="drop-down-list">
+        <div tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">
+            <list-renderer
+                    [itemRenderer]="listItemRenderer"
+                    [labelHandler]="labelHandler"
+                    [allowMultiSelection]="allowMultiSelection"
+                    [moveSelectionOnTop]="true"
+                    [dataProvider]="mergedDataProvider"
+                    [selectedItems]="selectedItems"
+                    [childOffset]="childOffset"
+                    (selectedItemsChanged)="updateSelectedItems($event)"
+                    (requestClose)="openOrClose()">
+            </list-renderer>
+        </div>
+    </div>
+</div>

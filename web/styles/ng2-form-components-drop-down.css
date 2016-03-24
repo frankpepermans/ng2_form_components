@@ -1,0 +1,49 @@
+.ng2-form-components-drop-down {
+    background: #fff;
+}
+
+.ng2-form-components-drop-down .drop-down-header {
+    width: 160px;
+    border: 1px solid #aaa;
+    padding: 5px;
+}
+
+.ng2-form-components-drop-down .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    pointer-events: none;
+}
+
+.ng2-form-components-drop-down .drop-down-header .num-selected {
+    font-size: .75em;
+    color: #aaa;
+    margin-right: 4px;
+}
+
+.ng2-form-components-drop-down .header-label {
+    width: 100%;
+    user-select: none;
+    pointer-events: none;
+}
+
+.ng2-form-components-drop-down .drop-down-icon {
+    user-select: none;
+    pointer-events: none;
+}
+
+.ng2-form-components-drop-down .drop-down-list {
+    width: 170px;
+    height: 252px;
+    overflow: hidden;
+    position: absolute;
+    z-index: 9999999;
+}
+
+.ng2-form-components-drop-down .drop-down-list .mask {
+    width: 170px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+    position: absolute;
+}

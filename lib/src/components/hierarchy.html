@@ -1,0 +1,31 @@
+<div list-renderer class="ng2-form-components-hierarchy">
+    <div scroll-pane class="scroll-pane">
+        <div class="data-group" *ngFor='#listItem of dataProvider; #i = index'>
+            <div class="item" [ngClass]="{'selected': isSelected(listItem), 'not-selectable': !listItem.selectable}">
+                <div class="icon" (click)="toggleChildren(listItem, i)">
+                    <i *ngIf="resolveChildren(listItem).isNotEmpty" [ngClass]="{'fa-caret-up': !isOpen(listItem), 'fa-caret-down': isOpen(listItem)}" class="fa drop-down-icon"></i>
+                </div>
+                <list-item-renderer
+                        class="list-item-renderer"
+                        [listRendererService]="listRendererService"
+                        [renderType]="itemRenderer"
+                        [labelHandler]="labelHandler"
+                        [listItem]="listItem"
+                        [getHierarchyOffset]="getHierarchyOffset"
+                        [isSelected]="isSelected">
+                </list-item-renderer>
+            </div>
+            <div hierarchy-tween [beforeDestroyChildTrigger]="beforeDestroyChild" [index]="i" [level]="level + 1" class="item-group" *ngIf="isOpen(listItem)">
+                <hierarchy [state]="stateGroup" [stateId]="stateId + '_' + level.toString() + '_' + i.toString()"
+                           [labelHandler]="labelHandler"
+                           [allowMultiSelection]="allowMultiSelection"
+                           [resolveRendererHandler]="resolveRendererHandler"
+                           [resolveChildrenHandler]="resolveChildrenHandler"
+                           [dataProvider]="resolveChildren(listItem)"
+                           [level]="level + 1"
+                           (itemRendererEvent)="handleRendererEvent($event)">
+                </hierarchy>
+            </div>
+        </div>
+    </div>
+</div>

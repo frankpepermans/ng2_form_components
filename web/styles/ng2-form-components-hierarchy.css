@@ -1,0 +1,60 @@
+.ng2-form-components-hierarchy {
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+}
+
+.ng2-form-components-hierarchy .fixed-pane {
+    border-bottom: 1px solid #aaa;
+}
+
+.ng2-form-components-hierarchy .scroll-pane {
+    overflow: auto;
+    flex-grow: 1;
+}
+
+.ng2-form-components-hierarchy .data-group {
+    background: #fff;
+}
+
+.ng2-form-components-hierarchy .data-group .item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px;
+}
+
+.ng2-form-components-hierarchy .data-group .list-item-renderer {
+    width: 100%;
+}
+
+.ng2-form-components-hierarchy .data-group .item-group {
+    margin-left: 20px;
+    overflow: hidden;
+}
+
+.ng2-form-components-hierarchy .data-group .item:hover {
+    background: #000;
+    color: #fff;
+}
+
+.ng2-form-components-hierarchy .data-group .item .icon {
+    min-width: 20px;
+    min-height: 20px;
+}
+
+.ng2-form-components-hierarchy .instance {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ng2-form-components-hierarchy .data-group .selected {
+    background: #add8e6;
+}
+
+.ng2-form-components-hierarchy .data-group .not-selectable {
+    color: #808080;
+    pointer-events: none;
+}

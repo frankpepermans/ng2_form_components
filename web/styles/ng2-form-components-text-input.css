@@ -1,0 +1,18 @@
+.ng2-form-components-text-input {
+    background: #fff;
+}
+
+.ng2-form-components-text-input .container {
+    display: flex;
+    width: 160px;
+    border: 1px solid #aaa;
+    padding: 5px;
+}
+
+.ng2-form-components-text-input .container > input {
+    width: 100%;
+    background: none;
+    border: none;
+    outline: none;
+    flex-grow: 1;
+}

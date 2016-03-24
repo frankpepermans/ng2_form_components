@@ -1,0 +1,25 @@
+name: ng2_form_components
+description: Angular 2 stateful form components
+version: 0.0.1
+environment:
+  sdk: '>=1.13.0 <2.0.0'
+dependencies:
+  angular2: 2.0.0-beta.10
+  browser: ^0.10.0
+  dart_to_js_script_rewriter: ^0.1.0
+  rxdart: any
+  tuple: any
+  dorm: any
+  ng2_state:
+    path: ../ng2_state
+dev_dependencies:
+  faker: any
+transformers:
+- dorm/src/code_transform/meta_transformer
+- angular2:
+    platform_directives:
+    - 'package:angular2/common.dart#COMMON_DIRECTIVES'
+    platform_pipes:
+    - 'package:angular2/common.dart#COMMON_PIPES'
+    entry_points: web/main.dart
+- dart_to_js_script_rewriter

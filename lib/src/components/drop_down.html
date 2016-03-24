@@ -1,0 +1,23 @@
+<div class="ng2-form-components-drop-down">
+    <div drop-down-header class="drop-down-header" (click)="openOrCloseFromHeader()">
+        <div class="header">
+            <span class="header-label">{{currentHeaderLabel}}</span>
+            <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>
+            <i [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
+        </div>
+    </div>
+    <div *ngIf="isOpen && dataProvider?.isNotEmpty" class="drop-down-list">
+        <div tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">
+            <list-renderer
+                    [itemRenderer]="listItemRenderer"
+                    [labelHandler]="labelHandler"
+                    [allowMultiSelection]="allowMultiSelection"
+                    [dataProvider]="dataProvider"
+                    [selectedItems]="selectedItems"
+                    [childOffset]="childOffset"
+                    (selectedItemsChanged)="updateSelectedItems($event)"
+                    (requestClose)="closeFromList()">
+            </list-renderer>
+        </div>
+    </div>
+</div>

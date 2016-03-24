@@ -1,0 +1,114 @@
+<div class="component-container">
+
+    <div class="group">
+        <label *ngIf="recordingSession == null && !isReplaying">Record state</label>
+        <label *ngIf="recordingSession == null && isReplaying" style="color:green">Replaying...</label>
+        <label *ngIf="recordingSession != null" style="color:red">Recording...</label>
+        <div class="state-recorder">
+            <button class="button" (click)="startRecording()"><i class="fa fa-stop" style="color:red"></i></button>
+            <button class="button" (click)="replayRecording()"><i class="fa fa-play"></i></button>
+        </div>
+    </div>
+
+    <div class="group">
+        <label>Input</label>
+        <text-input
+            state="app-state" stateId="in1"
+            placeHolder="Type here"
+            actionContainerClassName="action"
+            actionIconClassName="fa fa-search fa-fw"
+            [action]="notifyInputAction">
+        </text-input>
+    </div>
+
+    <div class="group">
+        <label>Multi select</label>
+        <drop-down
+           state="app-state" stateId="dd1"
+           [labelHandler]="labelHandler"
+           [allowMultiSelection]="true"
+           headerLabel="Select..."
+           [dataProvider]="dataProviderA"
+           [childOffset]="10"
+           (selectedItemsChanged)="dd1sel.innerHtml = listItemsAToString($event)">
+        </drop-down>
+    </div>
+
+    <div class="group">
+        <label>Single select</label>
+        <drop-down
+            state="app-state" stateId="dd2"
+            [labelHandler]="labelHandler"
+            [allowMultiSelection]="false"
+            headerLabel="Select..."
+            [dataProvider]="dataProviderB"
+            [childOffset]="10"
+            (selectedItemsChanged)="dd2sel.innerHtml = listItemsAToString($event)">
+        </drop-down>
+    </div>
+
+    <div class="group">
+        <label>Multi select</label>
+        <auto-complete
+            state="app-state" stateId="af1"
+            [listItemRenderer]="personListItemRenderer"
+            [labelHandler]="personLabelHandler"
+            [allowMultiSelection]="true"
+            headerLabel="Type to search..."
+            [dataProvider]="mockResultDataProviderA"
+            [childOffset]="10"
+            (inputChanged)="triggerMockServiceA($event)"
+            (selectedItemsChanged)="af1sel.innerHtml = listItemsBToString($event)">
+        </auto-complete>
+    </div>
+
+    <div class="group">
+        <label>Single select</label>
+        <auto-complete
+            state="app-state" stateId="af2"
+            [listItemRenderer]="personListItemRenderer"
+            [labelHandler]="personLabelHandler"
+            [allowMultiSelection]="false"
+            headerLabel="Type to search..."
+            [dataProvider]="mockResultDataProviderB"
+            [childOffset]="10"
+            (inputChanged)="triggerMockServiceB($event)"
+            (selectedItemsChanged)="af2sel.innerHtml = listItemsBToString($event)">
+        </auto-complete>
+    </div>
+</div>
+
+<html-text-transform-component state="app-state" stateId="txt" [buttons]="buttons" [model]="model"></html-text-transform-component>
+
+<div style="width: 500px">
+    <hierarchy
+            state="app-state" stateId="hie1"
+            [dataProvider]="dataProviderC"
+            [allowMultiSelection]="true"
+            [resolveChildrenHandler]="resolveChildrenHandler"
+            [labelHandler]="hierarchyLabelHandler"
+            (itemRendererEvent)="notifyItemRendererEvent($event)">
+    </hierarchy>
+</div>
+
+<div class="form">
+    <div class="group">
+        <label class="selector"><i class="fa fa-angle-right"></i>&nbsp;Multi select drop down</label>
+        <label class="value" #dd1sel></label>
+    </div>
+
+    <div class="group">
+        <label class="selector"><i class="fa fa-angle-right"></i>&nbsp;Single select drop down</label>
+        <label class="value" #dd2sel></label>
+    </div>
+
+    <div class="group">
+        <label class="selector"><i class="fa fa-angle-right"></i>&nbsp;Multi select auto fill</label>
+        <label class="value" #af1sel></label>
+    </div>
+
+    <div class="group">
+        <label class="selector"><i class="fa fa-angle-right"></i>&nbsp;Single select auto fill</label>
+        <label class="value" #af2sel></label>
+    </div>
+</div>
