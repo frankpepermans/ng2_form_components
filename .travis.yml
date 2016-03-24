@@ -1,0 +1,12 @@
+language: dart
+# Speed up builds by using containerization.
+sudo: false
+dart:
+- stable
+- dev
+with_content_shell: false
+before_install:
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+script:
+  - set -e
