@@ -16,7 +16,7 @@
                 </list-item-renderer>
             </div>
             <div hierarchy-tween [beforeDestroyChildTrigger]="beforeDestroyChild" [index]="i" [level]="level + 1" class="item-group" *ngIf="isOpen(listItem)">
-                <hierarchy [state]="stateGroup" [stateId]="stateId + '_' + level.toString() + '_' + i.toString()"
+                <hierarchy [state]="stateGroup" [stateId]="getStateId(i)"
                            [labelHandler]="labelHandler"
                            [allowMultiSelection]="allowMultiSelection"
                            [resolveRendererHandler]="resolveRendererHandler"

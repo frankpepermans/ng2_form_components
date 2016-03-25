@@ -1,6 +1,7 @@
 library ng2_form_components.components.hierarchy;
 
 import 'dart:async' show StreamController, StreamSubscription, Stream, Completer;
+import 'dart:math' show Random;
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
 import 'package:dorm/dorm.dart' show Entity;
@@ -223,7 +224,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       }) as StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>>;
 
     _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem>>>.zip([
-      _selection$Ctrl.stream,
+      rx.observable(_selection$Ctrl.stream).startWith(internalSelectedItems as List<ListItem<T>>),
       rx.observable(_childHierarchyList$ctrl.stream)
         .flatMapLatest((List<Hierarchy> hierarchies) => new rx.Observable.merge((new List<Hierarchy>.from(hierarchies)..add(this))
             .map((Hierarchy hierarchy) => hierarchy.internalSelectedItemsChanged
@@ -262,6 +263,12 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   //-----------------------------
   // template methods
   //-----------------------------
+
+  String getStateId(int index) {
+    final String id = (stateId != null) ? stateId : new Random().nextInt(0xffffff).toString();
+
+    return '${id}_${level}_$index';
+  }
 
   bool isOpen(ListItem<T> listItem) {
     bool result = false;

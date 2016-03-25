@@ -36,8 +36,8 @@ class Tween implements OnInit {
   CssAnimationBuilder cssAnimationBuilder;
 
   Tween(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
-  nativeElement = element.nativeElement as Element;
-  cssAnimationBuilder = animationBuilder.css();
+    nativeElement = element.nativeElement as Element;
+    cssAnimationBuilder = animationBuilder.css();
   }
 
   void ngOnInit() {

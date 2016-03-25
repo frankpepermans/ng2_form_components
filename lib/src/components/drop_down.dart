@@ -19,7 +19,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase;
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
-    directives: const [ListRenderer, Tween, NgClass, NgIf]
+    directives: const [ListRenderer, Tween]
 )
 class DropDown<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
 
