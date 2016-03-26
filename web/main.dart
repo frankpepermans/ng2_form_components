@@ -94,6 +94,7 @@ class AppComponent {
   ];
 
   AppComponent(@Inject(ChangeDetectorRef) this.changeDetector, @Inject(StateService) this.stateService) {
+    stateService.stateName = 'ng2-form-components';
     fakeData = _generateRandomServiceData().toList(growable: false);
 
     ListItem<String> rootA = new ListItem<String>()
