@@ -265,7 +265,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   //-----------------------------
 
   String getStateId(int index) {
-    final String id = (stateId != null) ? stateId : new Random().nextInt(0xffffff).toString();
+    final String id = (stateId != null) ? stateId : index.toString();
 
     return '${id}_${level}_$index';
   }
