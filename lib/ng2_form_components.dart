@@ -35,3 +35,6 @@ export 'src/components/animation/tween.dart'
 
 export 'src/infrastructure/list_renderer_service.dart'
     show ListRendererService, ItemRendererEvent, ListRendererEvent;
+
+export 'src/infrastructure/hierarchy_level.dart'
+    show HierarchyLevel;

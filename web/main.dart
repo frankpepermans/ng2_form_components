@@ -12,7 +12,6 @@ import 'package:faker/faker.dart';
 
 import 'person_list_item_renderer.dart';
 import 'person.dart' as domain;
-import 'hierarchy_level.dart' as domain2;
 
 main() {
   ormInitialize();
@@ -24,7 +23,7 @@ void ormInitialize() {
   try {
     ListItem.DO_SCAN();
     domain.Person.DO_SCAN();
-    domain2.HierarchyLevel.DO_SCAN();
+    HierarchyLevel.DO_SCAN();
     StateContainer.DO_SCAN();
     SerializableTuple1.DO_SCAN();
     SerializableTuple2.DO_SCAN();
@@ -54,12 +53,12 @@ class AppComponent {
 
   LabelHandler labelHandler = (String value) => value;
   LabelHandler personLabelHandler = (domain.Person value) => value.name;
-  LabelHandler hierarchyLabelHandler = (domain2.HierarchyLevel value) => value.label;
+  LabelHandler hierarchyLabelHandler = (HierarchyLevel value) => value.label;
 
   List<ListItem<domain.Person>> fakeData;
 
   List<ListItem<String>> dataProviderA, dataProviderB;
-  List<ListItem<domain2.HierarchyLevel>> dataProviderC = <ListItem<domain2.HierarchyLevel>>[];
+  List<ListItem<HierarchyLevel>> dataProviderC = <ListItem<HierarchyLevel>>[];
   List<ListItem<String>> selectedItem;
   List<ListItem<String>> selectedItems;
   List<ListItem<domain.Person>> mockResultDataProviderA, mockResultDataProviderB;
@@ -68,15 +67,15 @@ class AppComponent {
   bool isReplaying = false;
 
   ResolveChildrenHandler resolveChildrenHandler = (int level, ListItem listItem) {
-    final ListItem<domain2.HierarchyLevel> cast = listItem as ListItem<domain2.HierarchyLevel>;
-    List<ListItem<domain2.HierarchyLevel>> result;
+    final ListItem<HierarchyLevel> cast = listItem as ListItem<HierarchyLevel>;
+    List<ListItem<HierarchyLevel>> result;
 
     if (cast.data.children != null) {
-      result = (cast.data.children.map((domain2.HierarchyLevel item) => new ListItem<domain2.HierarchyLevel>()
+      result = (cast.data.children.map((HierarchyLevel item) => new ListItem<HierarchyLevel>()
         ..data = item
         ..container = ''
         ..selectable = true)).toList(growable: false);
-    } else result = <ListItem<domain2.HierarchyLevel>>[];
+    } else result = <ListItem<HierarchyLevel>>[];
 
     return result;
   };
@@ -147,49 +146,49 @@ class AppComponent {
       rootB, rootC
     ]);
 
-    ListItem<domain2.HierarchyLevel> h_rootA = new ListItem<domain2.HierarchyLevel>()
-      ..data = (new domain2.HierarchyLevel()
+    ListItem<HierarchyLevel> h_rootA = new ListItem<HierarchyLevel>()
+      ..data = (new HierarchyLevel()
         ..label = 'Question 1'
-        ..children = <domain2.HierarchyLevel>[
-          new domain2.HierarchyLevel()
+        ..children = <HierarchyLevel>[
+          new HierarchyLevel()
             ..label = 'Answer 1',
-          new domain2.HierarchyLevel()
+          new HierarchyLevel()
             ..label = 'Answer 2'
-            ..children = <domain2.HierarchyLevel>[
-              new domain2.HierarchyLevel()
+            ..children = <HierarchyLevel>[
+              new HierarchyLevel()
                 ..label = 'Answer 1',
-              new domain2.HierarchyLevel()
+              new HierarchyLevel()
                 ..label = 'Answer 2'
-                ..children = <domain2.HierarchyLevel>[
-                  new domain2.HierarchyLevel()
+                ..children = <HierarchyLevel>[
+                  new HierarchyLevel()
                     ..label = 'Answer 1',
-                  new domain2.HierarchyLevel()
+                  new HierarchyLevel()
                     ..label = 'Answer 2',
-                  new domain2.HierarchyLevel()
+                  new HierarchyLevel()
                     ..label = 'Answer 3'
                 ]
             ],
-          new domain2.HierarchyLevel()
+          new HierarchyLevel()
             ..label = 'Answer 3'
         ])
       ..container = ''
       ..selectable = true;
 
-    ListItem<domain2.HierarchyLevel> h_rootB = new ListItem<domain2.HierarchyLevel>()
-      ..data = (new domain2.HierarchyLevel()
+    ListItem<HierarchyLevel> h_rootB = new ListItem<HierarchyLevel>()
+      ..data = (new HierarchyLevel()
         ..label = 'Question 2'
-        ..children = <domain2.HierarchyLevel>[
-          new domain2.HierarchyLevel()
+        ..children = <HierarchyLevel>[
+          new HierarchyLevel()
             ..label = 'Answer 1',
-          new domain2.HierarchyLevel()
+          new HierarchyLevel()
             ..label = 'Answer 2',
-          new domain2.HierarchyLevel()
+          new HierarchyLevel()
             ..label = 'Answer 3'
         ])
       ..container = ''
       ..selectable = true;
 
-    dataProviderC = new List<ListItem<domain2.HierarchyLevel>>.unmodifiable(<ListItem<domain2.HierarchyLevel>>[
+    dataProviderC = new List<ListItem<HierarchyLevel>>.unmodifiable(<ListItem<HierarchyLevel>>[
       h_rootA,
       h_rootB
     ]);
