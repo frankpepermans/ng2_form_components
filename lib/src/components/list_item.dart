@@ -11,6 +11,13 @@ class ListItem<T extends Comparable> extends Entity implements Comparable {
   // public properties
   //-----------------------------
 
+  @Property(ID_SYMBOL, 'id', int, 'id')
+  @Id(0)
+  static const String ID = 'id';
+  static const Symbol ID_SYMBOL = const Symbol('entities.listItem.id');
+
+  int id;
+
   @Property(DATA_SYMBOL, 'data', dynamic, 'data')
   static const String DATA = 'data';
   static const Symbol DATA_SYMBOL = const Symbol('entities.listItem.data');
