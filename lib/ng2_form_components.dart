@@ -3,9 +3,6 @@ library ng2_form_components;
 export 'package:ng2_form_components/src/components/list_item.dart'
  show ListItem;
 
-export 'package:ng2_form_components/src/components/list_item_factory.dart'
-    show ListItemFactory;
-
 export 'src/components/internal/form_component.dart'
   show LabelHandler, FormComponent;
 

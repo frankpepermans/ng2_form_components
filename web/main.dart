@@ -70,7 +70,7 @@ class AppComponent {
     List<ListItem<HierarchyLevel>> result;
 
     if (cast.data.children != null) {
-      result = (cast.data.children.map((HierarchyLevel item) => new ListItemFactory<HierarchyLevel>().create()
+      result = (cast.data.children.map((HierarchyLevel item) => new ListItem<HierarchyLevel>()
         ..data = item
         ..container = ''
         ..selectable = true)).toList(growable: false);
@@ -95,35 +95,35 @@ class AppComponent {
     stateService.stateName = 'ng2-form-components';
     fakeData = _generateRandomServiceData().toList(growable: false);
 
-    ListItem<String> rootA = new ListItemFactory<String>().create()
+    ListItem<String> rootA = new ListItem<String>()
       ..data = 'apples'
       ..container = ''
       ..selectable = false;
-    ListItem<String> rootB = new ListItemFactory<String>().create()
+    ListItem<String> rootB = new ListItem<String>()
       ..data = 'oranges'
       ..container = ''
       ..selectable = false;
-    ListItem<String> rootC = new ListItemFactory<String>().create()
+    ListItem<String> rootC = new ListItem<String>()
       ..data = 'lemons'
       ..container = ''
       ..selectable = false;
 
-    ListItem<String> level1A = new ListItemFactory<String>().create()
+    ListItem<String> level1A = new ListItem<String>()
       ..data = 'bananas'
       ..container = ''
       ..selectable = true;
-    ListItem<String> level1B = new ListItemFactory<String>().create()
+    ListItem<String> level1B = new ListItem<String>()
       ..data = 'grapes'
       ..parent = rootA
       ..container = ''
       ..selectable = true;
 
-    ListItem<String> level2A = new ListItemFactory<String>().create()
+    ListItem<String> level2A = new ListItem<String>()
       ..data = 'pears'
       ..parent = level1A
       ..container = ''
       ..selectable = true;
-    ListItem<String> level2B = new ListItemFactory<String>().create()
+    ListItem<String> level2B = new ListItem<String>()
       ..data = 'cherries'
       ..parent = level1A
       ..container = ''
@@ -145,7 +145,7 @@ class AppComponent {
       rootB, rootC
     ]);
 
-    ListItem<HierarchyLevel> h_rootA = new ListItemFactory<HierarchyLevel>().create()
+    ListItem<HierarchyLevel> h_rootA = new ListItem<HierarchyLevel>()
       ..data = (new HierarchyLevel()
         ..label = 'Question 1'
         ..children = <HierarchyLevel>[
@@ -173,7 +173,7 @@ class AppComponent {
       ..container = ''
       ..selectable = true;
 
-    ListItem<HierarchyLevel> h_rootB = new ListItemFactory<HierarchyLevel>().create()
+    ListItem<HierarchyLevel> h_rootB = new ListItem<HierarchyLevel>()
       ..data = (new HierarchyLevel()
         ..label = 'Question 2'
         ..children = <HierarchyLevel>[
@@ -248,7 +248,7 @@ class AppComponent {
   }
 
   Iterable<ListItem<domain.Person>> _generateRandomServiceData() sync* {
-    for (int i=0; i<5000; i++) yield new ListItemFactory<domain.Person>().create()
+    for (int i=0; i<5000; i++) yield new ListItem<domain.Person>()
       ..data = (new domain.Person()
         ..name = '${faker.person.firstName()} ${faker.person.lastName()}'
         ..image = 'images/img_${random.nextInt(40) + 1}.png')
