@@ -52,4 +52,6 @@ class ListItem<T extends Comparable> extends Entity implements Comparable {
     return -1;
   }
 
+  String toString() => data.toString();
+
 }
