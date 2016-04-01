@@ -43,7 +43,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   rx.Observable<Tuple2<Range, HTMLTextTransformation>> _rangeTransform$;
   StreamSubscription<String> _range$subscription;
 
-  final StreamController<num> _animation$ctrl = new StreamController<num>.broadcast();
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
 
@@ -83,8 +82,10 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   @override void ngOnDestroy() {
     super.ngOnDestroy();
-    // onBlur will destroy any subscriptions, no need to do it again here
+
     _isDestroyCalled = true;
+
+    _range$subscription?.cancel();
   }
 
   //-----------------------------
@@ -136,9 +137,10 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _initStreams() {
-    _nextAnimationFrame();
-
-    _range$ = rx.observable(_animation$ctrl.stream)
+    _range$ = new rx.Observable.merge([
+      document.onMouseUp,
+      document.onKeyUp
+    ])
       .map((_) => window.getSelection())
       .map((Selection selection) {
         final List<Range> ranges = <Range>[];
@@ -166,14 +168,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     rangeA.startOffset == rangeB.startOffset &&
     rangeA.endOffset == rangeB.endOffset
   );
-
-  void _nextAnimationFrame() {
-    window.animationFrame.then((num time) {
-      _animation$ctrl.add(time);
-
-      if (!_isDestroyCalled) _nextAnimationFrame();
-    });
-  }
 
   void _contentModifier(Event event) {
     model = _container.innerHtml;
