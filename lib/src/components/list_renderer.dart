@@ -28,7 +28,7 @@ class SelectedItemsPipe<T extends Comparable> implements PipeTransform {
 
   const SelectedItemsPipe();
 
-  List<ListItem<T>> transform(List<ListItem<T>> dataProvider, [List<dynamic> args = null]) {
+  @override List<ListItem<T>> transform(List<ListItem<T>> dataProvider, [List<dynamic> args = null]) {
     final Function handler = args.first as Function;
     final bool moveSelectionOnTop = args.last as bool;
 
@@ -44,7 +44,7 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
 
   const UnselectedItemsPipe();
 
-  List<ListItem<T>> transform(List<ListItem<T>> dataProvider, [List<dynamic> args = null]) {
+  @override List<ListItem<T>> transform(List<ListItem<T>> dataProvider, [List<dynamic> args = null]) {
     final Function handler = args.first as Function;
     final bool moveSelectionOnTop = args.last as bool;
 
@@ -175,10 +175,10 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   // ng2 life cycle
   //-----------------------------
 
-  Stream<Entity> provideState() => rx.observable(_scroll$ctrl.stream)
+  @override Stream<Entity> provideState() => rx.observable(_scroll$ctrl.stream)
     .map((int scrollTop) => new SerializableTuple1<int>()..item1 = scrollTop) as Stream<Entity>;
 
-  void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
 
     if (scrollPane != null) {
@@ -194,7 +194,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     }
   }
 
-  void ngOnChanges(Map<String, SimpleChange> changes) {
+  @override void ngOnChanges(Map<String, SimpleChange> changes) {
     if (changes.containsKey('selectedItems')) {
       internalSelectedItems.forEach(handleSelection);
 
@@ -228,7 +228,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _clearSelectionSubscription?.cancel();
   }
 
-  void ngAfterViewInit() {
+  @override void ngAfterViewInit() {
     _domClickSubscription = window.onMouseDown.listen((MouseEvent event) {
       Node target = event.target as Node;
 

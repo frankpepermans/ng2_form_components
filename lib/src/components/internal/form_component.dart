@@ -13,9 +13,9 @@ abstract class FormComponent<T extends Comparable> implements StatefulComponent,
   final ChangeDetectorRef changeDetector;
   final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
 
-  Stream<bool> get onDestroy => _onDestroy$ctrl.stream;
+  @override Stream<bool> get onDestroy => _onDestroy$ctrl.stream;
 
-  String stateGroup, stateId;
+  @override String stateGroup, stateId;
 
   //-----------------------------
   // constructor
@@ -33,6 +33,6 @@ abstract class FormComponent<T extends Comparable> implements StatefulComponent,
   // ng2 life cycle
   //-----------------------------
 
-  void ngOnDestroy() => _onDestroy$ctrl.add(true);
+  @override void ngOnDestroy() => _onDestroy$ctrl.add(true);
 
 }

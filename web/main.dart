@@ -12,25 +12,12 @@ import 'package:faker/faker.dart';
 import 'person_list_item_renderer.dart';
 import 'person.dart' as domain;
 
-main() {
+import 'orm_init.dart' show ormInitialize;
+
+void main() {
   ormInitialize();
 
   bootstrap(AppComponent);
-}
-
-void ormInitialize() {
-  try {
-    ListItem.DO_SCAN();
-    domain.Person.DO_SCAN();
-    HierarchyLevel.DO_SCAN();
-    StateContainer.DO_SCAN();
-    SerializableTuple1.DO_SCAN();
-    SerializableTuple2.DO_SCAN();
-    SerializableTuple3.DO_SCAN();
-    SerializableTuple4.DO_SCAN();
-  } catch (error) {
-    print('orm failed...');
-  }
 }
 
 @Component(

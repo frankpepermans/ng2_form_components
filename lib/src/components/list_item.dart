@@ -5,7 +5,7 @@ import 'package:dorm/dorm.dart';
 @Ref('entities.listItem')
 class ListItem<T extends Comparable> extends Entity implements Comparable {
 
-  String get refClassName => 'entities.listItem';
+  @override String get refClassName => 'entities.listItem';
 
   //-----------------------------
   // public properties
@@ -45,12 +45,12 @@ class ListItem<T extends Comparable> extends Entity implements Comparable {
 
   static ListItem construct() => new ListItem();
 
-  int compareTo(ListItem<T> other) {
+  @override int compareTo(ListItem<T> other) {
     if (other != null) return other.data.compareTo(data);
 
     return -1;
   }
 
-  String toString() => data.toString();
+  @override String toString() => data.toString();
 
 }

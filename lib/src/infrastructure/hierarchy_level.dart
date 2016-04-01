@@ -5,7 +5,7 @@ import 'package:dorm/dorm.dart';
 @Ref('domain.hierarchy_level')
 class HierarchyLevel extends Entity implements Comparable {
 
-  String get refClassName => 'domain.hierarchy_level';
+  @override String get refClassName => 'domain.hierarchy_level';
 
   @Property(LABEL_SYMBOL, 'label', String, 'label')
   @Id('')
@@ -25,7 +25,7 @@ class HierarchyLevel extends Entity implements Comparable {
 
   static HierarchyLevel construct() => new HierarchyLevel();
 
-  int compareTo(HierarchyLevel other) {
+  @override int compareTo(HierarchyLevel other) {
     if (other != null) return (other.label.compareTo(label) == 0) ? 0 : 1;
 
     return -1;

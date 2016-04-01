@@ -60,21 +60,21 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   // ng2 life cycle
   //-----------------------------
 
-  Stream<SerializableTuple1> provideState() => _modelTransformation$ctrl.stream
+  @override Stream<SerializableTuple1> provideState() => _modelTransformation$ctrl.stream
     .where((String value) => value != null && value.isNotEmpty)
     .distinct((String vA, String vB) => vA.compareTo(vB) == 0)
     .map((String value) => new SerializableTuple1()..item1 = value);
 
-  void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple1 tuple = entity as SerializableTuple1;
     final String incoming = tuple.item1;
 
     _updateInnerHtmlTrusted(incoming, false);
   }
 
-  void ngOnInit() => _initStreams();
+  @override void ngOnInit() => _initStreams();
 
-  void ngAfterViewInit() {
+  @override void ngAfterViewInit() {
     _container = _findEditableElement(element.nativeElement);
 
     _updateInnerHtmlTrusted(model, false);
@@ -206,7 +206,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     if (tuple.item2.style != null) {
       final List<String> styleParts = <String>[];
 
-      tuple.item2.style.forEach((String K, String V) => styleParts.add('${K}:${V}'));
+      tuple.item2.style.forEach((String K, String V) => styleParts.add('$K:$V'));
 
       buffer.write(' style="${styleParts.join(';')}"');
     }

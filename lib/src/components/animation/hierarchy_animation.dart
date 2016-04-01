@@ -47,7 +47,7 @@ class HierarchyAnimation extends Tween implements OnInit {
 
   HierarchyAnimation(@Inject(AnimationBuilder) AnimationBuilder animationBuilder, @Inject(ElementRef) ElementRef element) : super(animationBuilder, element);
 
-  void ngOnInit() {
+  @override void ngOnInit() {
     nativeElement.style.visibility = 'hidden';
     nativeElement.style.position = 'absolute';
 

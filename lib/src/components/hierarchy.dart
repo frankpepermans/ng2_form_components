@@ -1,7 +1,6 @@
 library ng2_form_components.components.hierarchy;
 
 import 'dart:async' show StreamController, StreamSubscription, Stream, Completer;
-import 'dart:math' show Random;
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
 import 'package:dorm/dorm.dart' show Entity;
@@ -97,7 +96,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   @override @Output() Stream<bool> get scrolledToBottom => super.scrolledToBottom;
   @override @Output() Stream<ItemRendererEvent> get itemRendererEvent => super.itemRendererEvent;
 
-  StreamController get beforeDestroyChild => _beforeDestroyChild$ctrl;
+  @override StreamController get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
   //-----------------------------
   // private properties
@@ -137,7 +136,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   // ng2 life cycle
   //-----------------------------
 
-  Stream<Entity> provideState() {
+  @override Stream<Entity> provideState() {
     final Stream<SerializableTuple1<int>> scroll$ = super.provideState();
 
     return new rx.Observable.combineLatest([
@@ -152,7 +151,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     }, asBroadcastStream: true) as Stream<Entity>;
   }
 
-  void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>> tuple = entity as SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>;
 
     super.receiveState(new SerializableTuple1<int>()
@@ -166,7 +165,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     changeDetector.markForCheck();
   }
 
-  Stream<int> ngBeforeDestroyChild([List args]) async* {
+  @override Stream<int> ngBeforeDestroyChild([List args]) async* {
     final Completer<int> completer = new Completer<int>();
 
     beforeDestroyChild.add(args.first);

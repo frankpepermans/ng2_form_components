@@ -61,14 +61,14 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
   // ng2 life cycle
   //-----------------------------
 
-  Stream<Entity> provideState() {
+  @override Stream<Entity> provideState() {
     return new rx.Observable<SerializableTuple2<String, bool>>.merge([
       _input$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = false),
       _action$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = true)
     ]) as Stream<Entity>;
   }
 
-  void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple2<String, bool> tuple = entity as SerializableTuple2<String, bool>;
 
     inputValue = tuple.item1;
@@ -78,7 +78,7 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
     changeDetector.markForCheck();
   }
 
-  void ngOnChanges(Map<String, SimpleChange> changes) {
+  @override void ngOnChanges(Map<String, SimpleChange> changes) {
     if (changes.containsKey('actionContainerClassName')) actionContainerClassMap = <String, bool>{actionContainerClassName: true};
 
     if (changes.containsKey('actionIconClassName')) actionIconClassMap = <String, bool>{actionIconClassName: true};

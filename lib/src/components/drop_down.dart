@@ -76,7 +76,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   @Output() Stream<Iterable<ListItem<T>>> get selectedItemsChanged => _selectedItems$ctrl.stream
     .distinct(_distinctSelectedItems);
 
-  StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
+  @override StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
   //-----------------------------
   // private properties
@@ -112,7 +112,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   // ng2 life cycle
   //-----------------------------
 
-  Stream<Entity> provideState() {
+  @override Stream<Entity> provideState() {
     return new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest([
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(<Iterable<ListItem<T>>>[selectedItems]),
@@ -124,7 +124,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
       ..item2 = items) as Stream<Entity>;
   }
 
-  void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple2<bool, Iterable<ListItem<T>>> tuple = entity as SerializableTuple2<bool, Iterable<ListItem<T>>>;
 
     _selectedItems$ctrl.add(tuple.item2);
@@ -134,7 +134,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     selectedItems = tuple.item2;
   }
 
-  void ngOnChanges(Map<String, SimpleChange> changes) {
+  @override void ngOnChanges(Map<String, SimpleChange> changes) {
     if (changes.containsKey('headerLabel')) {
       _headerLabel$ctrl.add(headerLabel);
       _selectedItems$ctrl.add(const []);
@@ -143,11 +143,11 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     if (changes.containsKey('selectedItems')) _selectedItems$ctrl.add(selectedItems);
   }
 
-  void ngAfterViewInit() {
+  @override void ngAfterViewInit() {
     FormComponent.openFormComponents.add(this);
   }
 
-  Stream<bool> ngBeforeDestroyChild([List args]) async* {
+  @override Stream<bool> ngBeforeDestroyChild([List args]) async* {
     final Completer<bool> completer = new Completer<bool>();
 
     beforeDestroyChild.stream

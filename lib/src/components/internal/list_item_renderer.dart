@@ -50,7 +50,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit {
   // ng2 life cycle
   //-----------------------------
 
-  void ngAfterViewInit() {
+  @override void ngAfterViewInit() {
     dynamicComponentLoader.loadIntoLocation(renderType, elementRef, 'renderType', Injector.resolve(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),

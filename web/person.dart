@@ -5,7 +5,7 @@ import 'package:dorm/dorm.dart';
 @Ref('domain.person')
 class Person extends Entity implements Comparable {
 
-  String get refClassName => 'domain.person';
+  @override String get refClassName => 'domain.person';
 
   @Property(NAME_SYMBOL, 'name', String, 'name')
   static const String NAME = 'name';
@@ -23,7 +23,7 @@ class Person extends Entity implements Comparable {
 
   static Person construct() => new Person();
 
-  int compareTo(Person other) {
+  @override int compareTo(Person other) {
     if (other != null) return (other.name.compareTo(name) == 0 && other.image.compareTo(image) == 0) ? 0 : 1;
 
     return -1;

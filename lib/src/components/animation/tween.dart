@@ -40,7 +40,7 @@ class Tween implements OnInit {
     cssAnimationBuilder = animationBuilder.css();
   }
 
-  void ngOnInit() {
+  @override void ngOnInit() {
     nativeElement.style.visibility = 'hidden';
 
     window.animationFrame.whenComplete(tweenOpen);
