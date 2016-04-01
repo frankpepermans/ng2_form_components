@@ -76,9 +76,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   void ngOnInit() => _initStreams();
 
   void ngAfterViewInit() {
-    final Element ng2element = element.nativeElement;
-
-    _container = ng2element.childNodes.firstWhere((Node childNode) => (childNode is Element && childNode.contentEditable == 'true'), orElse: () => null);
+    _container = _findEditableElement(element.nativeElement);
 
     _updateInnerHtmlTrusted(model, false);
   }
@@ -225,5 +223,24 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     buffer.write(oldContent.substring(endOffset));
 
     return buffer.toString();
+  }
+
+  Element _findEditableElement(Element element) {
+    element.childNodes.firstWhere((Node childNode) => (childNode is Element && childNode.contentEditable == 'true'), orElse: () => null);
+
+    for (int i=0, len=element.childNodes.length; i<len; i++) {
+      Node childNode = element.childNodes[i];
+      bool isElement = childNode is Element;
+
+      if (isElement && (childNode as Element).contentEditable == 'true') return childNode;
+
+      if (isElement) {
+        Element childElement = _findEditableElement(childNode);
+
+        if (childElement != null) return childElement;
+      }
+    }
+
+    return null;
   }
 }
