@@ -24,4 +24,11 @@
     border: 1px solid #aaa;
     padding: 10px;
     margin: 10px;
+    -moz-appearance: textfield;
+    -webkit-appearance: textfield;
+    background-color: white;
+    background-color: -moz-field;
+    border: 1px solid darkgray;
+    box-shadow: 1px 1px 1px 0 lightgray inset;
+    font: -moz-field;
 }
