@@ -248,4 +248,8 @@ class AppComponent {
   String listItemsAToString(List<ListItem<String>> items) => items.map((ListItem<String> item) => labelHandler(item.data)).join(', ');
 
   String listItemsBToString(List<ListItem<domain.Person>> items) => items.map((ListItem<domain.Person> item) => personLabelHandler(item.data)).join(', ');
+
+  void handleRange(bool hasRange) {
+    print(hasRange);
+  }
 }

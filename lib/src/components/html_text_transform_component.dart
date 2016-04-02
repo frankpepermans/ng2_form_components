@@ -122,24 +122,14 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       .map(_transformContent)
       .where((String result) => result != null)
       .listen(_updateInnerHtmlTrusted, onError: (e) => print('error: $e')) as StreamSubscription<String>;
-
-    _hasRangeSubscription = _range$
-      .map((Range range) {
-        if (range == null) return false;
-
-        return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
-      })
-      .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
   }
 
   void onBlur(FocusEvent event) {
     _container.removeEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription.cancel();
-    _hasRangeSubscription.cancel();
 
     _range$subscription = null;
-    _hasRangeSubscription = null;
   }
 
   //-----------------------------
@@ -170,15 +160,23 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         }
 
         return (ranges.isNotEmpty) ? ranges.first : null;
-      })
-      .where((Range range) => range != null)
-      .distinct(_areSameRanges) as rx.Observable<Range>;
+      }) as rx.Observable<Range>;
 
     _rangeTransform$ = _range$
+      .where((Range range) => range != null)
+      .distinct(_areSameRanges)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
       ) as rx.Observable<Tuple2<Range, HTMLTextTransformation>>;
+
+    _hasRangeSubscription = _range$
+      .map((Range range) {
+        if (range == null) return false;
+
+        return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
+      })
+      .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
   }
 
   bool _areSameRanges(Range rangeA, Range rangeB) => (
