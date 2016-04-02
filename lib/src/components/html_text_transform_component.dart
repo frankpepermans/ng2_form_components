@@ -158,7 +158,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     _range$ = new rx.Observable.merge([
       document.onMouseUp,
       document.onKeyUp
-    ])
+    ], asBroadcastStream: true)
       .map((_) => window.getSelection())
       .map((Selection selection) {
         final List<Range> ranges = <Range>[];
