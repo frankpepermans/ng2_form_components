@@ -34,12 +34,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   //-----------------------------
 
   @Output() Stream<String> get transformation => _modelTransformation$ctrl.stream;
-  @Output() rx.Observable<bool> get hasSelectedRange => _range$
-    .map((Range range) {
-      if (range == null) return false;
-
-      return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
-    }) as rx.Observable<bool>;
+  @Output() Stream<bool> get hasSelectedRange => _hasSelectedRange$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -48,9 +43,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   rx.Observable<Range> _range$;
   rx.Observable<Tuple2<Range, HTMLTextTransformation>> _rangeTransform$;
   StreamSubscription<String> _range$subscription;
+  StreamSubscription<bool> _hasRangeSubscription;
 
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
+  final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
 
   String _lastProcessedRangeValue;
   Element _container;
@@ -94,6 +91,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     _isDestroyCalled = true;
 
     _range$subscription?.cancel();
+    _hasRangeSubscription?.cancel();
   }
 
   //-----------------------------
@@ -124,12 +122,24 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       .map(_transformContent)
       .where((String result) => result != null)
       .listen(_updateInnerHtmlTrusted, onError: (e) => print('error: $e')) as StreamSubscription<String>;
+
+    _hasRangeSubscription = _range$
+      .map((Range range) {
+        if (range == null) return false;
+
+        return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
+      })
+      .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
   }
 
   void onBlur(FocusEvent event) {
     _container.removeEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription.cancel();
+    _hasRangeSubscription.cancel();
+
+    _range$subscription = null;
+    _hasRangeSubscription = null;
   }
 
   //-----------------------------
