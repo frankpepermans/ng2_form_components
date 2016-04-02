@@ -35,7 +35,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   @Output() Stream<String> get transformation => _modelTransformation$ctrl.stream;
   @Output() rx.Observable<bool> get hasSelectedRange => _range$
-    .map((Range range) => ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true) as rx.Observable<bool>;
+    .map((Range range) {
+      if (range == null) return false;
+
+      return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
+    }) as rx.Observable<bool>;
 
   //-----------------------------
   // private properties
