@@ -30,6 +30,9 @@ export 'src/components/hierarchy.dart'
 export 'src/components/item_renderers/default_list_item_renderer.dart'
   show DefaultListItemRenderer;
 
+export 'src/components/internal/list_item_renderer.dart'
+    show IsSelectedHandler, GetHierarchyOffsetHandler;
+
 export 'src/components/item_renderers/default_hierarchy_list_item_renderer.dart'
     show DefaultHierarchyListItemRenderer;
 
