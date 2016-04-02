@@ -33,7 +33,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   // output
   //-----------------------------
 
-  @Output() Stream get transformation => _modelTransformation$ctrl.stream;
+  @Output() Stream<String> get transformation => _modelTransformation$ctrl.stream;
+  @Output() rx.Observable<bool> get hasSelectedRange => _range$
+    .map((Range range) => ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true) as rx.Observable<bool>;
 
   //-----------------------------
   // private properties
@@ -82,6 +84,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   @override void ngOnDestroy() {
     super.ngOnDestroy();
+
+    _container.removeEventListener('DOMSubtreeModified', _contentModifier);
 
     _isDestroyCalled = true;
 
@@ -203,12 +207,25 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     if (tuple.item2.id != null) buffer.write(' id="${tuple.item2.id}"');
 
+    if (tuple.item2.className != null) buffer.write(' class="${tuple.item2.className}"');
+
     if (tuple.item2.style != null) {
       final List<String> styleParts = <String>[];
 
       tuple.item2.style.forEach((String K, String V) => styleParts.add('$K:$V'));
 
       buffer.write(' style="${styleParts.join(';')}"');
+    }
+
+    if (tuple.item2.attributes != null) {
+      final List<String> attributes = <String>[];
+
+      tuple.item2.attributes.forEach((String K, String V) {
+        if (V == null || V.toLowerCase() == 'true') attributes.add(K);
+        else attributes.add('$K="$V"');
+      });
+
+      buffer.write(' ${attributes.join(' ')}');
     }
 
     buffer.write('>');
