@@ -158,7 +158,19 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       ..item1 = tuple.item1, phase);
 
     if (level == 0) tuple.item2.forEach(handleSelection);
-    else tuple.item2.forEach((ListItem<T> listItem) => listRendererService.triggerSelection(listItem));
+    else tuple.item2.forEach((ListItem<T> listItem) {
+      listRendererService.rendererSelection$
+          .take(1)
+          .listen((_) {
+        listRendererService.triggerEvent(new ItemRendererEvent<bool, T>(
+            'selection',
+            listItem,
+            true)
+        );
+      });
+
+      listRendererService.triggerSelection(listItem);
+    });
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
