@@ -159,10 +159,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
     if (level == 0) tuple.item2.forEach(handleSelection);
     else tuple.item2.forEach((ListItem<T> listItem) {
-      listRendererService.rendererSelection$
-        .take(1)
-        .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
-        .listen(handleRendererEvent);
+      handleRendererEvent(new ItemRendererEvent<bool, T>('selection', listItem, true));
 
       listRendererService.triggerSelection(listItem);
     });
