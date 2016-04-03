@@ -157,7 +157,16 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    tuple.item2.forEach(listRendererService.triggerSelection);
+    if (level == 0) tuple.item2.forEach(handleSelection);
+    else tuple.item2.forEach((ListItem<T> listItem) {
+      listRendererService.rendererSelection$
+        .take(1)
+        .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
+        .listen(handleRendererEvent);
+
+      listRendererService.triggerSelection(listItem);
+    });
+
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
     _openListItems$Ctrl.add(tuple.item3);
