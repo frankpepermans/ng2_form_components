@@ -1,6 +1,6 @@
 library ng2_form_components.components.hierarchy;
 
-import 'dart:async' show StreamController, StreamSubscription, Stream, Completer;
+import 'dart:async';
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
 import 'package:dorm/dorm.dart' show Entity;
@@ -158,11 +158,18 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       ..item1 = tuple.item1, phase);
 
     if (level == 0) tuple.item2.forEach(handleSelection);
-    else tuple.item2.forEach((ListItem<T> listItem) {
-      handleRendererEvent(new ItemRendererEvent<bool, T>('selection', listItem, true));
+    else {
+      new Timer(const Duration(milliseconds: 100), () {
+        tuple.item2.forEach((ListItem<T> listItem) {
+          rx.observable(listRendererService.rendererSelection$)
+            .take(1)
+            .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
+            .listen(handleRendererEvent);
 
-      listRendererService.triggerSelection(listItem);
-    });
+          listRendererService.triggerSelection(listItem);
+        });
+      });
+    }
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 

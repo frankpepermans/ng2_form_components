@@ -82,6 +82,8 @@ class AppComponent {
     stateService.stateName = 'ng2-form-components';
     fakeData = _generateRandomServiceData().toList(growable: false);
 
+    stateService.init();
+
     ListItem<String> rootA = new ListItem<String>()
       ..data = 'apples'
       ..container = ''
