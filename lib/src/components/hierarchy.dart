@@ -104,7 +104,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   final Map<ListItem<T>, List<ListItem<T>>> _resolvedChildren = <ListItem<T>, List<ListItem<T>>>{};
 
-  final StreamController<Hierarchy> _childHierarchies$ctrl = new StreamController<Hierarchy>.broadcast();
+  final StreamController<Tuple2<Hierarchy, bool>> _childHierarchies$ctrl = new StreamController<Tuple2<Hierarchy, bool>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearChildHierarchies$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
   final StreamController<List<Hierarchy>> _childHierarchyList$ctrl = new StreamController<List<Hierarchy>>.broadcast();
   final StreamController<Map<Hierarchy, List<ListItem>>> _selection$Ctrl = new StreamController<Map<Hierarchy, List<ListItem>>>.broadcast();
@@ -215,34 +215,22 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     ], (List<Hierarchy> childHierarchies, ClearSelectionWhereHandler handler) => new Tuple2<List<Hierarchy>, ClearSelectionWhereHandler>(childHierarchies, handler))
       .listen((Tuple2<List<Hierarchy>, ClearSelectionWhereHandler> tuple) => tuple.item1.forEach((Hierarchy childHierarchy) => childHierarchy.clearSelection(tuple.item2))) as StreamSubscription<Tuple2<List<Hierarchy>, ClearSelectionWhereHandler>>;
 
-    _registerChildHierarchySubscription = new rx.Observable<Tuple2<Hierarchy, List<Hierarchy>>>.zip([
+    _registerChildHierarchySubscription = new rx.Observable<Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>>>.zip([
       _childHierarchies$ctrl.stream,
       _childHierarchyList$ctrl.stream
-    ], (Hierarchy childHierarchy, List<Hierarchy> hierarchies) {
+    ], (Tuple2<Hierarchy, bool> childHierarchy, List<Hierarchy> hierarchies) {
       final List<Hierarchy> clone = hierarchies.toList();
 
-      if (childHierarchy != null) clone.add(childHierarchy);
+      if (childHierarchy.item2) clone.add(childHierarchy.item1);
+      else clone.remove(childHierarchy.item1);
 
-      return new Tuple2<Hierarchy, List<Hierarchy>>(childHierarchy, new List<Hierarchy>.unmodifiable(clone));
+      return new Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>>(childHierarchy, new List<Hierarchy>.unmodifiable(clone));
     })
+      .where((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => tuple.item1.item2)
+      .map((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => new Tuple2<Hierarchy, List<Hierarchy>>(tuple.item1.item1, tuple.item2))
       .tap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
-      .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) {
-        if (tuple.item1 != null) {
-          return tuple.item1.onDestroy.take(1).map((_) => tuple);
-        } else {
-          return new Stream<Tuple2<Hierarchy, List<Hierarchy>>>.fromFuture(new Future<Tuple2<Hierarchy, List<Hierarchy>>>.value(tuple));
-        }
-      })
-      .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) {
-        if (tuple.item1 != null) {
-          final List<Hierarchy> clone = tuple.item2.toList();
-
-          clone.remove(tuple.item1);
-
-          _childHierarchies$ctrl.add(null);
-          _childHierarchyList$ctrl.add(clone);
-        }
-      }) as StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>>;
+      .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))
+      .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false))) as StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>>;
 
     _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem>>>.zip([
       rx.observable(_selection$Ctrl.stream).startWith(internalSelectedItems as List<ListItem<T>>),
@@ -351,7 +339,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   void handleRendererEvent(ItemRendererEvent<dynamic, Comparable> event) {
-    if (event.type == 'childRegistry') _childHierarchies$ctrl.add(event.data);
+    if (event.type == 'childRegistry') _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(event.data, true));
 
     if (!allowMultiSelection && event.type == 'selection') {
       clearSelection((ListItem listItem) => listItem != event.listItem);
