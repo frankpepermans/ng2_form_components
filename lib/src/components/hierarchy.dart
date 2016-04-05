@@ -226,9 +226,9 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
       return new Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>>(childHierarchy, new List<Hierarchy>.unmodifiable(clone));
     })
+      .tap((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
       .where((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => tuple.item1.item2)
       .map((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => new Tuple2<Hierarchy, List<Hierarchy>>(tuple.item1.item1, tuple.item2))
-      .tap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
       .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))
       .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false))) as StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>>;
 
