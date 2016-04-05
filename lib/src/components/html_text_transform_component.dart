@@ -198,7 +198,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     int startOffset = -1, endOffset = -1;
 
     range.extractContents();
-    range.insertNode(document.body.createFragment('|', treeSanitizer: NodeTreeSanitizer.trusted));
+    range.insertNode(new Element.tag('section'));
 
     final String newContent = _container.innerHtml;
 
