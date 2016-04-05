@@ -195,16 +195,27 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     final StringBuffer buffer = new StringBuffer();
     final Range range = tuple.item1;
     final String oldContent = model;
+    final int openTagUnit = '<'.codeUnitAt(0);
+    final int closeTagUnit = '>'.codeUnitAt(0);
     int startOffset = -1, endOffset = -1;
+    int oldUnit, newUnit;
+    int lastOpenUnit = -1;
 
     range.extractContents();
-    range.insertNode(new Element.tag('section'));
+    range.insertNode(document.body.createFragment('|', treeSanitizer: NodeTreeSanitizer.trusted));
 
     final String newContent = _container.innerHtml;
 
     for (int i=0, len=oldContent.length; i<len; i++) {
-      if (startOffset == -1 && oldContent.codeUnitAt(i) != newContent.codeUnitAt(i)) {
-        startOffset = i;
+      if (startOffset == -1) {
+        oldUnit = oldContent.codeUnitAt(i);
+
+        if (oldUnit == openTagUnit) lastOpenUnit = i;
+        else if (oldUnit == closeTagUnit) lastOpenUnit = -1;
+
+        newUnit = newContent.codeUnitAt(i);
+
+        startOffset = (lastOpenUnit == -1) ? i : lastOpenUnit;
       }
 
       if (endOffset == -1 && oldContent.codeUnitAt(oldContent.length - i - 1) != newContent.codeUnitAt(newContent.length - i - 1)) {
@@ -244,7 +255,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     buffer.write(oldContent.substring(startOffset, endOffset));
     buffer.write('</${tuple.item2.tag}>');
     buffer.write(oldContent.substring(endOffset));
-
+    print(oldContent.substring(startOffset, endOffset));
     return buffer.toString();
   }
 

@@ -221,18 +221,27 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     ], (Hierarchy childHierarchy, List<Hierarchy> hierarchies) {
       final List<Hierarchy> clone = hierarchies.toList();
 
-      clone.add(childHierarchy);
+      if (childHierarchy != null) clone.add(childHierarchy);
 
       return new Tuple2<Hierarchy, List<Hierarchy>>(childHierarchy, new List<Hierarchy>.unmodifiable(clone));
     })
       .tap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
-      .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))
+      .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) {
+        if (tuple.item1 != null) {
+          return tuple.item1.onDestroy.take(1).map((_) => tuple);
+        } else {
+          return new Stream<Tuple2<Hierarchy, List<Hierarchy>>>.fromFuture(new Future<Tuple2<Hierarchy, List<Hierarchy>>>.value(tuple));
+        }
+      })
       .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) {
-        final List<Hierarchy> clone = tuple.item2.toList();
+        if (tuple.item1 != null) {
+          final List<Hierarchy> clone = tuple.item2.toList();
 
-        clone.remove(tuple.item1);
+          clone.remove(tuple.item1);
 
-        _childHierarchyList$ctrl.add(clone);
+          _childHierarchies$ctrl.add(null);
+          _childHierarchyList$ctrl.add(clone);
+        }
       }) as StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>>;
 
     _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem>>>.zip([
