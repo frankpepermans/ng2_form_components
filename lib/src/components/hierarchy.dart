@@ -239,8 +239,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       rx.observable(_selection$Ctrl.stream).startWith(internalSelectedItems as List<ListItem<T>>),
       rx.observable(_childHierarchyList$ctrl.stream)
         .flatMapLatest((List<Hierarchy> hierarchies) => new rx.Observable.merge((new List<Hierarchy>.from(hierarchies)..add(this))
-            .map((Hierarchy hierarchy) => hierarchy.internalSelectedItemsChanged
-              .map((List<ListItem> selectedItems) => new Tuple2<Hierarchy, List<ListItem>>(hierarchy, selectedItems)))))
+          .map((Hierarchy hierarchy) => hierarchy.internalSelectedItemsChanged
+            .map((List<ListItem> selectedItems) => new Tuple2<Hierarchy, List<ListItem>>(hierarchy, selectedItems)))))
     ], (Map<Hierarchy, List<ListItem>> selectedItems, Tuple2<Hierarchy, List<ListItem>> tuple) {
       if (tuple.item1.stateGroup != null && tuple.item1.stateGroup.isNotEmpty && tuple.item1.stateId != null && tuple.item1.stateId.isNotEmpty) {
         Hierarchy match;
