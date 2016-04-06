@@ -15,8 +15,6 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 )
 class HierarchyAnimation extends Tween implements OnInit {
 
-  static final Map<String, bool> _hasOpenedRegistry = <String, bool>{};
-
   @override @Input() void set duration(int value) {
     super.duration = value;
   }
@@ -58,9 +56,7 @@ class HierarchyAnimation extends Tween implements OnInit {
       @Inject(ElementRef) ElementRef element) : super(animationBuilder, element);
 
   @override void ngOnInit() {
-    if (forceAnimateOnOpen) _hasOpenedRegistry['${index}_${level}'] = true;
-
-    if (_hasOpenedRegistry.containsKey('${index}_${level}')) {
+    if (forceAnimateOnOpen) {
       nativeElement.style.visibility = 'hidden';
       nativeElement.style.position = 'absolute';
 
