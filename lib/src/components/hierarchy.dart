@@ -120,6 +120,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   Stream<List<ListItem>> _selection$;
 
+  bool forceAnimateOnOpen = false;
+
   //-----------------------------
   // constructor
   //-----------------------------
@@ -293,6 +295,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     final List<ListItem<T>> openItems = <ListItem<T>>[];
     final Map<ListItem<T>, bool> clone = <ListItem<T>, bool>{};
     ListItem<T> match;
+
+    forceAnimateOnOpen = true;
 
     _isOpenMap.forEach((ListItem<T> item, bool isOpen) => clone[item] = isOpen);
 

@@ -15,6 +15,8 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 )
 class HierarchyAnimation extends Tween implements OnInit {
 
+  static final Map<String, bool> _hasOpenedRegistry = <String, bool>{};
+
   @override @Input() void set duration(int value) {
     super.duration = value;
   }
@@ -39,23 +41,35 @@ class HierarchyAnimation extends Tween implements OnInit {
     _level = value;
   }
 
+  bool _forceAnimateOnOpen = false;
+  bool get forceAnimateOnOpen => _forceAnimateOnOpen;
+  @Input() void set forceAnimateOnOpen(bool value) {
+    _forceAnimateOnOpen = value;
+  }
+
   static List<HierarchyAnimation> animations = <HierarchyAnimation>[];
 
   final StreamController<num> _animation$ctrl = new StreamController<num>.broadcast();
 
   bool _animationBegan = false;
 
-  HierarchyAnimation(@Inject(AnimationBuilder) AnimationBuilder animationBuilder, @Inject(ElementRef) ElementRef element) : super(animationBuilder, element);
+  HierarchyAnimation(
+      @Inject(AnimationBuilder) AnimationBuilder animationBuilder,
+      @Inject(ElementRef) ElementRef element) : super(animationBuilder, element);
 
   @override void ngOnInit() {
-    nativeElement.style.visibility = 'hidden';
-    nativeElement.style.position = 'absolute';
+    if (forceAnimateOnOpen || _hasOpenedRegistry.containsKey('${index}_${level}')) {
+      nativeElement.style.visibility = 'hidden';
+      nativeElement.style.position = 'absolute';
 
-    window.animationFrame.whenComplete(tweenOpen);
+      window.animationFrame.whenComplete(tweenOpen);
 
-    animations.add(this);
+      animations.add(this);
 
-    _nextAnimationFrame();
+      _nextAnimationFrame();
+    } else {
+      _hasOpenedRegistry['${index}_${level}'] = true;
+    }
 
     if (beforeDestroyChildTrigger != null) beforeDestroyChildTrigger.stream
       .where((int index) => index == this.index)
