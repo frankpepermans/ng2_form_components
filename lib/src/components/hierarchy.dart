@@ -42,6 +42,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   @override @Input() void set dataProvider(List<ListItem<T>> value) {
+    forceAnimateOnOpen = false;
+
     super.dataProvider = value;
   }
 
