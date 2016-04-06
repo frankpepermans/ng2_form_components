@@ -42,7 +42,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   rx.Observable<Range> _range$;
   rx.Observable<Tuple2<Range, HTMLTextTransformation>> _rangeTransform$;
-  StreamSubscription<String> _range$subscription;
+  StreamSubscription<Tuple2<Range, HTMLTextTransformation>> _range$subscription;
   StreamSubscription<bool> _hasRangeSubscription;
 
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
@@ -119,9 +119,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
         return true;
       })
-      .map(_transformContent)
-      .where((String result) => result != null)
-      .listen(_updateInnerHtmlTrusted, onError: (e) => print('error: $e')) as StreamSubscription<String>;
+      .listen(_transformContent) as StreamSubscription<Tuple2<Range, HTMLTextTransformation>>;
   }
 
   void onBlur(FocusEvent event) {
@@ -194,38 +192,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   String _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
     final StringBuffer buffer = new StringBuffer();
     final Range range = tuple.item1;
-    final String oldContent = model;
-    final int openTagUnit = '<'.codeUnitAt(0);
-    final int closeTagUnit = '>'.codeUnitAt(0);
-    int startOffset = -1, endOffset = -1;
-    int oldUnit, newUnit;
-    int lastOpenUnit = -1;
 
-    range.extractContents();
-    range.insertNode(document.body.createFragment('|', treeSanitizer: NodeTreeSanitizer.trusted));
+    final DocumentFragment extractedContent = range.extractContents();
 
-    final String newContent = _container.innerHtml;
-
-    for (int i=0, len=oldContent.length; i<len; i++) {
-      if (startOffset == -1) {
-        oldUnit = oldContent.codeUnitAt(i);
-
-        if (oldUnit == openTagUnit) lastOpenUnit = i;
-        else if (oldUnit == closeTagUnit) lastOpenUnit = -1;
-
-        newUnit = newContent.codeUnitAt(i);
-
-        startOffset = (lastOpenUnit == -1) ? i : lastOpenUnit;
-      }
-
-      if (endOffset == -1 && oldContent.codeUnitAt(oldContent.length - i - 1) != newContent.codeUnitAt(newContent.length - i - 1)) {
-        endOffset = oldContent.length - i;
-      }
-
-      if (startOffset >= 0 && endOffset >= 0) break;
-    }
-
-    buffer.write(oldContent.substring(0, startOffset));
     buffer.write('<${tuple.item2.tag}');
 
     if (tuple.item2.id != null) buffer.write(' id="${tuple.item2.id}"');
@@ -252,10 +221,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     }
 
     buffer.write('>');
-    buffer.write(oldContent.substring(startOffset, endOffset));
+    buffer.write(extractedContent.innerHtml);
     buffer.write('</${tuple.item2.tag}>');
-    buffer.write(oldContent.substring(endOffset));
-    print(oldContent.substring(startOffset, endOffset));
+
+    range.insertNode(new DocumentFragment.html(buffer.toString(), treeSanitizer: NodeTreeSanitizer.trusted));
+
     return buffer.toString();
   }
 
