@@ -58,7 +58,9 @@ class HierarchyAnimation extends Tween implements OnInit {
       @Inject(ElementRef) ElementRef element) : super(animationBuilder, element);
 
   @override void ngOnInit() {
-    if (forceAnimateOnOpen || _hasOpenedRegistry.containsKey('${index}_${level}')) {
+    if (forceAnimateOnOpen) _hasOpenedRegistry['${index}_${level}'] = true;
+
+    if (_hasOpenedRegistry.containsKey('${index}_${level}')) {
       nativeElement.style.visibility = 'hidden';
       nativeElement.style.position = 'absolute';
 
@@ -67,8 +69,6 @@ class HierarchyAnimation extends Tween implements OnInit {
       animations.add(this);
 
       _nextAnimationFrame();
-    } else {
-      _hasOpenedRegistry['${index}_${level}'] = true;
     }
 
     if (beforeDestroyChildTrigger != null) beforeDestroyChildTrigger.stream
