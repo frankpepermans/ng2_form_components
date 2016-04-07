@@ -78,9 +78,9 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _level = value;
   }
 
-  List<ListItem<T>> _hierarchySelectedItems;
-  List<ListItem<T>> get hierarchySelectedItems => _hierarchySelectedItems;
-  @Input() void set hierarchySelectedItems(List<ListItem<T>> value) {
+  List<ListItem<Comparable>> _hierarchySelectedItems;
+  List<ListItem<Comparable>> get hierarchySelectedItems => _hierarchySelectedItems;
+  @Input() void set hierarchySelectedItems(List<ListItem<Comparable>> value) {
     _hierarchySelectedItems = value;
   }
 
@@ -168,7 +168,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    _delegateSelectedItems(tuple.item2);
+    _processIncomingSelectedState(tuple.item2);
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
@@ -198,9 +198,10 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.ngOnChanges(changes);
 
     if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null) {
-      _delegateSelectedItems(hierarchySelectedItems);
-
-      changeDetector.markForCheck();
+      hierarchySelectedItems.forEach((ListItem<Comparable> listItem) => listRendererService.triggerEvent(new ItemRendererEvent<bool, Comparable>(
+        'selection',
+        listItem,
+        true)));
     }
   }
 
@@ -278,7 +279,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _selection$Ctrl.add(<Hierarchy, List<ListItem>>{});
   }
 
-  void _delegateSelectedItems(List<ListItem<T>> selectedItems) {
+  void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
     if (level == 0) selectedItems.forEach(handleSelection);
     else {
       //TODO: do this after a change detection has occurred instead
