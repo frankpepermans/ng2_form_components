@@ -78,11 +78,11 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _level = value;
   }
 
-  List<ListItem<Comparable>> _hierarchySelectedItems;
+  /*List<ListItem<Comparable>> _hierarchySelectedItems;
   List<ListItem<Comparable>> get hierarchySelectedItems => _hierarchySelectedItems;
   @Input() void set hierarchySelectedItems(List<ListItem<Comparable>> value) {
     _hierarchySelectedItems = value;
-  }
+  }*/
 
   ResolveChildrenHandler _resolveChildrenHandler;
   ResolveChildrenHandler get resolveChildrenHandler => _resolveChildrenHandler;
@@ -192,17 +192,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     await completer.future;
 
     yield args.first;
-  }
-
-  @override void ngOnChanges(Map<String, SimpleChange> changes) {
-    super.ngOnChanges(changes);
-
-    if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null) {
-      hierarchySelectedItems.forEach((ListItem<Comparable> listItem) => listRendererService.triggerEvent(new ItemRendererEvent<bool, Comparable>(
-        'selection',
-        listItem,
-        true)));
-    }
   }
 
   @override void ngOnDestroy() {
