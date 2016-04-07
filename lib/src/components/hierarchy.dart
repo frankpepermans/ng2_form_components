@@ -29,7 +29,8 @@ typedef Type ResolveRendererHandler(int level);
 @Component(
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
-    directives: const [State, Hierarchy, HierarchyAnimation, ListItemRenderer, NgClass]
+    directives: const [State, Hierarchy, HierarchyAnimation, ListItemRenderer, NgClass],
+    changeDetection: ChangeDetectionStrategy.OnPush
 )
 class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
 

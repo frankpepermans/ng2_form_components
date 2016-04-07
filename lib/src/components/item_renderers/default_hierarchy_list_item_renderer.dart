@@ -19,7 +19,8 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
         <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelHandler(listItem.data)}}</label>
         <i *ngIf="isSelected(listItem)" class="fa fa-check" style="float:right"></i>
       </div>
-    '''
+    ''',
+    changeDetection: ChangeDetectionStrategy.OnPush
 )
 class DefaultHierarchyListItemRenderer<T extends Comparable> implements DynamicListItemRenderer {
 

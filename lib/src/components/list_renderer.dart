@@ -58,7 +58,8 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
     directives: const [ListItemRenderer, NgClass],
-    pipes: const [SelectedItemsPipe, UnselectedItemsPipe]
+    pipes: const [SelectedItemsPipe, UnselectedItemsPipe],
+    changeDetection: ChangeDetectionStrategy.OnPush
 )
 class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
 

@@ -17,7 +17,8 @@ typedef void TextInputAction(String inputValue);
 @Component(
     selector: 'text-input',
     templateUrl: 'text_input.html',
-    directives: const [NgClass, NgIf]
+    directives: const [NgClass, NgIf],
+    changeDetection: ChangeDetectionStrategy.OnPush
 )
 class TextInput<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy {
 

@@ -16,7 +16,8 @@ import 'package:ng2_form_components/src/components/helpers/html_text_transformat
 
 @Component(
   selector: 'html-text-transform-component',
-  templateUrl: 'html_text_transform_component.html'
+  templateUrl: 'html_text_transform_component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 )
 class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, OnInit, AfterViewInit {
 
