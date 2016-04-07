@@ -259,13 +259,13 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       if (_scrollPositionSubscription != null) _scrollPositionSubscription.cancel();
 
       _scrollPositionSubscription = rx.observable(scrollPane.onScroll)
-          .map((_) => scrollPane.scrollTop)
-          .tap(_scroll$ctrl.add)
-          .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.scrollHeight, scrollTop >= scrollPane.scrollHeight - scrollPane.clientHeight - 20))
-          .where((Tuple2<int, bool> tuple) => tuple.item2)
-          .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
-          .map((Tuple2<int, bool> tuple) => tuple.item2)
-          .listen(_scrolledToBottom$ctrl.add) as StreamSubscription<bool>;
+        .map((_) => scrollPane.scrollTop)
+        .tap(_scroll$ctrl.add)
+        .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.scrollHeight, scrollTop >= scrollPane.scrollHeight - scrollPane.clientHeight - 20))
+        .where((Tuple2<int, bool> tuple) => tuple.item2)
+        .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
+        .map((Tuple2<int, bool> tuple) => tuple.item2)
+        .listen(_scrolledToBottom$ctrl.add) as StreamSubscription<bool>;
     }
   }
 
@@ -317,6 +317,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       final int scrollTop = math.min(scrollPane.scrollHeight - scrollPane.clientHeight, _pendingScrollTop);
 
       scrollPane.scrollTop = scrollTop;
+
+      changeDetector.markForCheck();
 
       if (scrollPane.scrollTop != _pendingScrollTop) _nextAnimationFrame();
     });
