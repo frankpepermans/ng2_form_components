@@ -273,6 +273,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _internalSelectedItemsSubscription = _selectedItems$ctrl.stream.listen((Iterable<ListItem<T>> items) {
       internalSelectedItems = items;
 
+      listRendererService.respondEvents(<ListRendererEvent<Iterable<ListItem<T>>, Comparable>>[new ListRendererEvent<Iterable<ListItem<T>>, Comparable>('selectionChanged', null, items)]);
+
       changeDetector.markForCheck();
     });
 

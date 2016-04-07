@@ -1,5 +1,7 @@
 library ng2_form_components.components.default_list_item_renderer;
 
+import 'dart:async';
+
 import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_item_renderer.dart' show DynamicListItemRenderer;
@@ -8,7 +10,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
 import 'package:ng2_form_components/src/components/list_item.dart';
 
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
 
 @Component(
     selector: 'default-list-item-renderer',
@@ -20,17 +22,20 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
     ''',
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class DefaultListItemRenderer<T extends Comparable> implements DynamicListItemRenderer {
+class DefaultListItemRenderer<T extends Comparable> implements DynamicListItemRenderer, OnDestroy {
 
   //-----------------------------
   // input
   //-----------------------------
 
   final ListRendererService listRendererService;
+  final ChangeDetectorRef changeDetector;
   final ListItem listItem;
   final IsSelectedHandler isSelected;
   final GetHierarchyOffsetHandler getHierarchyOffset;
   final LabelHandler labelHandler;
+
+  StreamSubscription<List<ListRendererEvent>> _eventSubscription;
 
   //-----------------------------
   // constructor
@@ -38,11 +43,24 @@ class DefaultListItemRenderer<T extends Comparable> implements DynamicListItemRe
 
   DefaultListItemRenderer(
     @Inject(ListRendererService) this.listRendererService,
+    @Inject(ChangeDetectorRef) this.changeDetector,
     @Inject(ListItem) this.listItem,
     @Inject(IsSelectedHandler) this.isSelected,
     @Inject(GetHierarchyOffsetHandler) this.getHierarchyOffset,
     @Inject(LabelHandler) this.labelHandler,
-    @Inject(ElementRef) ElementRef elementRef);
+    @Inject(ElementRef) ElementRef elementRef) {
+    _initStreams();
+  }
+
+  void ngOnDestroy() {
+    _eventSubscription?.cancel();
+  }
+
+  void _initStreams() {
+    _eventSubscription = listRendererService.responders$
+      .where((List<ListRendererEvent> events) => events.firstWhere((ListRendererEvent event) => event.type == 'selectionChanged', orElse: () => null) != null)
+      .listen((_) => changeDetector.markForCheck());
+  }
 
   void triggerSelection() => listRendererService.triggerSelection(listItem);
 
