@@ -304,7 +304,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       .listen((Iterable<ListItem<T>> items) => items.forEach((ListItem<T> listItem) => _incomingSelection$ctrl.add(listItem))) as StreamSubscription<List<ListItem<T>>>;
 
     _rendererSelectionSubscription = listRendererService.rendererSelection$
-      .where((ListItem listItem) => listItem.data.runtimeType == dataProvider.first.runtimeType)
+      .where((ListItem listItem) => listItem.data.runtimeType == dataProvider.first.data.runtimeType)
       .listen((ListItem listItem) => handleSelection(listItem as ListItem<T>));
 
     _selectionStateSubscription = _selectedItems$.listen(_selectedItems$ctrl.add) as StreamSubscription<List<ListItem<T>>>;
