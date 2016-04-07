@@ -83,6 +83,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   List<ListItem<T>> get dataProvider => _dataProvider;
   @Input() void set dataProvider(List<ListItem<T>> value) {
     _dataProvider = value;
+
+    changeDetector.markForCheck();
   }
 
   List<ListItem<T>> _selectedItems = <ListItem<T>>[];
