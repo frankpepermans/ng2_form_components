@@ -83,8 +83,6 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   List<ListItem<T>> get dataProvider => _dataProvider;
   @Input() void set dataProvider(List<ListItem<T>> value) {
     _dataProvider = value;
-
-    changeDetector.markForCheck();
   }
 
   List<ListItem<T>> _selectedItems = <ListItem<T>>[];
@@ -198,6 +196,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
+    if (changes.containsKey('dataProvider')) changeDetector.markForCheck();
+
     if (changes.containsKey('selectedItems')) {
       internalSelectedItems.forEach(handleSelection);
 
@@ -214,9 +214,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       }
     }
 
-    if (changes.containsKey('rendererEvents')) {
-      listRendererService.respondEvents(rendererEvents);
-    }
+    if (changes.containsKey('rendererEvents')) listRendererService.respondEvents(rendererEvents);
   }
 
   @override
