@@ -78,6 +78,12 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _level = value;
   }
 
+  List<ListItem<T>> _hierarchySelectedItems;
+  List<ListItem<T>> get hierarchySelectedItems => _hierarchySelectedItems;
+  @Input() void set hierarchySelectedItems(List<ListItem<T>> value) {
+    _hierarchySelectedItems = value;
+  }
+
   ResolveChildrenHandler _resolveChildrenHandler;
   ResolveChildrenHandler get resolveChildrenHandler => _resolveChildrenHandler;
   @Input() void set resolveChildrenHandler(ResolveChildrenHandler value) {
@@ -162,19 +168,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    if (level == 0) tuple.item2.forEach(handleSelection);
-    else {
-      new Timer(const Duration(milliseconds: 100), () {
-        tuple.item2.forEach((ListItem<T> listItem) {
-          rx.observable(listRendererService.rendererSelection$)
-            .take(1)
-            .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
-            .listen(handleRendererEvent);
-
-          listRendererService.triggerSelection(listItem);
-        });
-      });
-    }
+    _delegateSelectedItems(tuple.item2);
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
@@ -198,6 +192,16 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     await completer.future;
 
     yield args.first;
+  }
+
+  @override void ngOnChanges(Map<String, SimpleChange> changes) {
+    super.ngOnChanges(changes);
+
+    if (changes.containsKey('hierarchySelectedItems')) {
+      _delegateSelectedItems(hierarchySelectedItems);
+
+      changeDetector.markForCheck();
+    }
   }
 
   @override void ngOnDestroy() {
@@ -272,6 +276,23 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
     _childHierarchyList$ctrl.add(const []);
     _selection$Ctrl.add(<Hierarchy, List<ListItem>>{});
+  }
+
+  void _delegateSelectedItems(List<ListItem<T>> selectedItems) {
+    if (level == 0) selectedItems.forEach(handleSelection);
+    else {
+      //TODO: do this after a change detection has occurred instead
+      new Timer(const Duration(milliseconds: 100), () {
+        selectedItems.forEach((ListItem<T> listItem) {
+          rx.observable(listRendererService.rendererSelection$)
+              .take(1)
+              .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
+              .listen(handleRendererEvent);
+
+          listRendererService.triggerSelection(listItem);
+        });
+      });
+    }
   }
 
   //-----------------------------
