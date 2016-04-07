@@ -197,7 +197,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
     super.ngOnChanges(changes);
 
-    if (changes.containsKey('hierarchySelectedItems')) {
+    if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null) {
       _delegateSelectedItems(hierarchySelectedItems);
 
       changeDetector.markForCheck();
