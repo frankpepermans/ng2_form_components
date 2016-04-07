@@ -52,7 +52,7 @@ class DefaultListItemRenderer<T extends Comparable> implements DynamicListItemRe
     _initStreams();
   }
 
-  void ngOnDestroy() {
+  @override void ngOnDestroy() {
     _eventSubscription?.cancel();
   }
 

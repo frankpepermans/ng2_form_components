@@ -52,7 +52,7 @@ class DefaultHierarchyListItemRenderer<T extends Comparable> implements DynamicL
     _initStreams();
   }
 
-  void ngOnDestroy() {
+  @override void ngOnDestroy() {
     _eventSubscription?.cancel();
   }
 
