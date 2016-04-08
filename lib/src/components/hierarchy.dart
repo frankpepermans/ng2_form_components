@@ -168,8 +168,9 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    if (hierarchySelectedItems == null) _processIncomingSelectedState(tuple.item2);
-    else hierarchySelectedItems = null;
+    if (hierarchySelectedItems == null || hierarchySelectedItems.isEmpty) _processIncomingSelectedState(tuple.item2);
+
+    hierarchySelectedItems = null;
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
@@ -181,7 +182,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
     super.ngOnChanges(changes);
 
-    if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null) {
+    if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null && hierarchySelectedItems.isNotEmpty) {
       hierarchySelectedItems.forEach((ListItem<Comparable> listItem) {
         listRendererService.rendererSelection$
             .take(1)
