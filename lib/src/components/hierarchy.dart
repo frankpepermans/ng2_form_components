@@ -269,15 +269,17 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
-    List<ListItem<Comparable>> items = selectedItems;
+    if (hierarchySelectedItems != null) {
+      selectedItems = hierarchySelectedItems;
 
-    if (hierarchySelectedItems != null) items = hierarchySelectedItems;
+      hierarchySelectedItems = null;
+    }
 
-    if (level == 0) items.forEach(handleSelection);
+    if (level == 0) selectedItems.forEach(handleSelection);
     else {
       //TODO: do this after a change detection has occurred instead
       new Timer(const Duration(milliseconds: 100), () {
-        items.forEach((ListItem<Comparable> listItem) {
+        selectedItems.forEach((ListItem<Comparable> listItem) {
           rx.observable(listRendererService.rendererSelection$)
             .take(1)
             .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
