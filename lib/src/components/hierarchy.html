@@ -20,7 +20,6 @@
                  [beforeDestroyChildTrigger]="beforeDestroyChild"
                  [index]="i"
                  [level]="level + 1"
-                 [hierarchySelectedItems]="hierarchySelectedItems"
                  class="item-group" *ngIf="isOpen(listItem)">
                 <hierarchy [state]="stateGroup" [stateId]="getStateId(i)"
                            [labelHandler]="labelHandler"
@@ -28,6 +27,7 @@
                            [resolveRendererHandler]="resolveRendererHandler"
                            [resolveChildrenHandler]="resolveChildrenHandler"
                            [dataProvider]="resolveChildren(listItem)"
+                           [hierarchySelectedItems]="hierarchySelectedItems"
                            [level]="level + 1"
                            (itemRendererEvent)="handleRendererEvent($event)">
                 </hierarchy>
