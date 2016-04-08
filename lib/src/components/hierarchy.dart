@@ -195,6 +195,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
         listRendererService.triggerSelection(listItem);
       });
+
+      changeDetector.markForCheck();
     }
   }
 
