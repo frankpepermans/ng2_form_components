@@ -168,13 +168,34 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    _processIncomingSelectedState(tuple.item2);
+    if (hierarchySelectedItems == null) _processIncomingSelectedState(tuple.item2);
+    else hierarchySelectedItems = null;
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
     _openListItems$Ctrl.add(tuple.item3);
 
     changeDetector.markForCheck();
+  }
+
+  @override void ngOnChanges(Map<String, SimpleChange> changes) {
+    super.ngOnChanges(changes);
+
+    if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null) {
+      hierarchySelectedItems.forEach((ListItem<Comparable> listItem) {
+        listRendererService.rendererSelection$
+            .take(1)
+            .listen((_) {
+          listRendererService.triggerEvent(new ItemRendererEvent<bool, T>(
+              'selection',
+              listItem as ListItem<T>,
+              true)
+          );
+        });
+
+        listRendererService.triggerSelection(listItem);
+      });
+    }
   }
 
   @override Stream<int> ngBeforeDestroyChild([List args]) async* {
@@ -269,12 +290,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
-    if (hierarchySelectedItems != null) {
-      selectedItems = hierarchySelectedItems;
-
-      hierarchySelectedItems = null;
-    }
-
     if (level == 0) selectedItems.forEach(handleSelection);
     else {
       //TODO: do this after a change detection has occurred instead
