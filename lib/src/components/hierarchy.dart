@@ -177,22 +177,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     changeDetector.markForCheck();
   }
 
-  @override void ngOnChanges(Map<String, SimpleChange> changes) {
-    super.ngOnChanges(changes);
-
-    if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null) {
-      hierarchySelectedItems.forEach((ListItem<Comparable> listItem) {
-        listRendererService.triggerEvent(new ItemRendererEvent<bool, T>(
-            'selection',
-            listItem as ListItem<T>,
-            true)
-        );
-
-        listRendererService.triggerSelection(listItem);
-      });
-    }
-  }
-
   @override Stream<int> ngBeforeDestroyChild([List args]) async* {
     final Completer<int> completer = new Completer<int>();
 
@@ -285,11 +269,15 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
-    if (level == 0) selectedItems.forEach(handleSelection);
+    List<ListItem<Comparable>> items = selectedItems;
+
+    if (hierarchySelectedItems != null) items = hierarchySelectedItems;
+
+    if (level == 0) items.forEach(handleSelection);
     else {
       //TODO: do this after a change detection has occurred instead
       new Timer(const Duration(milliseconds: 100), () {
-        selectedItems.forEach((ListItem<T> listItem) {
+        items.forEach((ListItem<Comparable> listItem) {
           rx.observable(listRendererService.rendererSelection$)
             .take(1)
             .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
@@ -384,7 +372,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     listRendererService.triggerEvent(event);
   }
 
-  @override void handleSelection(ListItem<T> listItem) {
+  @override void handleSelection(ListItem<Comparable> listItem) {
     super.handleSelection(listItem);
 
     if (!allowMultiSelection) _clearChildHierarchies$ctrl.add((ListItem listItem) => true);
