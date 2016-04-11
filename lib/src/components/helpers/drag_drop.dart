@@ -8,7 +8,7 @@ import 'package:angular2/animate.dart';
 
 import 'package:dnd/dnd.dart';
 
-typedef void DragDropHandler(DropzoneEvent event);
+typedef void DragDropHandler(int dragItemIndex, int dropItemIndex);
 
 @Directive(
     selector: '[drag-drop]'
@@ -29,6 +29,8 @@ class DragDrop implements AfterViewInit {
   Element nativeElement;
   CssAnimationBuilder cssAnimationBuilder;
 
+  List<Element> list;
+
   DragDrop(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
     nativeElement = element.nativeElement as Element;
     cssAnimationBuilder = animationBuilder.css();
@@ -36,7 +38,8 @@ class DragDrop implements AfterViewInit {
 
   void ngAfterViewInit() {
     final ddId = _dragDropSessionId++;
-    final List<Element> list = <Element>[];
+
+    list = <Element>[];
 
     _compileSortablesList(nativeElement, list);
 
@@ -49,7 +52,10 @@ class DragDrop implements AfterViewInit {
   }
 
   void _handleSwap(DropzoneEvent event) {
-    if (handler != null) handler(event);
+    if (handler != null) handler(
+        list.indexOf(event.draggableElement),
+        list.indexOf(event.dropzoneElement)
+    );
   }
 
   void _compileSortablesList(Element element, List<Element> list) {
