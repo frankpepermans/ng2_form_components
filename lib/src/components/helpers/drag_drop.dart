@@ -13,7 +13,7 @@ typedef void DragDropHandler(int dragItemIndex, int dropItemIndex);
 @Directive(
     selector: '[drag-drop]'
 )
-class DragDrop implements AfterViewInit {
+class DragDrop implements OnDestroy, AfterViewInit {
 
   DragDropHandler _handler;
   DragDropHandler get handler => _handler;
@@ -31,12 +31,18 @@ class DragDrop implements AfterViewInit {
 
   List<Element> list;
 
+  StreamSubscription _dropStreamSubscription;
+
   DragDrop(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
     nativeElement = element.nativeElement as Element;
     cssAnimationBuilder = animationBuilder.css();
   }
 
-  void ngAfterViewInit() {
+  @override ngOnDestroy() {
+    _dropStreamSubscription?.cancel();
+  }
+
+  @override void ngAfterViewInit() {
     final ddId = _dragDropSessionId++;
 
     list = <Element>[];
@@ -47,14 +53,20 @@ class DragDrop implements AfterViewInit {
 
     final ElementList<Element> elements = querySelectorAll('._sortable_$ddId');
 
-    new Draggable(elements, avatarHandler: new AvatarHandler.clone());
-    new Dropzone(elements)..onDrop.listen(_handleSwap);
+    final Draggable draggable = new Draggable(elements, avatarHandler: new AvatarHandler.clone());
+    final Dropzone dropzone = new Dropzone(elements);
+
+    _dropStreamSubscription = dropzone.onDrop.listen(_handleSwap);
   }
 
   void _handleSwap(DropzoneEvent event) {
+    final List<Element> currentList = <Element>[];
+
+    _compileSortablesList(nativeElement, currentList);
+
     if (handler != null) handler(
-        list.indexOf(event.draggableElement),
-        list.indexOf(event.dropzoneElement)
+        currentList.indexOf(event.draggableElement),
+        currentList.indexOf(event.dropzoneElement)
     );
   }
 
