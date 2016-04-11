@@ -19,8 +19,8 @@ class HierarchyAnimation extends Tween implements OnInit {
     super.duration = value;
   }
 
-  @override @Input() void set style(String value) {
-    super.style = value;
+  @override @Input() void set tweenStyleProperty(String value) {
+    super.tweenStyleProperty = value;
   }
 
   @override @Input() void set beforeDestroyChildTrigger(StreamController value) {

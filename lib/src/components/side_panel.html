@@ -1,0 +1,8 @@
+<div class="ng2-form-components-side-panel" [ngStyle]="{'flex-direction': orientation == 'left' ? 'row-reverse' : 'row'}">
+    <div class="control" (click)="toggle()">
+        <i class="fa fa-fw" [ngClass]="{'fa-chevron-left': orientation == 'left' ? isOpen : !isOpen, 'fa-chevron-right': orientation == 'left' ? !isOpen : isOpen}"></i>
+    </div>
+    <div *ngIf="isOpen" panel-tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">
+        <ng-content></ng-content>
+    </div>
+</div>

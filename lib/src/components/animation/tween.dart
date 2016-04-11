@@ -17,10 +17,10 @@ class Tween implements OnInit {
     _duration = value;
   }
 
-  String _style = 'top';
-  String get style => _style;
-  @Input() void set style(String value) {
-    _style = value;
+  String _tweenStyleProperty = 'top';
+  String get tweenStyleProperty => _tweenStyleProperty;
+  @Input() void set tweenStyleProperty(String value) {
+    _tweenStyleProperty = value;
   }
 
   StreamController _beforeDestroyChildTrigger;
@@ -52,17 +52,17 @@ class Tween implements OnInit {
     cssAnimationBuilder.setDuration(duration);
 
     cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      style: '-${nativeElement.clientHeight}px',
+      tweenStyleProperty: '-${nativeElement.clientHeight}px',
       'visibility': 'visible'
     });
 
     cssAnimationBuilder.setToStyles(<String, dynamic>{
-      style: '0'
+      tweenStyleProperty: '0'
     });
 
     cssAnimationBuilder.start(nativeElement)
       ..onComplete(() {
-        nativeElement.style.removeProperty(style);
+        nativeElement.style.removeProperty(tweenStyleProperty);
         nativeElement.style.removeProperty('visibility');
       });
   }
@@ -71,16 +71,16 @@ class Tween implements OnInit {
     cssAnimationBuilder.setDuration(duration);
 
     cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      style: '0'
+      tweenStyleProperty: '0'
     });
 
     cssAnimationBuilder.setToStyles(<String, dynamic>{
-      style: '-${nativeElement.clientHeight}px'
+      tweenStyleProperty: '-${nativeElement.clientHeight}px'
     });
 
     cssAnimationBuilder.start(nativeElement)
       ..onComplete(() {
-        nativeElement.style.removeProperty(style);
+        nativeElement.style.removeProperty(tweenStyleProperty);
 
         beforeDestroyChildTrigger.add(true);
       });

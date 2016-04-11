@@ -18,6 +18,9 @@ export 'src/components/auto_complete.dart'
 export 'src/components/list_renderer.dart'
   show ListRenderer;
 
+export 'src/components/side_panel.dart'
+    show SidePanel;
+
 export 'src/components/html_text_transform_component.dart'
     show HTMLTextTransformComponent;
 

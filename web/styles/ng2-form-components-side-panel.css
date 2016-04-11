@@ -1,0 +1,29 @@
+.ng2-form-components-side-panel {
+    display: flex;
+    flex-direction: row;
+    height: inherit;
+}
+
+.ng2-form-components-side-panel .control {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    background: white;
+    border-left: 1px solid #666;
+    border-right: 1px solid #666;
+    width: 20px;
+    height: 250px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.ng2-form-components-side-panel .control:hover {
+    background: #ccc;
+}
+
+.ng2-form-components-side-panel .mask {
+    overflow: hidden;
+    flex: 1 1 auto;
+    background: yellow;
+}

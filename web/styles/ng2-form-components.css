@@ -69,3 +69,17 @@ body, html {
 .form .group .value {
     color: blue;
 }
+
+.side-panel-test {
+    display: flex;
+    height: 250px;
+}
+
+.side-panel-test .content {
+    flex: 1 1 auto;
+}
+
+.side-panel-test-content {
+    width: 250px;
+    height: inherit;
+}
