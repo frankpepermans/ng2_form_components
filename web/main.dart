@@ -25,7 +25,7 @@ void main() {
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: const [StateService],
-    directives: const [State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformComponent, SidePanel]
+    directives: const [State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformComponent, SidePanel, DragDrop]
 )
 class AppComponent {
 

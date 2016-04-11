@@ -42,6 +42,9 @@ export 'src/components/item_renderers/default_hierarchy_list_item_renderer.dart'
 export 'src/components/animation/tween.dart'
     show Tween;
 
+export 'src/components/helpers/drag_drop.dart'
+    show DragDrop, DragDropHandler;
+
 export 'src/infrastructure/list_renderer_service.dart'
     show ListRendererService, ItemRendererEvent, ListRendererEvent;
 
