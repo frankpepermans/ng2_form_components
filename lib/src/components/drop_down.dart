@@ -91,6 +91,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   StreamSubscription<String> _currentHeaderLabelSubscription;
   StreamSubscription<bool> _openCloseSubscription;
   StreamSubscription<Iterable<ListItem<T>>> _selectedItemsSubscription;
+  StreamSubscription<bool> _beforeDestroyChildSubscription;
 
   bool _isClosedFromList = false;
 
@@ -151,10 +152,14 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   @override Stream<bool> ngBeforeDestroyChild([List args]) async* {
     final Completer<bool> completer = new Completer<bool>();
 
-    beforeDestroyChild.stream
-      .where((bool isDone) => isDone)
+    _beforeDestroyChildSubscription = new rx.Observable<bool>.merge([
+      beforeDestroyChild.stream
+        .where((bool isDone) => isDone),
+      onDestroy
+        .map((_) => true)
+    ])
       .take(1)
-      .listen((bool value) => completer.complete(value));
+      .listen((bool value) => completer.complete(value)) as StreamSubscription<bool>;
 
     beforeDestroyChild.add(false);
 
@@ -167,9 +172,10 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   void ngOnDestroy() {
     super.ngOnDestroy();
 
-    if (_currentHeaderLabelSubscription != null) _currentHeaderLabelSubscription.cancel();
-    if (_openCloseSubscription != null) _openCloseSubscription.cancel();
-    if (_selectedItemsSubscription != null) _selectedItemsSubscription.cancel();
+    _currentHeaderLabelSubscription?.cancel();
+    _openCloseSubscription?.cancel();
+    _selectedItemsSubscription?.cancel();
+    _beforeDestroyChildSubscription?.cancel();
 
     FormComponent.openFormComponents.remove(this);
   }
