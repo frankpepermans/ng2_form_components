@@ -8,6 +8,7 @@
                 <list-item-renderer
                         class="list-item-renderer"
                         [listRendererService]="listRendererService"
+                        [dragDropHandler]="dragDropHandler"
                         [renderType]="itemRenderer"
                         [labelHandler]="labelHandler"
                         [listItem]="listItem"
@@ -23,6 +24,7 @@
                  class="item-group" *ngIf="isOpen(listItem)">
                 <hierarchy [state]="stateGroup" [stateId]="getStateId(i)"
                            [labelHandler]="labelHandler"
+                           [dragDropHandler]="dragDropHandler"
                            [allowMultiSelection]="allowMultiSelection"
                            [resolveRendererHandler]="resolveRendererHandler"
                            [resolveChildrenHandler]="resolveChildrenHandler"
