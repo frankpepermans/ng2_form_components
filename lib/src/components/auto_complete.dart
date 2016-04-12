@@ -166,6 +166,9 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   @override void setSelectedItems(Iterable<ListItem<T>> value) {
     mergedDataProvider = value;
 
+    print('from selected items');
+    if (value != null) print(value.length);
+
     _updateHasDropDownValues();
 
     super.setSelectedItems(value);
@@ -236,6 +239,9 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
       .map(_rebuildMergedDataProvider)
       .tap((Tuple2<bool, List<ListItem<T>>> tuple) {
         mergedDataProvider = tuple.item2;
+
+        print('from rx');
+        if (tuple.item2 != null) print(tuple.item2.length);
 
         showLoading = false;
 
