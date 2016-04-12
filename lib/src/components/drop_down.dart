@@ -132,7 +132,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
     if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
 
-    selectedItems = tuple.item2;
+    setSelectedItems(tuple.item2);
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
@@ -177,6 +177,12 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   //-----------------------------
   // private methods
   //-----------------------------
+
+  void setSelectedItems(Iterable<ListItem<T>> value) {
+    selectedItems = value;
+
+    changeDetector.markForCheck();
+  }
 
   void _initStreams() {
     _currentHeaderLabelSubscription = new rx.Observable.combineLatest(<Stream>[
@@ -223,11 +229,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
       return null;
     })
       .where((Iterable<ListItem<T>> selectedItems) => selectedItems != null)
-      .listen((Iterable<ListItem<T>> selectedItems) {
-        this.selectedItems = selectedItems;
-
-        changeDetector.markForCheck();
-      }) as StreamSubscription<Iterable<ListItem<T>>>;
+      .listen(setSelectedItems) as StreamSubscription<Iterable<ListItem<T>>>;
   }
 
   Stream<bool> _awaitCloseAnimation(bool isOpen) {

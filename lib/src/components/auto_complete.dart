@@ -162,13 +162,19 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   // private methods
   //-----------------------------
 
+  @override void setSelectedItems(Iterable<ListItem<T>> value) {
+    super.setSelectedItems(value);
+
+    if (value != null && value.isNotEmpty) mergedDataProvider = value;
+  }
+
   void _initStreams() {
     _currentHeaderLabelSubscription = rx.observable(selectedItemsChanged).startWith(const [])
       .map((Iterable<ListItem<T>> selectedItems) {
         if (selectedItems != null && selectedItems.isNotEmpty) {
           return (selectedItems.length == 1) ?
-          labelHandler(selectedItems.first.data) :
-          selectedItems.map((ListItem<T> listItem) => labelHandler(listItem.data)).join(', ');
+            labelHandler(selectedItems.first.data) :
+            selectedItems.map((ListItem<T> listItem) => labelHandler(listItem.data)).join(', ');
         }
 
         return '';
