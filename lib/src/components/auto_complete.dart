@@ -90,6 +90,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   //-----------------------------
 
   bool showLoading = false;
+  bool hasDropDownValues = false;
   String inputValue, lastReplayedInputValue;
 
   List<ListItem<T>> mergedDataProvider = <ListItem<T>>[];
@@ -163,7 +164,15 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   //-----------------------------
 
   @override void setSelectedItems(Iterable<ListItem<T>> value) {
-    if (value != null && value.isNotEmpty) mergedDataProvider = value;
+    if (value != null && value.isNotEmpty) {
+      mergedDataProvider = value;
+
+      hasDropDownValues = true;
+    } else {
+      hasDropDownValues = false;
+
+      if (isOpen) openOrClose();
+    }
 
     super.setSelectedItems(value);
   }
@@ -221,6 +230,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
       .map(_rebuildMergedDataProvider)
       .tap((Tuple2<bool, List<ListItem<T>>> tuple) {
         mergedDataProvider = tuple.item2;
+
+        hasDropDownValues = (tuple.item2 != null && tuple.item2.isNotEmpty);
 
         showLoading = false;
 

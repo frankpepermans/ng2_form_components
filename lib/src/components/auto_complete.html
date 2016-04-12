@@ -5,7 +5,7 @@
         <i *ngIf="showLoading" class="fa fa-spinner fa-spin space-right"></i>
         <i *ngIf="!showLoading" [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
     </div>
-    <div *ngIf="isOpen" class="drop-down-list">
+    <div *ngIf="isOpen && hasDropDownValues" class="drop-down-list">
         <div tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">
             <list-renderer
                     [itemRenderer]="listItemRenderer"
