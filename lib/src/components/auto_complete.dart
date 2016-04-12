@@ -170,7 +170,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   }
 
   @override void setOpenOrClosed(bool value) {
-    hasDropDownValues = (mergedDataProvider != null && mergedDataProvider.isNotEmpty);
+    hasDropDownValues = (value && mergedDataProvider != null && mergedDataProvider.isNotEmpty);
 
     super.setOpenOrClosed(value);
   }
