@@ -180,7 +180,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   void _updateHasDropDownValues() {
     hasDropDownValues = (isOpen && mergedDataProvider != null && mergedDataProvider.isNotEmpty);
 
-    print('hasDropDownValues: $hasDropDownValues');
+    print('isOpen: $isOpen & hasDropDownValues: $hasDropDownValues ');
   }
 
   void _initStreams() {
@@ -238,6 +238,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
         mergedDataProvider = tuple.item2;
 
         showLoading = false;
+
+        _updateHasDropDownValues();
 
         if (tuple.item1) open();
       })
