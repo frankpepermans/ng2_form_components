@@ -9,6 +9,8 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart' show BeforeDestroyChild;
 
+import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListDragDropHandler;
+
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer;
 
@@ -40,6 +42,10 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   @override @Input() void set labelHandler(LabelHandler value) {
     super.labelHandler = value;
+  }
+
+  @override @Input() void set dragDropHandler(ListDragDropHandler value) {
+    super.dragDropHandler = value;
   }
 
   @override @Input() void set dataProvider(List<ListItem<T>> value) {
