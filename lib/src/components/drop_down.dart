@@ -184,6 +184,12 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     changeDetector.markForCheck();
   }
 
+  void setOpenOrClosed(bool value) {
+    isOpen = value;
+
+    changeDetector.markForCheck();
+  }
+
   void _initStreams() {
     _currentHeaderLabelSubscription = new rx.Observable.combineLatest(<Stream>[
       rx.observable(_headerLabel$ctrl.stream).startWith(const <String>['']),
@@ -206,15 +212,13 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
       .distinct((bool vA, bool vB) => vA == vB)
       .flatMapLatest(_awaitCloseAnimation)
       .listen((bool isOpen) {
-        this.isOpen = isOpen;
+        setOpenOrClosed(isOpen);
 
         if (isOpen) {
           FormComponent.openFormComponents
             .where((FormComponent component) => (component != this && component is DropDown && component.isOpen))
             .forEach((FormComponent component) => (component as DropDown).openOrClose());
         }
-
-        changeDetector.markForCheck();
       }) as StreamSubscription<bool>;
 
     _selectedItemsSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest([
