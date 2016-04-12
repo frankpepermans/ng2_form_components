@@ -166,13 +166,19 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   @override void setSelectedItems(Iterable<ListItem<T>> value) {
     mergedDataProvider = value;
 
+    _updateHasDropDownValues();
+
     super.setSelectedItems(value);
   }
 
   @override void setOpenOrClosed(bool value) {
-    hasDropDownValues = (value && mergedDataProvider != null && mergedDataProvider.isNotEmpty);
-
     super.setOpenOrClosed(value);
+
+    _updateHasDropDownValues();
+  }
+
+  void _updateHasDropDownValues() {
+    hasDropDownValues = (isOpen && mergedDataProvider != null && mergedDataProvider.isNotEmpty);
   }
 
   void _initStreams() {
