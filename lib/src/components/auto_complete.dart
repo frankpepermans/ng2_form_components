@@ -166,8 +166,6 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   @override void setSelectedItems(Iterable<ListItem<T>> value) {
     mergedDataProvider = value;
 
-    if (value != null && value.isNotEmpty) _inputCriteriaMet$ctrl.add(true);
-
     _updateHasDropDownValues();
 
     super.setSelectedItems(value);
