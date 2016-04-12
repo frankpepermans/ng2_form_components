@@ -132,6 +132,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>> _registerChildHierarchySubscription;
   StreamSubscription<Map<Hierarchy, List<ListItem>>> _selectionBuilderSubscription;
   StreamSubscription<Map<ListItem<T>, bool>> _beforeDestroyChildSubscription;
+  StreamSubscription<int> _onBeforeDestroyChildSubscription;
 
   Stream<List<ListItem>> _selection$;
 
@@ -208,16 +209,21 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   @override Stream<int> ngBeforeDestroyChild([List args]) async* {
+    final List<int> argsCast = args as List<int>;
     final Completer<int> completer = new Completer<int>();
 
-    beforeDestroyChild.add(args.first);
+    beforeDestroyChild.add(argsCast.first);
 
-    beforeDestroyChild.stream
-      .where((int index) => index == args.first)
+    _onBeforeDestroyChildSubscription = new rx.Observable<int>.merge([
+      (beforeDestroyChild.stream as Stream<int>)
+        .where((int index) => index == argsCast.first),
+      onDestroy
+        .map((_) => 0)
+    ])
       .take(1)
       .listen((_) {
-        completer.complete(args.first);
-      });
+        completer.complete(argsCast.first);
+      }) as StreamSubscription<int>;
 
     await completer.future;
 
@@ -231,6 +237,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _registerChildHierarchySubscription?.cancel();
     _selectionBuilderSubscription?.cancel();
     _beforeDestroyChildSubscription?.cancel();
+    _onBeforeDestroyChildSubscription?.cancel();
   }
 
   //-----------------------------

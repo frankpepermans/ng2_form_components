@@ -179,6 +179,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
 
   void _updateHasDropDownValues() {
     hasDropDownValues = (isOpen && mergedDataProvider != null && mergedDataProvider.isNotEmpty);
+
+    print('hasDropDownValues: $hasDropDownValues');
   }
 
   void _initStreams() {
