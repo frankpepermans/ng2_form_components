@@ -1,22 +1,25 @@
 library ng2_form_components;
 
 export 'package:ng2_form_components/src/components/list_item.dart'
- show ListItem;
+    show ListItem;
 
 export 'src/components/internal/form_component.dart'
-  show LabelHandler, FormComponent;
+    show LabelHandler, FormComponent;
 
 export 'src/components/text_input.dart'
     show TextInput, TextInputAction;
 
 export 'src/components/drop_down.dart'
-  show DropDown;
+    show DropDown;
 
 export 'src/components/auto_complete.dart'
-  show AutoComplete;
+    show AutoComplete;
 
 export 'src/components/list_renderer.dart'
-  show ListRenderer;
+    show ListRenderer;
+
+export 'src/components/internal/list_item_renderer.dart'
+    show ListDragDropHandler;
 
 export 'src/components/side_panel.dart'
     show SidePanel;
@@ -31,7 +34,7 @@ export 'src/components/hierarchy.dart'
     show Hierarchy, ResolveChildrenHandler, ResolveRendererHandler;
 
 export 'src/components/item_renderers/default_list_item_renderer.dart'
-  show DefaultListItemRenderer;
+    show DefaultListItemRenderer;
 
 export 'src/components/internal/list_item_renderer.dart'
     show IsSelectedHandler, GetHierarchyOffsetHandler;

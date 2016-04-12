@@ -38,25 +38,28 @@ class DragDrop implements OnDestroy, AfterViewInit {
     cssAnimationBuilder = animationBuilder.css();
   }
 
-  @override ngOnDestroy() {
+  @override void ngOnDestroy() {
     _dropStreamSubscription?.cancel();
   }
 
   @override void ngAfterViewInit() {
-    final ddId = _dragDropSessionId++;
+    if (handler != null) {
+      final ddId = _dragDropSessionId++;
 
-    list = <Element>[];
+      list = <Element>[];
 
-    _compileSortablesList(nativeElement, list);
+      _compileSortablesList(nativeElement, list);
 
-    list.forEach((Element element) => element.className = _appendStyleName(element.className, '_sortable_$ddId'));
+      list.forEach((Element element) => element.className = _appendStyleName(element.className, '_sortable_$ddId'));
 
-    final ElementList<Element> elements = querySelectorAll('._sortable_$ddId');
+      final ElementList<Element> elements = querySelectorAll('._sortable_$ddId');
 
-    final Draggable draggable = new Draggable(elements, avatarHandler: new AvatarHandler.clone());
-    final Dropzone dropzone = new Dropzone(elements);
+      new Draggable(elements, avatarHandler: new AvatarHandler.clone());
 
-    _dropStreamSubscription = dropzone.onDrop.listen(_handleSwap);
+      final Dropzone dropzone = new Dropzone(elements);
+
+      _dropStreamSubscription = dropzone.onDrop.listen(_handleSwap);
+    }
   }
 
   void _handleSwap(DropzoneEvent event) {

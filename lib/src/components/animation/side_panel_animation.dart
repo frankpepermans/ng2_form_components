@@ -1,7 +1,6 @@
 library ng2_form_components.components.animation.side_panel_animation;
 
 import 'dart:async';
-import 'dart:html';
 
 import 'package:angular2/angular2.dart';
 import 'package:angular2/animate.dart';
@@ -31,7 +30,7 @@ class SidePanelAnimation extends Tween implements OnInit {
     tweenStyleProperty = 'width';
   }
 
-  void tweenOpen() {
+  @override void tweenOpen() {
     cssAnimationBuilder.setDuration(duration);
 
     cssAnimationBuilder.setFromStyles(<String, dynamic>{
@@ -50,7 +49,7 @@ class SidePanelAnimation extends Tween implements OnInit {
       });
   }
 
-  void tweenClose(_) {
+  @override void tweenClose(_) {
     cssAnimationBuilder.setDuration(duration);
 
     cssAnimationBuilder.setFromStyles(<String, dynamic>{

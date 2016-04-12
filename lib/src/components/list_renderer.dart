@@ -57,7 +57,7 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
 @Component(
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
-    directives: const [ListItemRenderer, NgClass],
+    directives: const [ListItemRenderer],
     pipes: const [SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
@@ -71,6 +71,12 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   LabelHandler get labelHandler => _labelHandler;
   @Input() void set labelHandler(LabelHandler value) {
     _labelHandler = value;
+  }
+
+  ListDragDropHandler _dragDropHandler;
+  ListDragDropHandler get dragDropHandler => _dragDropHandler;
+  @Input() void set dragDropHandler(ListDragDropHandler value) {
+    _dragDropHandler = value;
   }
 
   Type _itemRenderer = DefaultListItemRenderer;

@@ -94,13 +94,9 @@ body, html {
 }
 
 .dnd-over {
-    border-width: medium;
-    border-color: #ff5722;
-    border-style: dashed;
-    background-color: white;
-    opacity: 1;
+    border: 2px dashed orange;
 }
 
-.dnd-over * {
-    display: none;
+.dnd-over > * {
+    opacity: 0;
 }
