@@ -328,11 +328,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
         Node currentNode = range.startContainer;
 
-        while (currentNode != null) {
+        while (currentNode != null) {print('looking at: ${_toNodeNameFromElement(currentNode)}: trying to match: $tag');
           if (_toNodeNameFromElement(currentNode) == tag) {
             transformation.doRemoveTag = true;
             transformation.outerContainer = currentNode;
-
+            print('has match!');
             break;
           }
 
