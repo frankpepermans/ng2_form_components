@@ -229,10 +229,12 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       result = result.replaceFirst(r'<tmp_tag>', _writeClosingTag(tuple.item2));
       result = result.replaceFirst(r'</tmp_tag>', _writeOpeningTag(tuple.item2));
 
-      tuple.item2.outerContainer = null;print(result);
+      tuple.item2.outerContainer = null;
 
       range.insertNode(new DocumentFragment.html(result, treeSanitizer: NodeTreeSanitizer.trusted));
     }
+
+    _resetButtons();
   }
 
   String _writeOpeningTag(HTMLTextTransformation transformation) {
@@ -314,12 +316,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       return prev;
     });
 
-    span.forEach((String K, int V) => print('$K: $V'));
-
     allButtons.forEach((HTMLTextTransformation transformation) {
-      final String tag = transformation.tag.toUpperCase();
-
-      print('$tag: ${span[tag]}: $textLength');
+      final String tag = _toNodeNameFromTransformation(transformation);
 
       transformation.doRemoveTag = (span.containsKey(tag) && span[tag] == textLength);
 
@@ -327,7 +325,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         Node currentNode = range.startContainer;
 
         while (currentNode != null) {
-          if (currentNode.nodeName.toUpperCase() == tag) {
+          if (_toNodeNameFromElement(currentNode) == tag) {
             transformation.doRemoveTag = true;
             transformation.outerContainer = currentNode;
 
@@ -343,7 +341,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _mapChildElements(Element element, Map<String, int> elementSpan, [List<String> elementsEncountered]) {
-    final String nodeName = element.nodeName.toUpperCase();
+    final String nodeName = _toNodeNameFromElement(element);
 
     elementsEncountered = elementsEncountered ?? <String>[];
 
@@ -355,6 +353,22 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     elementsEncountered.add(nodeName);
 
     element.children.forEach((Element E) => _mapChildElements(E, elementSpan, elementsEncountered));
+  }
+
+  String _toNodeNameFromElement(Element element) {
+    List<String> nameList = <String>[element.nodeName.toUpperCase()];
+
+    if (element.attributes != null) element.attributes.forEach((String K, String V) => nameList.add('$K:$V'));
+
+    return nameList.join('|');
+  }
+
+  String _toNodeNameFromTransformation(HTMLTextTransformation transformation) {
+    List<String> nameList = <String>[transformation.tag.toUpperCase()];
+
+    if (transformation.attributes != null) transformation.attributes.forEach((String K, String V) => nameList.add('$K:$V'));
+
+    return nameList.join('|');
   }
 
   void _findElements(Node element, String nodeName, List<Element> elements) {
