@@ -20,6 +20,10 @@
     background: #fff;
 }
 
+.ng2-html-text-transform-buttons .buttons .selected {
+    background: #ccc;
+}
+
 .ng2-html-text-transform-text-area {
     border: 1px solid #aaa;
     padding: 10px;

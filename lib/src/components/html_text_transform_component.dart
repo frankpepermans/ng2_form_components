@@ -17,6 +17,7 @@ import 'package:ng2_form_components/src/components/helpers/html_text_transformat
 @Component(
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
+  directives: const [NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush
 )
 class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, OnInit, AfterViewInit {
@@ -155,15 +156,16 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         for (int i=0, len=selection.rangeCount; i<len; i++) {
           Range range = selection.getRangeAt(i);
 
-          if (range.startOffset != range.endOffset) ranges.add(range);
+          if (range.startContainer != range.endContainer || range.startOffset != range.endOffset) ranges.add(range);
         }
 
         return (ranges.isNotEmpty) ? ranges.first : null;
       }) as rx.Observable<Range>;
 
     _rangeTransform$ = _range$
+      .tap((_) => _resetButtons())
       .where((Range range) => range != null)
-      .distinct(_areSameRanges)
+      .tap(_analyzeRange)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
@@ -178,42 +180,82 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
   }
 
-  bool _areSameRanges(Range rangeA, Range rangeB) => (
-    rangeA.startContainer == rangeB.startContainer &&
-    rangeA.startOffset == rangeB.startOffset &&
-    rangeA.endOffset == rangeB.endOffset
-  );
-
   void _contentModifier(Event event) {
     model = _container.innerHtml;
 
     _modelTransformation$ctrl.add(model);
   }
 
-  String _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
+  void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
     final StringBuffer buffer = new StringBuffer();
     final Range range = tuple.item1;
 
     final DocumentFragment extractedContent = range.extractContents();
 
-    buffer.write('<${tuple.item2.tag}');
+    if (tuple.item2.doRemoveTag) {
+      final List<Element> matchingElements = <Element>[];
 
-    if (tuple.item2.id != null) buffer.write(' id="${tuple.item2.id}"');
+      _findElements(extractedContent, tuple.item2.tag.toLowerCase(), matchingElements);
 
-    if (tuple.item2.className != null) buffer.write(' class="${tuple.item2.className}"');
+      for (int i=matchingElements.length-1; i>=0; i--) {
+        Element element = matchingElements[i];
 
-    if (tuple.item2.style != null) {
+        element.replaceWith(new DocumentFragment.html(element.innerHtml, treeSanitizer: NodeTreeSanitizer.trusted));
+      }
+
+      if (tuple.item2.outerContainer != null) {
+        buffer.write('<tmp_tag>');
+        buffer.write(extractedContent.innerHtml);
+        buffer.write('</tmp_tag>');
+      } else {
+        buffer.write(extractedContent.innerHtml);
+      }
+
+      tuple.item2.doRemoveTag = false;
+    } else {
+      buffer.write(_writeOpeningTag(tuple.item2));
+      buffer.write(extractedContent.innerHtml);
+      buffer.write(_writeClosingTag(tuple.item2));
+    }
+
+    range.insertNode(new DocumentFragment.html(buffer.toString(), treeSanitizer: NodeTreeSanitizer.trusted));
+
+    if (tuple.item2.outerContainer != null) {
+      range.selectNode(tuple.item2.outerContainer);
+
+      final DocumentFragment extractedParentContent = range.extractContents();
+      String result = extractedParentContent.innerHtml;
+
+      result = result.replaceFirst(r'<tmp_tag>', _writeClosingTag(tuple.item2));
+      result = result.replaceFirst(r'</tmp_tag>', _writeOpeningTag(tuple.item2));
+
+      tuple.item2.outerContainer = null;print(result);
+
+      range.insertNode(new DocumentFragment.html(result, treeSanitizer: NodeTreeSanitizer.trusted));
+    }
+  }
+
+  String _writeOpeningTag(HTMLTextTransformation transformation) {
+    final StringBuffer buffer = new StringBuffer();
+
+    buffer.write('<${transformation.tag}');
+
+    if (transformation.id != null) buffer.write(' id="${transformation.id}"');
+
+    if (transformation.className != null) buffer.write(' class="${transformation.className}"');
+
+    if (transformation.style != null) {
       final List<String> styleParts = <String>[];
 
-      tuple.item2.style.forEach((String K, String V) => styleParts.add('$K:$V'));
+      transformation.style.forEach((String K, String V) => styleParts.add('$K:$V'));
 
       buffer.write(' style="${styleParts.join(';')}"');
     }
 
-    if (tuple.item2.attributes != null) {
+    if (transformation.attributes != null) {
       final List<String> attributes = <String>[];
 
-      tuple.item2.attributes.forEach((String K, String V) {
+      transformation.attributes.forEach((String K, String V) {
         if (V == null || V.toLowerCase() == 'true') attributes.add(K);
         else attributes.add('$K="$V"');
       });
@@ -222,13 +264,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     }
 
     buffer.write('>');
-    buffer.write(extractedContent.innerHtml);
-    buffer.write('</${tuple.item2.tag}>');
-
-    range.insertNode(new DocumentFragment.html(buffer.toString(), treeSanitizer: NodeTreeSanitizer.trusted));
 
     return buffer.toString();
   }
+
+  String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
 
   Element _findEditableElement(Element element) {
     element.childNodes.firstWhere((Node childNode) => (childNode is Element && childNode.contentEditable == 'true'), orElse: () => null);
@@ -247,5 +287,76 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     }
 
     return null;
+  }
+
+  void _resetButtons() {
+    List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
+      prev.addAll(value);
+
+      return prev;
+    });
+
+    allButtons.forEach((HTMLTextTransformation transformation) => transformation.doRemoveTag = false);
+
+    changeDetector.markForCheck();
+  }
+
+  void _analyzeRange(Range range) {
+    final DocumentFragment fragment = range.cloneContents();
+    final Map<String, int> span = <String, int>{};
+    final int textLength = fragment.text.length;
+
+    fragment.children.forEach((Element element) => _mapChildElements(element, span));
+
+    List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
+      prev.addAll(value);
+
+      return prev;
+    });
+
+    allButtons.forEach((HTMLTextTransformation transformation) {
+      final String tag = transformation.tag.toUpperCase();
+
+      transformation.doRemoveTag = (span.containsKey(tag) && span[tag] == textLength);
+
+      if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
+        Node currentNode = range.startContainer;
+
+        while (currentNode != null) {
+          if (currentNode.nodeName.toUpperCase() == tag) {
+            transformation.doRemoveTag = true;
+            transformation.outerContainer = currentNode;
+
+            break;
+          }
+
+          currentNode = currentNode.parentNode;
+        }
+      }
+    });
+
+    changeDetector.markForCheck();
+  }
+
+  void _mapChildElements(Element element, Map<String, int> elementSpan, [List<String> elementsEncountered]) {
+    final String nodeName = element.nodeName.toUpperCase();
+
+    elementsEncountered = elementsEncountered ?? <String>[];
+
+    if (!elementsEncountered.contains(nodeName)) {
+      if (!elementSpan.containsKey(nodeName)) elementSpan[nodeName] = element.text.length;
+      else elementSpan[nodeName] += element.text.length;
+    }
+
+    elementsEncountered.add(nodeName);
+
+    element.children.forEach((Element E) => _mapChildElements(E, elementSpan, elementsEncountered));
+  }
+
+  void _findElements(Node element, String nodeName, List<Element> elements) {
+    if (element.nodeName.toLowerCase() == nodeName) elements.add(element);
+
+    if (element is DocumentFragment) element.children.forEach((Element E) => _findElements(E, nodeName, elements));
+    else if (element is Element) element.children.forEach((Element E) => _findElements(E, nodeName, elements));
   }
 }
