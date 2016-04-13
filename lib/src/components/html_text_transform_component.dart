@@ -14,21 +14,10 @@ import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTu
 import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent;
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
 
-@Pipe(name: 'visibleButtonsOnly')
-@Injectable()
-class VisibleButtonsOnlyPipe<T extends HTMLTextTransformation> implements PipeTransform {
-
-  const VisibleButtonsOnlyPipe();
-
-  @override List<T> transform(List<T> dataProvider, [List<dynamic> args = null]) =>
-    dataProvider.where((T transformation) => transformation.isShown).toList(growable: false);
-}
-
 @Component(
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
   directives: const [NgClass],
-  pipes: const [VisibleButtonsOnlyPipe],
   changeDetection: ChangeDetectionStrategy.OnPush
 )
 class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, OnInit, AfterViewInit {
