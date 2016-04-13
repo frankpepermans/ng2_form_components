@@ -314,8 +314,12 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       return prev;
     });
 
+    span.forEach((String K, int V) => print('$K: $V'));
+
     allButtons.forEach((HTMLTextTransformation transformation) {
       final String tag = transformation.tag.toUpperCase();
+
+      print('$tag: ${span[tag]}: $textLength');
 
       transformation.doRemoveTag = (span.containsKey(tag) && span[tag] == textLength);
 
