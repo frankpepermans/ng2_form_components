@@ -10,14 +10,16 @@ class HTMLTextTransformation {
   final Map<String, String> attributes;
   final String id;
   final String className;
+  final bool isShown;
 
   bool doRemoveTag = false;
   Element outerContainer;
 
-  HTMLTextTransformation(this.tag, this.label, {Map<String, String> style, String className, Map<String, String> attributes, String id}) :
+  HTMLTextTransformation(this.tag, this.label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool isShown}) :
     this.style = style,
     this.attributes = attributes,
     this.className = className,
-    this.id = id;
+    this.id = id,
+    this.isShown = isShown ?? true;
 
 }
