@@ -316,10 +316,14 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       return prev;
     });
 
+    span.forEach((String K, int V) => print('$K: $V'));
+
     allButtons.forEach((HTMLTextTransformation transformation) {
       final String tag = _toNodeNameFromTransformation(transformation);
 
       transformation.doRemoveTag = (span.containsKey(tag) && span[tag] == textLength);
+
+      print('$tag: ${span[tag]}: $textLength');
 
       if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
         Node currentNode = range.startContainer;
