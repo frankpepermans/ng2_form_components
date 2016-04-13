@@ -10,8 +10,8 @@ class HTMLTextTransformation {
   final Map<String, String> attributes;
   final String id;
   final String className;
-  final bool enabled;
 
+  bool enabled;
   bool doRemoveTag = false;
   Element outerContainer;
 
