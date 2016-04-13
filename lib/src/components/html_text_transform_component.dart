@@ -328,7 +328,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
         Node currentNode = range.startContainer;
 
-        while (currentNode != null) {print('looking at: ${_toNodeNameFromElement(currentNode)}: trying to match: $tag');
+        while (currentNode != null && currentNode != this.element.nativeElement) {print('looking at: ${_toNodeNameFromElement(currentNode)}: trying to match: $tag');
           if (_toNodeNameFromElement(currentNode) == tag) {
             transformation.doRemoveTag = true;
             transformation.outerContainer = currentNode;
@@ -362,7 +362,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   String _toNodeNameFromElement(Node element) {
     List<String> nameList = <String>[element.nodeName.toUpperCase()];
 
-    if (element is Element && element.attributes != null) element.attributes.forEach((String K, String V) => nameList.add('$K:$V'));
+    if (element is Element && element.attributes != null) element.attributes.forEach((String K, String V) {
+      String k = K.toLowerCase();
+
+      if (k != 'class' && k != 'id' && k != 'style') nameList.add('$k:$V');
+    });
 
     return nameList.join('|');
   }
@@ -370,7 +374,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   String _toNodeNameFromTransformation(HTMLTextTransformation transformation) {
     List<String> nameList = <String>[transformation.tag.toUpperCase()];
 
-    if (transformation.attributes != null) transformation.attributes.forEach((String K, String V) => nameList.add('$K:$V'));
+    if (transformation.attributes != null) transformation.attributes.forEach((String K, String V) => nameList.add('${K.toLowerCase()}:$V'));
 
     return nameList.join('|');
   }
