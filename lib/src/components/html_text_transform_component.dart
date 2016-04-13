@@ -355,10 +355,10 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     element.children.forEach((Element E) => _mapChildElements(E, elementSpan, elementsEncountered));
   }
 
-  String _toNodeNameFromElement(Element element) {
+  String _toNodeNameFromElement(Node element) {
     List<String> nameList = <String>[element.nodeName.toUpperCase()];
 
-    if (element.attributes != null) element.attributes.forEach((String K, String V) => nameList.add('$K:$V'));
+    if (element is Element && element.attributes != null) element.attributes.forEach((String K, String V) => nameList.add('$K:$V'));
 
     return nameList.join('|');
   }
