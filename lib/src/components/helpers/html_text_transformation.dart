@@ -10,16 +10,18 @@ class HTMLTextTransformation {
   final Map<String, String> attributes;
   final String id;
   final String className;
+  final bool allowRemove;
 
   bool enabled;
   bool doRemoveTag = false;
   Element outerContainer;
 
-  HTMLTextTransformation(this.tag, this.label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled}) :
+  HTMLTextTransformation(this.tag, this.label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled, bool allowRemove}) :
     this.style = style,
     this.attributes = attributes,
     this.className = className,
     this.id = id,
-    this.enabled = enabled ?? true;
+    this.enabled = enabled ?? true,
+    this.allowRemove = allowRemove ?? true;
 
 }
