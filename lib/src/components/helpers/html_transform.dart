@@ -18,7 +18,7 @@ class HtmlTransform {
       if (transformerFullName == fromNodeFullName) {
         final _ElementSwap elementSwap = new _ElementSwap(fromElement, strippedFragment(fromElement));
 
-        if (transformation.outerContainer == fromElement) transformation.outerContainer = elementSwap.swap as Element;
+        if (transformation.outerContainer == fromElement) transformation.outerContainer = elementSwap.swap;
 
         replacements.add(elementSwap);
       }

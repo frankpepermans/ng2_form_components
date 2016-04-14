@@ -21,7 +21,7 @@ import 'package:ng2_form_components/src/components/helpers/html_transform.dart' 
   directives: const [NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush
 )
-class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, OnInit, AfterViewInit {
+class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, AfterViewInit {
 
   final ElementRef element;
   final HtmlTransform transformer = new HtmlTransform();
@@ -54,6 +54,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
+  final StreamController<bool> _rangeTrigger$ctrl = new StreamController<bool>();
 
   String _lastProcessedRangeValue;
   bool _isDestroyCalled = false;
@@ -80,9 +81,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     _updateInnerHtmlTrusted(incoming, false);
   }
 
-  @override void ngOnInit() => _initStreams();
+  @override void ngAfterViewInit() {
+    _updateInnerHtmlTrusted(model, false);
 
-  @override void ngAfterViewInit() => _updateInnerHtmlTrusted(model, false);
+    _initStreams();
+  }
 
   @override void ngOnDestroy() {
     super.ngOnDestroy();
@@ -101,23 +104,45 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   void transformSelection(HTMLTextTransformation transformationType) => _transformation$ctrl.add(transformationType);
 
-  void onFocus(Event event) {
-    Element currentTarget = event.target as Element;
-    bool isInsideContent = false;
+  //-----------------------------
+  // inner methods
+  //-----------------------------
 
-    while (currentTarget != null && currentTarget != element.nativeElement) {
-      if (currentTarget == contentElement.nativeElement) {
-        isInsideContent = true;
+  void _updateInnerHtmlTrusted(String result, [bool notifyStateListeners=true]) {
+    model = result;
 
-        break;
-      }
+    if (contentElement != null) contentElement.nativeElement.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
 
-      currentTarget = currentTarget.parent;
-    }
+    if (notifyStateListeners) _modelTransformation$ctrl.add(result);
+  }int i = 0;
 
-    _removeListeners();
+  void _initStreams() {
+    _range$ = new rx.Observable.merge([
+      document.onMouseUp,
+      document.onKeyUp,
+      _rangeTrigger$ctrl.stream,
+    ], asBroadcastStream: true)
+      .map((_) => window.getSelection())
+      .map((Selection selection) {
+        final List<Range> ranges = <Range>[];
 
-    if (!isInsideContent) return;
+        for (int i=0, len=selection.rangeCount; i<len; i++) {
+          Range range = selection.getRangeAt(i);
+
+          if (range.startContainer != range.endContainer || range.startOffset != range.endOffset) ranges.add(range);
+        }
+
+        return (ranges.isNotEmpty) ? ranges.first : null;
+      }) as rx.Observable<Range>;
+
+    _rangeTransform$ = _range$
+      .tap((_) => _resetButtons())
+      .where((Range range) => range != null)
+      .tap(_analyzeRange)
+      .flatMapLatest((Range range) => _transformation$ctrl.stream
+        .take(1)
+        .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
+      ) as rx.Observable<Tuple2<Range, HTMLTextTransformation>>;
 
     contentElement.nativeElement.addEventListener('DOMSubtreeModified', _contentModifier);
 
@@ -143,58 +168,24 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       .map((Range range) {
         if (range == null) return false;
 
+        Node currentNode = range.commonAncestorContainer;
+        bool isOwnRange = false;
+
+        while (currentNode != null) {
+          if (currentNode == contentElement.nativeElement) {
+            isOwnRange = true;
+
+            break;
+          }
+
+          currentNode = currentNode.parentNode;
+        }
+
+        if (!isOwnRange) return false;
+
         return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
       })
       .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
-  }
-
-  void onBlur(FocusEvent event) => _removeListeners();
-
-  void _removeListeners() {
-    contentElement.nativeElement.removeEventListener('DOMSubtreeModified', _contentModifier);
-
-    _range$subscription?.cancel();
-    _hasRangeSubscription?.cancel();
-  }
-
-  //-----------------------------
-  // inner methods
-  //-----------------------------
-
-  void _updateInnerHtmlTrusted(String result, [bool notifyStateListeners=true]) {
-    model = result;
-
-    if (contentElement != null) contentElement.nativeElement.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
-
-    if (notifyStateListeners) _modelTransformation$ctrl.add(result);
-  }
-
-  void _initStreams() {
-    _range$ = new rx.Observable.merge([
-      document.onMouseUp,
-      document.onKeyUp
-    ], asBroadcastStream: true)
-      .map((_) => window.getSelection())
-      .map((Selection selection) {
-        final List<Range> ranges = <Range>[];
-
-        for (int i=0, len=selection.rangeCount; i<len; i++) {
-          Range range = selection.getRangeAt(i);
-
-          if (range.startContainer != range.endContainer || range.startOffset != range.endOffset) ranges.add(range);
-        }
-
-        return (ranges.isNotEmpty) ? ranges.first : null;
-      }) as rx.Observable<Range>;
-
-    _rangeTransform$ = _range$
-      .tap((_) => _resetButtons())
-      .where((Range range) => range != null)
-      .tap(_analyzeRange)
-      .flatMapLatest((Range range) => _transformation$ctrl.stream
-        .take(1)
-        .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
-      ) as rx.Observable<Tuple2<Range, HTMLTextTransformation>>;
   }
 
   void _contentModifier(Event event) {
@@ -243,7 +234,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       range.insertNode(new DocumentFragment.html(result, treeSanitizer: NodeTreeSanitizer.trusted));
     }
 
-    _resetButtons();
+    _rangeTrigger$ctrl.add(true);
   }
 
   String _writeOpeningTag(HTMLTextTransformation transformation) {

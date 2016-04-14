@@ -14,7 +14,7 @@ class HTMLTextTransformation {
 
   bool enabled;
   bool doRemoveTag = false;
-  Element outerContainer;
+  Node outerContainer;
 
   HTMLTextTransformation(this.tag, this.label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled, bool allowRemove}) :
     this.style = style,
