@@ -30,6 +30,9 @@ export 'src/components/html_text_transform_component.dart'
 export 'src/components/helpers/html_text_transformation.dart'
     show HTMLTextTransformation;
 
+export 'src/components/helpers/html_transform.dart'
+    show HTMLTransform;
+
 export 'src/components/hierarchy.dart'
     show Hierarchy, ResolveChildrenHandler, ResolveRendererHandler;
 

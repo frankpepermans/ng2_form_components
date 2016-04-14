@@ -13,7 +13,7 @@ import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTu
 
 import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent;
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
-import 'package:ng2_form_components/src/components/helpers/html_transform.dart' show HtmlTransform;
+import 'package:ng2_form_components/src/components/helpers/html_transform.dart' show HTMLTransform;
 
 @Component(
   selector: 'html-text-transform-component',
@@ -24,7 +24,7 @@ import 'package:ng2_form_components/src/components/helpers/html_transform.dart' 
 class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, AfterViewInit {
 
   final ElementRef element;
-  final HtmlTransform transformer = new HtmlTransform();
+  final HTMLTransform transformer = new HTMLTransform();
 
   @ViewChild('content') ElementRef contentElement;
 

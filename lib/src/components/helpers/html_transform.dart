@@ -4,7 +4,7 @@ import 'dart:html';
 
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart';
 
-class HtmlTransform {
+class HTMLTransform {
 
   void removeTransformation(HTMLTextTransformation transformation, Node fromNode, [List<_ElementSwap> replacements]) {
     final bool isRoot = replacements == null;
