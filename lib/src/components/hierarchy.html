@@ -1,5 +1,5 @@
 <div list-renderer class="ng2-form-components-hierarchy">
-    <div scroll-pane class="scroll-pane">
+    <div #scrollPane class="scroll-pane">
         <div class="data-group" *ngFor='#listItem of dataProvider; #i = index'>
             <div class="item" [ngClass]="{'selected': isSelected(listItem), 'not-selectable': !listItem.selectable}">
                 <div class="icon" (click)="toggleChildren(listItem, i)">

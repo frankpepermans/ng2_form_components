@@ -36,6 +36,10 @@ typedef Type ResolveRendererHandler(int level);
 )
 class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
 
+  @override @ViewChild('scrollPane') void set scrollPane(ElementRef value) {
+    super.scrollPane = value;
+  }
+
   //-----------------------------
   // input
   //-----------------------------

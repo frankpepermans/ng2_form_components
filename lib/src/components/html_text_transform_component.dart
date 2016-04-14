@@ -24,6 +24,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   final ElementRef element;
 
+  @ViewChild('content') ElementRef contentElement;
+
   //-----------------------------
   // input
   //-----------------------------
@@ -102,7 +104,24 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   void transformSelection(HTMLTextTransformation transformationType) => _transformation$ctrl.add(transformationType);
 
-  void onFocus(FocusEvent event) {
+  void onFocus(Event event) {
+    Element currentTarget = event.target as Element;
+    bool isInsideContent = false;
+
+    while (currentTarget != null && currentTarget != element.nativeElement) {
+      if (currentTarget == contentElement.nativeElement) {
+        isInsideContent = true;
+
+        break;
+      }
+
+      currentTarget = currentTarget.parent;
+    }
+
+    _removeListeners();
+
+    if (!isInsideContent) return;
+
     _container.addEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription = _rangeTransform$
@@ -122,14 +141,23 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         return true;
       })
       .listen(_transformContent) as StreamSubscription<Tuple2<Range, HTMLTextTransformation>>;
+
+    _hasRangeSubscription = _range$
+      .map((Range range) {
+        if (range == null) return false;
+
+        return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
+      })
+      .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
   }
 
-  void onBlur(FocusEvent event) {
+  void onBlur(FocusEvent event) => _removeListeners();
+
+  void _removeListeners() {
     _container.removeEventListener('DOMSubtreeModified', _contentModifier);
 
-    _range$subscription.cancel();
-
-    _range$subscription = null;
+    _range$subscription?.cancel();
+    _hasRangeSubscription?.cancel();
   }
 
   //-----------------------------
@@ -170,14 +198,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         .take(1)
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
       ) as rx.Observable<Tuple2<Range, HTMLTextTransformation>>;
-
-    _hasRangeSubscription = _range$
-      .map((Range range) {
-        if (range == null) return false;
-
-        return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
-      })
-      .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
   }
 
   void _contentModifier(Event event) {

@@ -8,5 +8,5 @@
                     [innerHtml]="button.label"></button>
         </div>
     </div>
-    <div class="ng2-html-text-transform-text-area" contenteditable="true" (focus)="onFocus($event)" (blur)="onBlur($event)"></div>
+    <div #content class="ng2-html-text-transform-text-area" contenteditable="true" (click)="onFocus($event)" (blur)="onBlur($event)"></div>
 </div>

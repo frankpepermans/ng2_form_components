@@ -16,7 +16,7 @@
             </div>
         </div>
     </div>
-    <div scroll-pane class="scroll-pane">
+    <div #scrollPane class="scroll-pane">
         <div class="data-group" *ngFor='#listItem of dataProvider | unselectedItems:isSelected:moveSelectionOnTop; #i = index'>
             <div class="item" [ngClass]="{'selected': isSelected(listItem), 'not-selectable': !listItem.selectable}">
                 <list-item-renderer

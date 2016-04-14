@@ -63,6 +63,12 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
 )
 class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
 
+  ElementRef _scrollPane;
+  ElementRef get scrollPane => _scrollPane;
+  @ViewChild('scrollPane') void set scrollPane(ElementRef value) {
+    _scrollPane = value;
+  }
+
   //-----------------------------
   // input
   //-----------------------------
@@ -164,8 +170,6 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   StreamSubscription<bool> _scrollPositionSubscription;
   StreamSubscription<ItemRendererEvent> _rendererEventSubscription;
 
-  Element scrollPane;
-
   int _pendingScrollTop = 0;
 
   //-----------------------------
@@ -189,9 +193,9 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
 
     if (scrollPane != null) {
-      scrollPane.scrollTop = tuple.item1;
+      scrollPane.nativeElement.scrollTop = tuple.item1;
 
-      if (scrollPane.scrollTop != tuple.item1) {
+      if (scrollPane.nativeElement.scrollTop != tuple.item1) {
         _pendingScrollTop = tuple.item1;
 
         _nextAnimationFrame();
@@ -214,7 +218,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
     if (changes.containsKey('pageOffset')) {
       if (pageOffset == 0) {
-        if (scrollPane != null) scrollPane.scrollTop = 0;
+        if (scrollPane != null) scrollPane.nativeElement.scrollTop = 0;
 
         _initScrollPositionStream();
       }
@@ -248,8 +252,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       _requestClose$ctrl.add(true);
     });
 
-    scrollPane = _findScrollPane(this.element.nativeElement as Element)
-      ..scrollTop = _pendingScrollTop;
+    scrollPane.nativeElement.scrollTop = _pendingScrollTop;
 
     if (scrollPane != null) _nextAnimationFrame();
 
@@ -264,10 +267,10 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     if (scrollPane != null) {
       if (_scrollPositionSubscription != null) _scrollPositionSubscription.cancel();
 
-      _scrollPositionSubscription = rx.observable(scrollPane.onScroll)
-        .map((_) => scrollPane.scrollTop)
+      _scrollPositionSubscription = rx.observable(scrollPane.nativeElement.onScroll)
+        .map((_) => scrollPane.nativeElement.scrollTop)
         .tap(_scroll$ctrl.add)
-        .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.scrollHeight, scrollTop >= scrollPane.scrollHeight - scrollPane.clientHeight - 20))
+        .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.nativeElement.scrollHeight, scrollTop >= scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight - 20))
         .where((Tuple2<int, bool> tuple) => tuple.item2)
         .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
         .map((Tuple2<int, bool> tuple) => tuple.item2)
@@ -322,38 +325,14 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
   void _nextAnimationFrame() {
     window.animationFrame.then((num time) {
-      final int scrollTop = math.min(scrollPane.scrollHeight - scrollPane.clientHeight, _pendingScrollTop);
+      final int scrollTop = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
 
-      scrollPane.scrollTop = scrollTop;
+      scrollPane.nativeElement.scrollTop = scrollTop;
 
       changeDetector.markForCheck();
 
-      if (scrollPane.scrollTop != _pendingScrollTop) _nextAnimationFrame();
+      if (scrollPane.nativeElement.scrollTop != _pendingScrollTop) _nextAnimationFrame();
     });
-  }
-
-  Element _findScrollPane(Element currentElement) {
-    Element scrollPane, child;
-
-    for (int i=0, len=currentElement.children.length; i<len; i++) {
-      child = currentElement.children[i];
-
-      if (child.attributes.containsKey('scroll-pane')) {
-        scrollPane = child;
-
-        break;
-      } else {
-        Element childMatch = _findScrollPane(child);
-
-        if (childMatch != null) {
-          scrollPane = childMatch;
-
-          break;
-        }
-      }
-    };
-
-    return scrollPane;
   }
 
   //-----------------------------
