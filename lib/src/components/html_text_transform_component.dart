@@ -13,6 +13,7 @@ import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTu
 
 import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent;
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
+import 'package:ng2_form_components/src/components/helpers/html_transform.dart' show HtmlTransform;
 
 @Component(
   selector: 'html-text-transform-component',
@@ -23,6 +24,7 @@ import 'package:ng2_form_components/src/components/helpers/html_text_transformat
 class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, OnInit, AfterViewInit {
 
   final ElementRef element;
+  final HtmlTransform transformer = new HtmlTransform();
 
   @ViewChild('content') ElementRef contentElement;
 
@@ -54,7 +56,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
 
   String _lastProcessedRangeValue;
-  Element _container;
   bool _isDestroyCalled = false;
 
   //-----------------------------
@@ -81,16 +82,12 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   @override void ngOnInit() => _initStreams();
 
-  @override void ngAfterViewInit() {
-    _container = _findEditableElement(element.nativeElement);
-
-    _updateInnerHtmlTrusted(model, false);
-  }
+  @override void ngAfterViewInit() => _updateInnerHtmlTrusted(model, false);
 
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
-    _container.removeEventListener('DOMSubtreeModified', _contentModifier);
+    contentElement.nativeElement.removeEventListener('DOMSubtreeModified', _contentModifier);
 
     _isDestroyCalled = true;
 
@@ -122,7 +119,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     if (!isInsideContent) return;
 
-    _container.addEventListener('DOMSubtreeModified', _contentModifier);
+    contentElement.nativeElement.addEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription = _rangeTransform$
       .where((Tuple2<Range, HTMLTextTransformation> tuple) {
@@ -154,7 +151,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   void onBlur(FocusEvent event) => _removeListeners();
 
   void _removeListeners() {
-    _container.removeEventListener('DOMSubtreeModified', _contentModifier);
+    contentElement.nativeElement.removeEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription?.cancel();
     _hasRangeSubscription?.cancel();
@@ -167,7 +164,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   void _updateInnerHtmlTrusted(String result, [bool notifyStateListeners=true]) {
     model = result;
 
-    if (_container != null) _container.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
+    if (contentElement != null) contentElement.nativeElement.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
 
     if (notifyStateListeners) _modelTransformation$ctrl.add(result);
   }
@@ -201,7 +198,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _contentModifier(Event event) {
-    model = _container.innerHtml;
+    model = contentElement.nativeElement.innerHtml;
 
     _modelTransformation$ctrl.add(model);
   }
@@ -213,15 +210,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     final DocumentFragment extractedContent = range.extractContents();
 
     if (tuple.item2.doRemoveTag) {
-      final List<Element> matchingElements = <Element>[];
-
-      _findElements(extractedContent, tuple.item2.tag.toLowerCase(), matchingElements);
-
-      for (int i=matchingElements.length-1; i>=0; i--) {
-        Element element = matchingElements[i];
-
-        element.replaceWith(new DocumentFragment.html(element.innerHtml, treeSanitizer: NodeTreeSanitizer.trusted));
-      }
+      transformer.removeTransformation(tuple.item2, extractedContent);
 
       if (tuple.item2.outerContainer != null) {
         buffer.write('<tmp_tag>');
@@ -292,25 +281,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
 
-  Element _findEditableElement(Element element) {
-    element.childNodes.firstWhere((Node childNode) => (childNode is Element && childNode.contentEditable == 'true'), orElse: () => null);
-
-    for (int i=0, len=element.childNodes.length; i<len; i++) {
-      Node childNode = element.childNodes[i];
-      bool isElement = childNode is Element;
-
-      if (isElement && (childNode as Element).contentEditable == 'true') return childNode;
-
-      if (isElement) {
-        Element childElement = _findEditableElement(childNode);
-
-        if (childElement != null) return childElement;
-      }
-    }
-
-    return null;
-  }
-
   void _resetButtons() {
     List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
       prev.addAll(value);
@@ -325,10 +295,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   void _analyzeRange(Range range) {
     final DocumentFragment fragment = range.cloneContents();
-    final Map<String, int> span = <String, int>{};
-    final int textLength = fragment.text.length;
-
-    fragment.children.forEach((Element element) => _mapChildElements(element, span));
+    final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
 
     List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
       prev.addAll(value);
@@ -336,23 +303,19 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       return prev;
     });
 
-    span.forEach((String K, int V) => print('$K: $V'));
-
     allButtons.forEach((HTMLTextTransformation transformation) {
-      final String tag = _toNodeNameFromTransformation(transformation);
+      final String tag = transformer.toNodeNameFromTransformation(transformation);
 
-      transformation.doRemoveTag = (span.containsKey(tag) && span[tag] == textLength);
-
-      print('$tag: ${span[tag]}: $textLength');
+      transformation.doRemoveTag = encounteredElementFullNames.contains(tag);
 
       if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
         Node currentNode = range.startContainer;
 
-        while (currentNode != null && currentNode != this.element.nativeElement) {print('looking at: ${_toNodeNameFromElement(currentNode)}: trying to match: $tag');
-          if (_toNodeNameFromElement(currentNode) == tag) {
+        while (currentNode != null && currentNode != this.element.nativeElement) {
+          if (transformer.toNodeNameFromElement(currentNode) == tag) {
             transformation.doRemoveTag = true;
             transformation.outerContainer = currentNode;
-            print('has match!');
+
             break;
           }
 
@@ -362,47 +325,5 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     });
 
     changeDetector.markForCheck();
-  }
-
-  void _mapChildElements(Element element, Map<String, int> elementSpan, [List<String> elementsEncountered]) {
-    final String nodeName = _toNodeNameFromElement(element);
-
-    elementsEncountered = elementsEncountered ?? <String>[];
-
-    if (!elementsEncountered.contains(nodeName)) {
-      if (!elementSpan.containsKey(nodeName)) elementSpan[nodeName] = element.text.length;
-      else elementSpan[nodeName] += element.text.length;
-    }
-
-    elementsEncountered.add(nodeName);
-
-    element.children.forEach((Element E) => _mapChildElements(E, elementSpan, elementsEncountered));
-  }
-
-  String _toNodeNameFromElement(Node element) {
-    List<String> nameList = <String>[element.nodeName.toUpperCase()];
-
-    if (element is Element && element.attributes != null) element.attributes.forEach((String K, String V) {
-      String k = K.toLowerCase();
-
-      if (k != 'class' && k != 'id' && k != 'style') nameList.add('$k:$V');
-    });
-
-    return nameList.join('|');
-  }
-
-  String _toNodeNameFromTransformation(HTMLTextTransformation transformation) {
-    List<String> nameList = <String>[transformation.tag.toUpperCase()];
-
-    if (transformation.attributes != null) transformation.attributes.forEach((String K, String V) => nameList.add('${K.toLowerCase()}:$V'));
-
-    return nameList.join('|');
-  }
-
-  void _findElements(Node element, String nodeName, List<Element> elements) {
-    if (element.nodeName.toLowerCase() == nodeName) elements.add(element);
-
-    if (element is DocumentFragment) element.children.forEach((Element E) => _findElements(E, nodeName, elements));
-    else if (element is Element) element.children.forEach((Element E) => _findElements(E, nodeName, elements));
   }
 }
