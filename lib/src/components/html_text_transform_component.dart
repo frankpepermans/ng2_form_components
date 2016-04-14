@@ -56,7 +56,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
   final StreamController<bool> _rangeTrigger$ctrl = new StreamController<bool>();
 
-  String _lastProcessedRangeValue;
   bool _isDestroyCalled = false;
 
   //-----------------------------
@@ -114,13 +113,13 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     if (contentElement != null) contentElement.nativeElement.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
 
     if (notifyStateListeners) _modelTransformation$ctrl.add(result);
-  }int i = 0;
+  }
 
   void _initStreams() {
     _range$ = new rx.Observable.merge([
       document.onMouseUp,
       document.onKeyUp,
-      _rangeTrigger$ctrl.stream,
+      rx.observable(_rangeTrigger$ctrl.stream),
     ], asBroadcastStream: true)
       .map((_) => window.getSelection())
       .map((Selection selection) {
@@ -147,21 +146,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     contentElement.nativeElement.addEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription = _rangeTransform$
-      .where((Tuple2<Range, HTMLTextTransformation> tuple) {
-        final Range range = tuple.item1;
-        final String currentRangeValue = '${range}_${range.startOffset}_${range.endOffset}_${tuple.item2.tag}';
-
-        if (
-        (
-          (range.startContainer == range.endContainer) &&
-          (range.startOffset == range.endOffset)
-        ) ||
-          (range.startOffset == 0 && range.endOffset == 0) ||
-          (currentRangeValue == _lastProcessedRangeValue)
-        ) return false;
-
-        return true;
-      })
       .listen(_transformContent) as StreamSubscription<Tuple2<Range, HTMLTextTransformation>>;
 
     _hasRangeSubscription = _range$
