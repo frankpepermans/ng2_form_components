@@ -136,7 +136,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     _rangeTransform$ = _range$
       .tap((_) => _resetButtons())
-      .where((Range range) => range != null)
+      .where(_hasValidRange)
       .tap(_analyzeRange)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
@@ -149,27 +149,29 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       .listen(_transformContent) as StreamSubscription<Tuple2<Range, HTMLTextTransformation>>;
 
     _hasRangeSubscription = _range$
-      .map((Range range) {
-        if (range == null) return false;
-
-        Node currentNode = range.commonAncestorContainer;
-        bool isOwnRange = false;
-
-        while (currentNode != null) {
-          if (currentNode == contentElement.nativeElement) {
-            isOwnRange = true;
-
-            break;
-          }
-
-          currentNode = currentNode.parentNode;
-        }
-
-        if (!isOwnRange) return false;
-
-        return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
-      })
+      .map(_hasValidRange)
       .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
+  }
+
+  bool _hasValidRange(Range range) {
+    if (range == null) return false;
+
+    Node currentNode = range.commonAncestorContainer;
+    bool isOwnRange = false;
+
+    while (currentNode != null) {
+      if (currentNode == contentElement.nativeElement) {
+        isOwnRange = true;
+
+        break;
+      }
+
+      currentNode = currentNode.parentNode;
+    }
+
+    if (!isOwnRange) return false;
+
+    return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
   }
 
   void _contentModifier(Event event) {

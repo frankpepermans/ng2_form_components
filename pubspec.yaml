@@ -1,6 +1,6 @@
 name: ng2_form_components
 description: Angular 2 stateful form components
-version: 0.0.93
+version: 0.0.94
 environment:
   sdk: '>=1.13.0 <2.0.0'
 dependencies:
@@ -12,7 +12,7 @@ dependencies:
   dorm: any
   dnd: any
   ng2_state:
-    git: https://github.com/frankpepermans/ng2_state.git
+    path: ../ng2_state
 dev_dependencies:
   faker: any
 transformers:
