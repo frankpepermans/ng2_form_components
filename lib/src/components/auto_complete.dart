@@ -164,7 +164,18 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   //-----------------------------
 
   @override void setSelectedItems(Iterable<ListItem<T>> value) {
-    mergedDataProvider = value;
+    if (mergedDataProvider == null) mergedDataProvider = value;
+    else {
+      final List<ListItem<T>> clonedList = mergedDataProvider.toList(growable: true);
+
+      value.forEach((ListItem<T> listItem) {
+        ListItem<T> matchingListItem = mergedDataProvider.firstWhere((ListItem<T> existingListItem) => existingListItem.compareTo(listItem) == 0, orElse: () => null);
+
+        if (matchingListItem == null) clonedList.add(listItem);
+      });
+
+      mergedDataProvider = clonedList;
+    }
 
     _updateHasDropDownValues();
 
@@ -240,6 +251,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
         _updateHasDropDownValues();
 
         if (tuple.item1) open();
+
+        changeDetector.markForCheck();
       })
       .debounce(const Duration(milliseconds: 30))
       .listen((_) => changeDetector.markForCheck()) as StreamSubscription<List<ListItem<T>>>;
@@ -247,7 +260,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
     _inputChangedSubscription = _inputChanged$.listen((_) {
       showLoading = true;
 
-      //if (isOpen) openOrClose();
+      changeDetector.markForCheck();
     });
   }
 
