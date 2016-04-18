@@ -132,7 +132,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         }
 
         return (ranges.isNotEmpty) ? ranges.first : null;
-      }) as rx.Observable<Range>;
+      });
 
     _rangeTransform$ = _range$
       .tap((_) => _resetButtons())
@@ -141,16 +141,16 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
-      ) as rx.Observable<Tuple2<Range, HTMLTextTransformation>>;
+      );
 
     contentElement.nativeElement.addEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription = _rangeTransform$
-      .listen(_transformContent) as StreamSubscription<Tuple2<Range, HTMLTextTransformation>>;
+      .listen(_transformContent);
 
     _hasRangeSubscription = _range$
       .map(_hasValidRange)
-      .listen(_hasSelectedRange$ctrl.add) as StreamSubscription<bool>;
+      .listen(_hasSelectedRange$ctrl.add);
   }
 
   bool _hasValidRange(Range range) {

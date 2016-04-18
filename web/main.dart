@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:angular2/bootstrap.dart';
+import 'package:angular2/platform/browser.dart';
 import 'package:angular2/angular2.dart';
 import 'package:ng2_state/ng2_state.dart';
 
@@ -188,6 +188,8 @@ class AppComponent {
     selectedItems = new List<ListItem<String>>.unmodifiable(<ListItem<String>>[
       level2A, level2B
     ]);
+
+    startRecording();
   }
 
   void startRecording() {

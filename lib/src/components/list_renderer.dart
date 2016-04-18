@@ -187,7 +187,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   //-----------------------------
 
   @override Stream<Entity> provideState() => rx.observable(_scroll$ctrl.stream)
-    .map((int scrollTop) => new SerializableTuple1<int>()..item1 = scrollTop) as Stream<Entity>;
+    .map((int scrollTop) => new SerializableTuple1<int>()..item1 = scrollTop);
 
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
@@ -274,7 +274,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
         .where((Tuple2<int, bool> tuple) => tuple.item2)
         .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
         .map((Tuple2<int, bool> tuple) => tuple.item2)
-        .listen(_scrolledToBottom$ctrl.add) as StreamSubscription<bool>;
+        .listen(_scrolledToBottom$ctrl.add);
     }
   }
 
@@ -317,7 +317,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _rendererSelectionSubscription = listRendererService.rendererSelection$
       .listen((ListItem listItem) => handleSelection(listItem as ListItem<T>));
 
-    _selectionStateSubscription = _selectedItems$.listen(_selectedItems$ctrl.add) as StreamSubscription<List<ListItem<T>>>;
+    _selectionStateSubscription = _selectedItems$.listen(_selectedItems$ctrl.add);
 
     _rendererEventSubscription = listRendererService.event$
       .listen(_itemRendererEvent$ctrl.add);

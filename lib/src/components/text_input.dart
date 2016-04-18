@@ -66,7 +66,7 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
     return new rx.Observable<SerializableTuple2<String, bool>>.merge([
       _input$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = false),
       _action$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = true)
-    ]) as Stream<Entity>;
+    ]);
   }
 
   @override void receiveState(Entity entity, StatePhase phase) {

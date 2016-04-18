@@ -107,7 +107,7 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
         .debounce(const Duration(milliseconds: 100))
         .map((_) => isOpen)
         .take(1))
-      .listen(_toggleState) as StreamSubscription<bool>;
+      .listen(_toggleState);
   }
 
   void _toggleState(bool newIsOpenState) {

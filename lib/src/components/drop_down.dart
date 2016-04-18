@@ -123,7 +123,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
         .distinct((bool vA, bool vB) => vA == vB)
     ], (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
       ..item1 = isOpen
-      ..item2 = items) as Stream<Entity>;
+      ..item2 = items);
   }
 
   @override void receiveState(Entity entity, StatePhase phase) {
@@ -159,7 +159,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
         .map((_) => true)
     ])
       .take(1)
-      .listen((bool value) => completer.complete(value)) as StreamSubscription<bool>;
+      .listen((bool value) => completer.complete(value));
 
     beforeDestroyChild.add(false);
 
@@ -225,7 +225,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
             .where((FormComponent component) => (component != this && component is DropDown && component.isOpen))
             .forEach((FormComponent component) => (component as DropDown).openOrClose());
         }
-      }) as StreamSubscription<bool>;
+      });
 
     _selectedItemsSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest([
       rx.observable(_openClose$ctrl.stream)
@@ -239,7 +239,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
       return null;
     })
       .where((Iterable<ListItem<T>> selectedItems) => selectedItems != null)
-      .listen(setSelectedItems) as StreamSubscription<Iterable<ListItem<T>>>;
+      .listen(setSelectedItems);
   }
 
   Stream<bool> _awaitCloseAnimation(bool isOpen) {

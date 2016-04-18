@@ -170,7 +170,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
         ..item1 = scrollPosition
         ..item2 = selectedItems
         ..item3 = openItems;
-    }, asBroadcastStream: true) as Stream<Entity>;
+    }, asBroadcastStream: true);
   }
 
   @override void receiveState(Entity entity, StatePhase phase) {
@@ -227,7 +227,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       .take(1)
       .listen((_) {
         completer.complete(argsCast.first);
-      }) as StreamSubscription<int>;
+      });
 
     await completer.future;
 
@@ -253,7 +253,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       _childHierarchyList$ctrl.stream,
       _clearChildHierarchies$ctrl.stream
     ], (List<Hierarchy> childHierarchies, ClearSelectionWhereHandler handler) => new Tuple2<List<Hierarchy>, ClearSelectionWhereHandler>(childHierarchies, handler))
-      .listen((Tuple2<List<Hierarchy>, ClearSelectionWhereHandler> tuple) => tuple.item1.forEach((Hierarchy childHierarchy) => childHierarchy.clearSelection(tuple.item2))) as StreamSubscription<Tuple2<List<Hierarchy>, ClearSelectionWhereHandler>>;
+      .listen((Tuple2<List<Hierarchy>, ClearSelectionWhereHandler> tuple) => tuple.item1.forEach((Hierarchy childHierarchy) => childHierarchy.clearSelection(tuple.item2)));
 
     _registerChildHierarchySubscription = new rx.Observable<Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>>>.zip([
       _childHierarchies$ctrl.stream,
@@ -270,7 +270,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       .where((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => tuple.item1.item2)
       .map((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) => new Tuple2<Hierarchy, List<Hierarchy>>(tuple.item1.item1, tuple.item2))
       .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))
-      .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false))) as StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>>;
+      .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false)));
 
     _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem>>>.zip([
       rx.observable(_selection$Ctrl.stream).startWith(internalSelectedItems as List<ListItem<T>>),
@@ -294,7 +294,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       return selectedItems;
     })
       .where((_) => level == 0)
-      .listen(_selection$Ctrl.add) as StreamSubscription<Map<Hierarchy, List<ListItem>>>;
+      .listen(_selection$Ctrl.add);
 
     _selection$ = _selection$Ctrl.stream
       .map((Map<Hierarchy, List<ListItem>> map) {
