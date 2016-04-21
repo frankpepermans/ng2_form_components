@@ -273,36 +273,38 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _analyzeRange(Range range) {
-    final DocumentFragment fragment = range.cloneContents();
-    final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
+    if (buttons != null) {
+      final DocumentFragment fragment = range.cloneContents();
+      final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
 
-    List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
-      prev.addAll(value);
+      List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
+        prev.addAll(value);
 
-      return prev;
-    });
+        return prev;
+      });
 
-    allButtons.forEach((HTMLTextTransformation transformation) {
-      final String tag = transformer.toNodeNameFromTransformation(transformation);
+      allButtons.forEach((HTMLTextTransformation transformation) {
+        final String tag = transformer.toNodeNameFromTransformation(transformation);
 
-      transformation.doRemoveTag = encounteredElementFullNames.contains(tag);
+        transformation.doRemoveTag = encounteredElementFullNames.contains(tag);
 
-      if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
-        Node currentNode = range.startContainer;
+        if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
+          Node currentNode = range.startContainer;
 
-        while (currentNode != null && currentNode != this.element.nativeElement) {
-          if (transformer.toNodeNameFromElement(currentNode) == tag) {
-            transformation.doRemoveTag = true;
-            transformation.outerContainer = currentNode;
+          while (currentNode != null && currentNode != this.element.nativeElement) {
+            if (transformer.toNodeNameFromElement(currentNode) == tag) {
+              transformation.doRemoveTag = true;
+              transformation.outerContainer = currentNode;
 
-            break;
+              break;
+            }
+
+            currentNode = currentNode.parentNode;
           }
-
-          currentNode = currentNode.parentNode;
         }
-      }
-    });
+      });
 
-    changeDetector.markForCheck();
+      changeDetector.markForCheck();
+    }
   }
 }
