@@ -71,6 +71,7 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
     isOpen = tuple.item1;
 
     changeDetector.markForCheck();
+    changeDetector.detectChanges();
   }
 
   @override void ngOnDestroy() {
@@ -117,6 +118,7 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
       this.isOpen = true;
 
       changeDetector.markForCheck();
+      changeDetector.detectChanges();
     } else {
       _beforeDestroyChildSubscription?.cancel();
 
@@ -128,6 +130,7 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
         this.isOpen = false;
 
         changeDetector.markForCheck();
+        changeDetector.detectChanges();
       });
     }
   }

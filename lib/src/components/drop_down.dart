@@ -225,6 +225,8 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
             .where((FormComponent component) => (component != this && component is DropDown && component.isOpen))
             .forEach((FormComponent component) => (component as DropDown).openOrClose());
         }
+
+        changeDetector.markForCheck();
       });
 
     _selectedItemsSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest([

@@ -20,9 +20,12 @@ typedef void ListDragDropHandler(ListItem dragListItem, ListItem dropListItem);
     selector: 'list-item-renderer',
     template: '''
       <div #renderType></div>
-    '''
+    ''',
+    changeDetection: ChangeDetectionStrategy.OnPush
 )
 class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy {
+
+  @ViewChild('renderType', read: ViewContainerRef) ViewContainerRef renderTypeTarget;
 
   //-----------------------------
   // input
@@ -69,7 +72,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   }
 
   @override void ngAfterViewInit() {
-    dynamicComponentLoader.loadIntoLocation(renderType, elementRef, 'renderType', Injector.resolve(<Provider>[
+    dynamicComponentLoader.loadNextToLocation(renderType, renderTypeTarget, ReflectiveInjector.resolve(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),
       new Provider(IsSelectedHandler, useValue: isSelected),
@@ -92,7 +95,9 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
           });
       }
 
-      changeDetector.markForCheck();
+      ref.changeDetectorRef.detectChanges();
+
+      changeDetector.detectChanges();
     });
   }
 

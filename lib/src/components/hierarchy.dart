@@ -385,8 +385,12 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
           _openListItems$Ctrl.add(openItems);
 
           changeDetector.markForCheck();
+          changeDetector.detectChanges();
         });
     }
+
+    changeDetector.markForCheck();
+    changeDetector.detectChanges();
   }
 
   List<ListItem<T>> resolveChildren(ListItem<T> listItem) {

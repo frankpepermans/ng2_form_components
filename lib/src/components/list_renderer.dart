@@ -28,10 +28,7 @@ class SelectedItemsPipe<T extends Comparable> implements PipeTransform {
 
   const SelectedItemsPipe();
 
-  @override List<ListItem<T>> transform(List<ListItem<T>> dataProvider, [List<dynamic> args = null]) {
-    final Function handler = args.first as Function;
-    final bool moveSelectionOnTop = args.last as bool;
-
+  List<ListItem<T>> transform(List<ListItem<T>> dataProvider, Function handler, bool moveSelectionOnTop) {
     if (!moveSelectionOnTop) return const [];
 
     return dataProvider.where((ListItem<T> listItem) => listItem != null && handler(listItem)).toList(growable: false);
@@ -44,10 +41,7 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
 
   const UnselectedItemsPipe();
 
-  @override List<ListItem<T>> transform(List<ListItem<T>> dataProvider, [List<dynamic> args = null]) {
-    final Function handler = args.first as Function;
-    final bool moveSelectionOnTop = args.last as bool;
-
+  List<ListItem<T>> transform(List<ListItem<T>> dataProvider, Function handler, bool moveSelectionOnTop) {
     if (!moveSelectionOnTop) return dataProvider;
 
     return dataProvider.where((ListItem<T> listItem) => listItem != null && !handler(listItem)).toList(growable: false);

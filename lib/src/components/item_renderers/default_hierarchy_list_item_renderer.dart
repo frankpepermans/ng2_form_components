@@ -13,7 +13,7 @@ import 'package:ng2_form_components/src/components/list_item.dart';
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
 
 @Component(
-    selector: 'default-list-item-renderer',
+    selector: 'default-hierarchy-list-item-renderer',
     template: '''
       <div class="instance" (click)="triggerSelection()" style="padding:5px">
         <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelHandler(listItem.data)}}</label>
