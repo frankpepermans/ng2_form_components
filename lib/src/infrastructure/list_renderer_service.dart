@@ -10,8 +10,8 @@ class ListRendererService {
   List<ListRendererEvent> lastResponders;
 
   Stream<ListItem> get rendererSelection$ => _rendererSelection$ctrl.stream;
-  Stream<ItemRendererEvent> get event$ => _event$ctrl.stream;
-  Stream<List<ListRendererEvent>> get responders$ => _responder$ctrl.stream;
+  Stream<ItemRendererEvent<dynamic, Comparable>> get event$ => _event$ctrl.stream;
+  Stream<List<ListRendererEvent<dynamic, Comparable>>> get responders$ => _responder$ctrl.stream;
 
   final List<Map<Element, ListItem>> dragDropElements = <Map<Element, ListItem>>[];
 

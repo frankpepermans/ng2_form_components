@@ -1,5 +1,5 @@
-<div class="ng2-form-components-drop-down">
-    <div class="drop-down-header" (click)="openOrCloseFromHeader()">
+<div [ngClass]="cssMap">
+    <div class="drop-down-header" (click)="openOrCloseFromHeader()" [ngClass]="{'open':isOpen}">
         <div class="header">
             <span class="header-label">{{currentHeaderLabel}}</span>
             <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>

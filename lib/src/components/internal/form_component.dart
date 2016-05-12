@@ -10,7 +10,7 @@ typedef String LabelHandler(dynamic data);
 
 abstract class FormComponent<T extends Comparable> implements StatefulComponent, OnDestroy {
 
-  final ChangeDetectorRef changeDetector;
+  @override final ChangeDetectorRef changeDetector;
   final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
 
   @override Stream<bool> get onDestroy => _onDestroy$ctrl.stream;

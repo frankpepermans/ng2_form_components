@@ -21,7 +21,7 @@ import 'package:ng2_form_components/src/components/animation/hierarchy_animation
 
 import 'package:ng2_form_components/src/components/item_renderers/default_hierarchy_list_item_renderer.dart' show DefaultHierarchyListItemRenderer;
 
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent, ListRendererEvent;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ItemRendererEvent, ListRendererEvent;
 
 import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase;
 
@@ -113,7 +113,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   @override @Output() rx.Observable<List<ListItem<T>>> get selectedItemsChanged => rx.observable(_selection$) as rx.Observable<List<ListItem>>;
   @override @Output() Stream<bool> get requestClose => super.requestClose;
   @override @Output() Stream<bool> get scrolledToBottom => super.scrolledToBottom;
-  @override @Output() Stream<ItemRendererEvent> get itemRendererEvent => super.itemRendererEvent;
+  @override @Output() Stream<ItemRendererEvent<dynamic, Comparable>> get itemRendererEvent => super.itemRendererEvent;
 
   @override StreamController get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
@@ -398,7 +398,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   void handleRendererEvent(ItemRendererEvent<dynamic, Comparable> event) {
-    if (event.type == 'childRegistry') _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(event.data, true));
+    if (event.type == 'childRegistry') _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(event.data as Hierarchy, true));
 
     if (!allowMultiSelection && event.type == 'selection') {
       clearSelection((ListItem listItem) => listItem != event.listItem);

@@ -46,6 +46,12 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     _dataProvider = value;
   }
 
+  bool _updateHeaderLabelWithSelection = true;
+  bool get updateHeaderLabelWithSelection => _updateHeaderLabelWithSelection;
+  @Input() void set updateHeaderLabelWithSelection(bool value) {
+    _updateHeaderLabelWithSelection = value;
+  }
+
   Iterable<ListItem<T>> _selectedItems = <ListItem<T>>[];
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
   @Input() void set selectedItems(Iterable<ListItem<T>> value) {
@@ -57,6 +63,16 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   @Input() void set headerLabel(String value) {
     _headerLabel = value;
   }
+
+  String _className = 'ng2-form-components-drop-down';
+  String get className => _className;
+  @Input() void set className(String value) {
+    _className = value;
+
+    cssMap = <String, bool>{value: true};
+  }
+
+  Map<String, bool> cssMap = const <String, bool>{'ng2-form-components-drop-down': true};
 
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
@@ -201,7 +217,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
       rx.observable(_headerLabel$ctrl.stream).startWith(const <String>['']),
       rx.observable(_selectedItems$ctrl.stream).startWith(const [])
     ], (String label, Iterable<ListItem<T>> selectedItems) {
-      if (selectedItems != null && selectedItems.isNotEmpty) {
+      if (updateHeaderLabelWithSelection && selectedItems != null && selectedItems.isNotEmpty) {
         return (selectedItems.length == 1) ?
           labelHandler(selectedItems.first.data) :
           selectedItems.map((ListItem<T> listItem) => labelHandler(listItem.data)).join(', ');
