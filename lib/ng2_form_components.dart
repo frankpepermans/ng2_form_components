@@ -4,7 +4,7 @@ export 'package:ng2_form_components/src/components/list_item.dart'
     show ListItem;
 
 export 'src/components/internal/form_component.dart'
-    show LabelHandler, FormComponent;
+    show LabelHandler, FormComponent, ResolveChildrenHandler, ResolveRendererHandler;
 
 export 'src/components/text_input.dart'
     show TextInput, TextInputAction;
@@ -34,7 +34,7 @@ export 'src/components/helpers/html_transform.dart'
     show HTMLTransform;
 
 export 'src/components/hierarchy.dart'
-    show Hierarchy, ResolveChildrenHandler, ResolveRendererHandler;
+    show Hierarchy;
 
 export 'src/components/item_renderers/default_list_item_renderer.dart'
     show DefaultListItemRenderer;

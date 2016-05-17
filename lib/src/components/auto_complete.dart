@@ -33,10 +33,6 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
     super.labelHandler = value;
   }
 
-  @override @Input() void set listItemRenderer(Type value) {
-    super.listItemRenderer = value;
-  }
-
   @override @Input() void set dataProvider(Iterable<ListItem<T>> value) {
     super.dataProvider = value;
   }
@@ -55,6 +51,10 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
 
   @override @Input() void set childOffset(int value) {
     super.childOffset = value;
+  }
+
+  @override @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+    super.resolveRendererHandler = value;
   }
 
   int _minCharsRequired = 3;

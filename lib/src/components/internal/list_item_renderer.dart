@@ -10,6 +10,8 @@ import 'package:ng2_form_components/src/components/list_item.dart' show ListItem
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService;
 
+import 'package:ng2_form_components/src/components/internal/form_component.dart';
+
 import 'package:dnd/dnd.dart';
 
 typedef bool IsSelectedHandler (ListItem listItem);
@@ -32,10 +34,10 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   @Input() int index;
   @Input() LabelHandler labelHandler;
   @Input() ListDragDropHandler dragDropHandler;
-  @Input() Type renderType;
   @Input() ListItem<T> listItem;
   @Input() IsSelectedHandler isSelected;
   @Input() GetHierarchyOffsetHandler getHierarchyOffset;
+  @Input() ResolveRendererHandler resolveRendererHandler;
 
   //-----------------------------
   // public properties
@@ -69,7 +71,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   }
 
   @override void ngAfterViewInit() {
-    dynamicComponentLoader.loadIntoLocation(renderType, elementRef, 'renderType', Injector.resolve(<Provider>[
+    dynamicComponentLoader.loadIntoLocation(resolveRendererHandler(0, listItem), elementRef, 'renderType', Injector.resolve(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),
       new Provider(IsSelectedHandler, useValue: isSelected),

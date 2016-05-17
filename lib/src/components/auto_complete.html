@@ -8,7 +8,7 @@
     <div *ngIf="hasDropDownValues" class="drop-down-list">
         <div tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">
             <list-renderer
-                    [itemRenderer]="listItemRenderer"
+                    [resolveRendererHandler]="resolveRendererHandler"
                     [labelHandler]="labelHandler"
                     [allowMultiSelection]="allowMultiSelection"
                     [moveSelectionOnTop]="true"

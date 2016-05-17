@@ -85,10 +85,10 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _dragDropHandler = value;
   }
 
-  Type _itemRenderer = DefaultListItemRenderer;
-  Type get itemRenderer => _itemRenderer;
-  @Input() void set itemRenderer(Type value) {
-    _itemRenderer = value;
+  ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
+  ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
+  @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+    _resolveRendererHandler = value;
   }
 
   List<ListItem<T>> _dataProvider = <ListItem<T>>[];

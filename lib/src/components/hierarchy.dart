@@ -25,8 +25,7 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
 
 import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase;
 
-typedef List<ListItem> ResolveChildrenHandler(int level, ListItem listItem);
-typedef Type ResolveRendererHandler(int level);
+import 'package:ng2_form_components/src/components/internal/form_component.dart' show ResolveChildrenHandler, ResolveRendererHandler;
 
 @Component(
     selector: 'hierarchy',
@@ -68,8 +67,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   @override bool get moveSelectionOnTop => false;
 
-  @override Type get itemRenderer => resolveRendererHandler(level);
-
   @override @Input() void set childOffset(int value) {
     super.childOffset = value;
   }
@@ -100,10 +97,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _resolveChildrenHandler = value;
   }
 
-  ResolveRendererHandler _resolveRendererHandler = (int level) => DefaultHierarchyListItemRenderer;
-  ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
-  @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
-    _resolveRendererHandler = value;
+  @override @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+    super.resolveRendererHandler = value;
   }
 
   //-----------------------------
@@ -149,6 +144,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   Hierarchy(
       @Inject(ElementRef) ElementRef element,
       @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(element, changeDetector) {
+    super.resolveRendererHandler = (int level, [_]) => DefaultHierarchyListItemRenderer;
+
     _initStreams();
 
     listRendererService.triggerEvent(new ItemRendererEvent<Hierarchy, T>('childRegistry', null, this));
@@ -414,4 +411,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
     if (!allowMultiSelection) _clearChildHierarchies$ctrl.add((ListItem listItem) => true);
   }
+
+  Type listItemRendererHandler(_, [__]) => resolveRendererHandler(level);
 }

@@ -35,7 +35,6 @@ class AppComponent {
   final TextInputAction notifyInputAction = (String inputValue) => print(inputValue);
 
   Type listItemRenderer = DefaultListItemRenderer;
-  Type personListItemRenderer = PersonListItemRenderer;
 
   LabelHandler labelHandler = (String value) => value;
   LabelHandler personLabelHandler = (domain.Person value) => value.name;
@@ -52,7 +51,7 @@ class AppComponent {
   StateRecordingSession recordingSession;
   bool isReplaying = false;
 
-  ResolveChildrenHandler resolveChildrenHandler = (int level, ListItem listItem) {
+  ResolveChildrenHandler resolveChildrenHandler = (int level, ListItem<Comparable> listItem) {
     final ListItem<HierarchyLevel> cast = listItem as ListItem<HierarchyLevel>;
     List<ListItem<HierarchyLevel>> result;
 
@@ -65,6 +64,8 @@ class AppComponent {
 
     return result;
   };
+
+  final ResolveRendererHandler personListItemRendererHandler = (_, [__]) => PersonListItemRenderer;
 
   final String model = 'Dart and Angular2 plus some reactive awesome sauce';
 

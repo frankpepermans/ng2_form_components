@@ -1,6 +1,7 @@
 library ng2_form_components.components.drop_down;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
@@ -32,12 +33,6 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   LabelHandler get labelHandler => _labelHandler;
   @Input() void set labelHandler(LabelHandler value) {
     _labelHandler = value;
-  }
-
-  Type _listItemRenderer = DefaultListItemRenderer;
-  Type get listItemRenderer => _listItemRenderer;
-  @Input() void set listItemRenderer(Type value) {
-    _listItemRenderer = value;
   }
 
   Iterable<ListItem<T>> _dataProvider;
@@ -84,6 +79,18 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   int get childOffset => _childOffset;
   @Input() void set childOffset(int value) {
     _childOffset = value;
+  }
+
+  ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
+  ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
+  @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+    _resolveRendererHandler = value;
+  }
+
+  Function _defaultHandler;
+  Function get defaultHandler => _defaultHandler;
+  @Input() void set defaultHandler(Function value) {
+    _defaultHandler = value;
   }
 
   //-----------------------------
@@ -290,13 +297,21 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   // template methods
   //-----------------------------
 
+  void close() {
+    if (isOpen) openOrClose();
+  }
+
   void openOrClose() {
     _openClose$ctrl.add(!isOpen);
   }
 
-  void openOrCloseFromHeader() {
-    if (_isClosedFromList) _isClosedFromList = false;
-    else openOrClose();
+  void openOrCloseFromHeader(MouseEvent event) {
+    if (defaultHandler != null && event.offset.x < (event.target as Element).client.width - 40) {
+      defaultHandler();
+    } else {
+      if (_isClosedFromList) _isClosedFromList = false;
+      else openOrClose();
+    }
   }
 
   void closeFromList() {
