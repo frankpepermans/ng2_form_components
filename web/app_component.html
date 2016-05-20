@@ -78,7 +78,8 @@
     </div>
 </div>
 
-<html-text-transform-component state="app-state" stateId="txt" [buttons]="buttons" [model]="model" (hasSelectedRange)="handleRange($event)"></html-text-transform-component>
+<html-text-transform-menu #textEditorMenu [buttons]="buttons"></html-text-transform-menu>
+<html-text-transform-component state="app-state" stateId="txt" [menu]="textEditorMenu" [model]="model" (hasSelectedRange)="handleRange($event)"></html-text-transform-component>
 
 <div style="width: 500px">
     <hierarchy

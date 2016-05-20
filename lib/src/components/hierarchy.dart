@@ -71,7 +71,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.childOffset = value;
   }
 
-  @override @Input() void set rendererEvents(List<ListRendererEvent> value) {
+  @override @Input() void set rendererEvents(List<ListRendererEvent<dynamic, Comparable>> value) {
     super.rendererEvents = value;
   }
 

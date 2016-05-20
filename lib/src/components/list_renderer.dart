@@ -123,7 +123,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
   List<ListRendererEvent> _rendererEvents;
   List<ListRendererEvent> get rendererEvents => _rendererEvents;
-  @Input() void set rendererEvents(List<ListRendererEvent> value) {
+  @Input() void set rendererEvents(List<ListRendererEvent<dynamic, Comparable>> value) {
     _rendererEvents = value;
   }
 

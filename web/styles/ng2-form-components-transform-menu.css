@@ -1,0 +1,33 @@
+.ng2-html-text-transform-menu {
+    display: flex;
+    background: #eee;
+    border-bottom: 1px solid #ccc;
+}
+
+.ng2-html-text-transform-menu .ng2-html-text-transform-buttons {
+    padding: 10px;
+}
+
+.ng2-html-text-transform-menu .ng2-html-text-transform-buttons .ng2-html-text-transform-button {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
+    background: #fff;
+    margin: 4px;
+    border: 1px solid #aaa;
+}
+
+.ng2-html-text-transform-menu .ng2-html-text-transform-buttons .selected {
+    background: #ccc;
+}
+
+.ng2-html-text-transform-menu .ng2-html-text-transform-buttons .disabled {
+    pointer-events: none;
+    background: #eee;
+    border: 1px solid #ccc;
+    color: #fff;
+}
+
+.ng2-html-text-transform-menu .ng2-html-text-transform-buttons:hover {
+    background: #ddd;
+}

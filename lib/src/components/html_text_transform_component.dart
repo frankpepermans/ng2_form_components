@@ -15,6 +15,8 @@ import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
 import 'package:ng2_form_components/src/components/helpers/html_transform.dart' show HTMLTransform;
 
+import 'package:ng2_form_components/src/components/html_text_transform_menu.dart';
+
 @Component(
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
@@ -33,7 +35,16 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   //-----------------------------
 
   @Input() String model;
-  @Input() List<List<HTMLTextTransformation>> buttons;
+
+  HTMLTextTransformMenu _menu;
+  HTMLTextTransformMenu get menu => _menu;
+  @Input() void set menu(HTMLTextTransformMenu value) {
+    _menu = value;
+
+    _menuSubscription?.cancel();
+
+    if (value != null) _menuSubscription = value.transformation.listen(transformSelection);
+  }
 
   //-----------------------------
   // output
@@ -50,6 +61,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   rx.Observable<Tuple2<Range, HTMLTextTransformation>> _rangeTransform$;
   StreamSubscription<Tuple2<Range, HTMLTextTransformation>> _range$subscription;
   StreamSubscription<bool> _hasRangeSubscription;
+  StreamSubscription<HTMLTextTransformation> _menuSubscription;
 
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
@@ -95,6 +107,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     _range$subscription?.cancel();
     _hasRangeSubscription?.cancel();
+    _menuSubscription?.cancel();
   }
 
   //-----------------------------
@@ -259,8 +272,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
 
   void _resetButtons() {
-    if (buttons != null) {
-      List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
+    if (menu.buttons != null) {
+      List<HTMLTextTransformation> allButtons = menu.buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
         prev.addAll(value);
 
         return prev;
@@ -273,11 +286,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _analyzeRange(Range range) {
-    if (buttons != null) {
+    if (menu.buttons != null) {
       final DocumentFragment fragment = range.cloneContents();
       final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
 
-      List<HTMLTextTransformation> allButtons = buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
+      List<HTMLTextTransformation> allButtons = menu.buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
         prev.addAll(value);
 
         return prev;

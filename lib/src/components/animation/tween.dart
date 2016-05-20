@@ -29,6 +29,24 @@ class Tween implements OnInit {
     _beforeDestroyChildTrigger = value;
   }
 
+  int _startValue = -1;
+  int get startValue => _startValue;
+  @Input() void set startValue(int value) {
+    _startValue = value;
+  }
+
+  int _endValue = -1;
+  int get endValue => _endValue;
+  @Input() void set endValue(int value) {
+    _endValue = value;
+  }
+
+  bool _hasCloseAnimation = true;
+  bool get hasCloseAnimation => _hasCloseAnimation;
+  @Input() void set hasCloseAnimation(bool value) {
+    _hasCloseAnimation = value;
+  }
+
   final AnimationBuilder animationBuilder;
   final ElementRef element;
 
@@ -45,37 +63,50 @@ class Tween implements OnInit {
 
     window.animationFrame.whenComplete(tweenOpen);
 
-    if (beforeDestroyChildTrigger != null) beforeDestroyChildTrigger.stream.take(1).listen(tweenClose);
+    if (hasCloseAnimation && beforeDestroyChildTrigger != null) beforeDestroyChildTrigger.stream.take(1).listen(tweenClose);
   }
 
   void tweenOpen() {
+    final int t0 = startValue == -1 ? -nativeElement.clientHeight : startValue;
+    final int t1 = endValue == -1 ? 0 : endValue;
+
     cssAnimationBuilder.setDuration(duration);
 
     cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      tweenStyleProperty: '-${nativeElement.clientHeight}px',
+      tweenStyleProperty: '${t0}px',
       'visibility': 'visible'
     });
 
     cssAnimationBuilder.setToStyles(<String, dynamic>{
-      tweenStyleProperty: '0'
+      tweenStyleProperty: '${t1}px'
     });
 
-    cssAnimationBuilder.start(nativeElement)
-      ..onComplete(() {
-        nativeElement.style.removeProperty(tweenStyleProperty);
-        nativeElement.style.removeProperty('visibility');
-      });
+    if (hasCloseAnimation) {
+      cssAnimationBuilder.start(nativeElement)
+        ..onComplete(() {
+          nativeElement.style.removeProperty(tweenStyleProperty);
+          nativeElement.style.removeProperty('visibility');
+        });
+    } else {
+      cssAnimationBuilder.start(nativeElement)
+        ..onComplete(() {
+          nativeElement.style.removeProperty('visibility');
+        });
+    }
   }
 
   void tweenClose(_) {
+    final int t0 = startValue == -1 ? 0 : startValue;
+    final int t1 = endValue == -1 ? -nativeElement.clientHeight : endValue;
+
     cssAnimationBuilder.setDuration(duration);
 
     cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      tweenStyleProperty: '0'
+      tweenStyleProperty: '${t0}px'
     });
 
     cssAnimationBuilder.setToStyles(<String, dynamic>{
-      tweenStyleProperty: '-${nativeElement.clientHeight}px'
+      tweenStyleProperty: '${t1}px'
     });
 
     cssAnimationBuilder.start(nativeElement)

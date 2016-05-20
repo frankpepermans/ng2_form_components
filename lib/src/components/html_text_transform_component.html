@@ -1,12 +1,3 @@
 <div class="ng2-html-text-transform">
-    <div class="ng2-html-text-transform-buttons">
-        <div class="buttons" *ngFor='#buttonSet of buttons'>
-            <button *ngFor='#button of buttonSet'
-                    class="button"
-                    [ngClass]="{'selected': button.doRemoveTag, 'disabled': !button.enabled || (!button.allowRemove && button.doRemoveTag)}"
-                    (mousedown)="transformSelection(button)"
-                    [innerHtml]="button.label"></button>
-        </div>
-    </div>
-    <div #content class="ng2-html-text-transform-text-area" contenteditable="true"></div>
+    <div #content class="ng2-html-text-transform-text-area" contenteditable="true" spellcheck="false"></div>
 </div>

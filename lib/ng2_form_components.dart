@@ -27,6 +27,9 @@ export 'src/components/side_panel.dart'
 export 'src/components/html_text_transform_component.dart'
     show HTMLTextTransformComponent;
 
+export 'src/components/html_text_transform_menu.dart'
+    show HTMLTextTransformMenu;
+
 export 'src/components/helpers/html_text_transformation.dart'
     show HTMLTextTransformation;
 
