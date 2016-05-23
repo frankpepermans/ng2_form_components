@@ -1,4 +1,4 @@
-<div list-renderer class="ng2-form-components-list-renderer">
+<div [ngClass]="cssMap">
     <div class="fixed-pane">
         <div class="data-group" *ngFor='#listItem of dataProvider | selectedItems:isSelected:moveSelectionOnTop; #i = index'>
             <div class="item selected">

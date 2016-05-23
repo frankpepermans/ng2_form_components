@@ -19,8 +19,8 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
 
 import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase;
 
-typedef bool IsSelectedHandler(ListItem listItem);
-typedef bool ClearSelectionWhereHandler(ListItem listItem);
+typedef bool IsSelectedHandler(ListItem<Comparable> listItem);
+typedef bool ClearSelectionWhereHandler(ListItem<Comparable> listItem);
 
 @Pipe(name: 'selectedItems')
 @Injectable()
@@ -133,6 +133,14 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _pageOffset = value;
   }
 
+  String _className = 'ng2-form-components-list-renderer';
+  String get className => _className;
+  @Input() void set className(String value) {
+    _className = value;
+
+    cssMap = <String, bool>{value: true};
+  }
+
   //-----------------------------
   // output
   //-----------------------------
@@ -146,6 +154,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   // private properties
   //-----------------------------
 
+  Map<String, bool> cssMap = const <String, bool>{'ng2-form-components-list-renderer': true};
   rx.Observable<List<ListItem<T>>> get internalSelectedItemsChanged => _selectedItems$;
   Iterable<ListItem<T>> internalSelectedItems = new List<ListItem<T>>.unmodifiable(const []);
 

@@ -121,7 +121,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   final StreamController<Tuple2<Hierarchy, bool>> _childHierarchies$ctrl = new StreamController<Tuple2<Hierarchy, bool>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearChildHierarchies$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
   final StreamController<List<Hierarchy>> _childHierarchyList$ctrl = new StreamController<List<Hierarchy>>.broadcast();
-  final StreamController<Map<Hierarchy, List<ListItem>>> _selection$Ctrl = new StreamController<Map<Hierarchy, List<ListItem>>>.broadcast();
+  final StreamController<Map<Hierarchy, List<ListItem<T>>>> _selection$Ctrl = new StreamController<Map<Hierarchy, List<ListItem<T>>>>.broadcast();
   final StreamController<List<ListItem<T>>> _openListItems$Ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<int> _beforeDestroyChild$ctrl = new StreamController<int>.broadcast();
 
@@ -129,7 +129,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   StreamSubscription<Tuple2<List<Hierarchy>, ClearSelectionWhereHandler>> _clearChildHierarchiesSubscription;
   StreamSubscription<Tuple2<Hierarchy, List<Hierarchy>>> _registerChildHierarchySubscription;
-  StreamSubscription<Map<Hierarchy, List<ListItem>>> _selectionBuilderSubscription;
+  StreamSubscription<Map<Hierarchy, List<ListItem<T>>>> _selectionBuilderSubscription;
   StreamSubscription<Map<ListItem<T>, bool>> _beforeDestroyChildSubscription;
   StreamSubscription<int> _onBeforeDestroyChildSubscription;
 
@@ -269,7 +269,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       .flatMap((Tuple2<Hierarchy, List<Hierarchy>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))
       .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false)));
 
-    _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem>>>.zip([
+    _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem<T>>>>.zip([
       rx.observable(_selection$Ctrl.stream).startWith(internalSelectedItems as List<ListItem<T>>),
       rx.observable(_childHierarchyList$ctrl.stream)
         .flatMapLatest((List<Hierarchy> hierarchies) => new rx.Observable.merge((new List<Hierarchy>.from(hierarchies)..add(this))
@@ -303,7 +303,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       });
 
     _childHierarchyList$ctrl.add(const []);
-    _selection$Ctrl.add(<Hierarchy, List<ListItem>>{});
+    _selection$Ctrl.add(<Hierarchy, List<ListItem<T>>>{});
   }
 
   void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
@@ -394,13 +394,13 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     return result;
   }
 
-  void handleRendererEvent(ItemRendererEvent<dynamic, Comparable> event) {
+  void handleRendererEvent(ItemRendererEvent<dynamic, T> event) {
     if (event.type == 'childRegistry') _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(event.data as Hierarchy, true));
 
     if (!allowMultiSelection && event.type == 'selection') {
-      clearSelection((ListItem listItem) => listItem != event.listItem);
+      clearSelection((ListItem<Comparable> listItem) => listItem != event.listItem);
 
-      _clearChildHierarchies$ctrl.add((ListItem listItem) => listItem != event.listItem);
+      _clearChildHierarchies$ctrl.add((ListItem<Comparable> listItem) => listItem != event.listItem);
     }
 
     listRendererService.triggerEvent(event);
@@ -409,7 +409,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   @override void handleSelection(ListItem<Comparable> listItem) {
     super.handleSelection(listItem);
 
-    if (!allowMultiSelection) _clearChildHierarchies$ctrl.add((ListItem listItem) => true);
+    if (!allowMultiSelection) _clearChildHierarchies$ctrl.add((ListItem<Comparable> listItem) => true);
   }
 
   Type listItemRendererHandler(_, [__]) => resolveRendererHandler(level);
