@@ -13,7 +13,7 @@ class ListRendererService {
   Stream<ItemRendererEvent<dynamic, Comparable>> get event$ => _event$ctrl.stream;
   Stream<List<ListRendererEvent<dynamic, Comparable>>> get responders$ => _responder$ctrl.stream;
 
-  final List<Map<Element, ListItem>> dragDropElements = <Map<Element, ListItem>>[];
+  final List<Map<Element, ListItem<Comparable>>> dragDropElements = <Map<Element, ListItem<Comparable>>>[];
 
   final StreamController<ListItem> _rendererSelection$ctrl = new StreamController<ListItem>.broadcast();
   final StreamController<ItemRendererEvent> _event$ctrl = new StreamController<ItemRendererEvent>.broadcast();

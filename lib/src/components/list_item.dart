@@ -46,7 +46,7 @@ class ListItem<T extends Comparable> extends Entity implements Comparable {
   static ListItem construct() => new ListItem();
 
   @override int compareTo(ListItem other) {
-    if (other != null) return other.data.compareTo(data);
+    if (other != null && other.data != null) return other.data.compareTo(data);
 
     return -1;
   }

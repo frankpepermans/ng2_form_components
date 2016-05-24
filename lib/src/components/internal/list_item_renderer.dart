@@ -64,7 +64,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
   @override void ngOnDestroy() {
     if (dragDropHandler != null && listRendererService.dragDropElements.contains(elementRef.nativeElement)) {
-      listRendererService.dragDropElements.removeWhere((Map<Element, ListItem> valuePair) => valuePair.containsKey(elementRef.nativeElement));
+      listRendererService.dragDropElements.removeWhere((Map<Element, ListItem<Comparable>> valuePair) => valuePair.containsKey(elementRef.nativeElement));
     }
 
     _dropSubscription?.cancel();
