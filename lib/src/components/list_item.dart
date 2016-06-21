@@ -3,7 +3,7 @@ library ng2_form_components.domain.list_item;
 import 'package:dorm/dorm.dart';
 
 @Ref('entities.listItem')
-class ListItem<T extends Comparable> extends Entity implements Comparable {
+class ListItem<T extends Comparable> extends Entity implements Comparable<ListItem> {
 
   @override String get refClassName => 'entities.listItem';
 

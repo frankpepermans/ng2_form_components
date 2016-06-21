@@ -116,6 +116,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   void transformSelection(HTMLTextTransformation transformationType) => _transformation$ctrl.add(transformationType);
 
+  void forceUpdate(String result, [bool notifyStateListeners=true]) => _updateInnerHtmlTrusted(result, notifyStateListeners);
+
   //-----------------------------
   // inner methods
   //-----------------------------

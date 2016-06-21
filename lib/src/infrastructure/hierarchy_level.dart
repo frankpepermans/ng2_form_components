@@ -3,7 +3,7 @@ library domain.hierarchy_level;
 import 'package:dorm/dorm.dart';
 
 @Ref('domain.hierarchy_level')
-class HierarchyLevel extends Entity implements Comparable {
+class HierarchyLevel extends Entity implements Comparable<HierarchyLevel> {
 
   @override String get refClassName => 'domain.hierarchy_level';
 

@@ -188,6 +188,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   ListRenderer(
     @Inject(ElementRef) this.element,
     @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
+    listRendererService.setRenderer(this);
+
     _initStreams();
   }
 
@@ -301,6 +303,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(<Iterable<ListItem<T>>>[internalSelectedItems])
     ], (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
+      if (incoming == null) return new List<ListItem<T>>.unmodifiable(const []);
+
       List<ListItem<T>> newList = currentList.toList(growable: true);
 
       final ListItem<T> match = newList.firstWhere((ListItem<T> listItem) => listItem.compareTo(incoming) == 0, orElse: () => null);

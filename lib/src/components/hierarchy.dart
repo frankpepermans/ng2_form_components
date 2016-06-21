@@ -91,10 +91,24 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _hierarchySelectedItems = value;
   }
 
+  List<int> _levelsThatBreak = const [];
+  List<int> get levelsThatBreak => _levelsThatBreak;
+  @Input() void set levelsThatBreak(List<int> value) {
+    _levelsThatBreak = value;
+  }
+
   ResolveChildrenHandler _resolveChildrenHandler;
   ResolveChildrenHandler get resolveChildrenHandler => _resolveChildrenHandler;
   @Input() void set resolveChildrenHandler(ResolveChildrenHandler value) {
     _resolveChildrenHandler = value;
+  }
+
+  bool _allowToggle = true;
+  bool get allowToggle => _allowToggle;
+  @Input() void set allowToggle(bool value) {
+    _allowToggle = value;
+
+    changeDetector.markForCheck();
   }
 
   @override @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
@@ -307,19 +321,21 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
-    if (level == 0) selectedItems.forEach(handleSelection);
-    else {
-      //TODO: do this after a change detection has occurred instead
-      new Timer(const Duration(milliseconds: 100), () {
-        selectedItems.forEach((ListItem<Comparable> listItem) {
-          rx.observable(listRendererService.rendererSelection$)
-            .take(1)
-            .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
-            .listen(handleRendererEvent);
+    if (selectedItems != null && selectedItems.isNotEmpty) {
+      if (level == 0) selectedItems.forEach(handleSelection);
+      else {
+        //TODO: do this after a change detection has occurred instead
+        new Timer(const Duration(milliseconds: 100), () {
+          selectedItems.forEach((ListItem<Comparable> listItem) {
+            rx.observable(listRendererService.rendererSelection$)
+                .take(1)
+                .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
+                .listen(handleRendererEvent);
 
-          listRendererService.triggerSelection(listItem);
+            listRendererService.triggerSelection(listItem);
+          });
         });
-      });
+      }
     }
   }
 
@@ -341,6 +357,10 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     });
 
     return result;
+  }
+
+  void maybeToggleChildren(ListItem<T> listItem, int index) {
+    if (!allowToggle) toggleChildren(listItem, index);
   }
 
   void toggleChildren(ListItem<T> listItem, int index) {

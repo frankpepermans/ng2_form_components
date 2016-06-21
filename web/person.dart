@@ -3,7 +3,7 @@ library domain.person;
 import 'package:dorm/dorm.dart';
 
 @Ref('domain.person')
-class Person extends Entity implements Comparable {
+class Person extends Entity implements Comparable<Person> {
 
   @override String get refClassName => 'domain.person';
 

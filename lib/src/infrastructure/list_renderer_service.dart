@@ -3,11 +3,14 @@ library ng2_form_components.infrastructure.list_renderer_service;
 import 'dart:async';
 import 'dart:html';
 
+import 'package:ng2_form_components/src/components/list_renderer.dart';
+
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
 
 class ListRendererService {
 
   List<ListRendererEvent> lastResponders;
+  ListRenderer renderer;
 
   Stream<ListItem> get rendererSelection$ => _rendererSelection$ctrl.stream;
   Stream<ItemRendererEvent<dynamic, Comparable>> get event$ => _event$ctrl.stream;
@@ -20,6 +23,10 @@ class ListRendererService {
   final StreamController<List<ListRendererEvent>> _responder$ctrl = new StreamController<List<ListRendererEvent>>.broadcast();
 
   ListRendererService();
+
+  void setRenderer(ListRenderer renderer) {
+    this.renderer = renderer;
+  }
 
   void triggerSelection(ListItem listItem) => _rendererSelection$ctrl.add(listItem);
 
