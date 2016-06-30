@@ -161,6 +161,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     contentElement.nativeElement.addEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription = _rangeTransform$
+      .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) => new Stream.fromFuture(tuple.item2.setup())
+        .map((HTMLTextTransformation transformation) => new Tuple2<Range, HTMLTextTransformation>(tuple.item1, transformation)))
+      .where((Tuple2<Range, HTMLTextTransformation> tuple) => tuple.item2 != null)
       .listen(_transformContent);
 
     _hasRangeSubscription = _range$
