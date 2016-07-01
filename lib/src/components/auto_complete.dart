@@ -57,6 +57,10 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
     super.resolveRendererHandler = value;
   }
 
+  @override @Input() void set className(String value) {
+    super.className = value;
+  }
+
   int _minCharsRequired = 3;
   int get minCharsRequired => _minCharsRequired;
   @Input() void set minCharsRequired(int value) {
@@ -100,6 +104,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   //-----------------------------
 
   AutoComplete(@Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
+    super.className = 'ng2-form-components-auto-complete';
+
     _initStreams();
   }
 
@@ -157,6 +163,16 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
     if (_mergedDataProviderChangedSubscription != null) _mergedDataProviderChangedSubscription.cancel();
     if (_inputChangedSubscription != null) _inputChangedSubscription.cancel();
     if (_currentHeaderLabelSubscription != null) _currentHeaderLabelSubscription.cancel();
+  }
+
+  void setInputValue(String value) {
+    inputValue = value;
+
+    _inputCriteriaMet$ctrl.add(value.length >= minCharsRequired);
+
+    _input$ctrl.add(value);
+
+    changeDetector.markForCheck();
   }
 
   //-----------------------------

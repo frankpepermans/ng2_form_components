@@ -1,4 +1,4 @@
-<div class="ng2-form-components-auto-complete">
+<div [ngClass]="cssMap">
     <div class="drop-down-header">
         <input type="text" [placeholder]="headerLabel" (input)="handleInput($event)" (focus)="handleFocus()" [value]="inputValue">
         <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>
