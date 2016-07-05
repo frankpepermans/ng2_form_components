@@ -137,8 +137,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() {
-    return new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest([
+  @override Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest([
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(<Iterable<ListItem<T>>>[selectedItems]),
       rx.observable(_openClose$ctrl.stream)
@@ -147,7 +146,6 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     ], (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
       ..item1 = isOpen
       ..item2 = items);
-  }
 
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple2<bool, Iterable<ListItem<T>>> tuple = entity as SerializableTuple2<bool, Iterable<ListItem<T>>>;
@@ -168,9 +166,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     if (changes.containsKey('selectedItems')) _selectedItems$ctrl.add(selectedItems);
   }
 
-  @override void ngAfterViewInit() {
-    FormComponent.openFormComponents.add(this);
-  }
+  @override void ngAfterViewInit() => FormComponent.openFormComponents.add(this);
 
   @override Stream<bool> ngBeforeDestroyChild([List args]) async* {
     final Completer<bool> completer = new Completer<bool>();
@@ -301,9 +297,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     if (isOpen) openOrClose();
   }
 
-  void openOrClose() {
-    _openClose$ctrl.add(!isOpen);
-  }
+  void openOrClose() => _openClose$ctrl.add(!isOpen);
 
   void openOrCloseFromHeader(MouseEvent event) {
     if (defaultHandler != null && event.offset.x < (event.target as Element).client.width - 40) {

@@ -25,6 +25,8 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableT
 )
 class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChanges, OnDestroy, AfterViewInit {
 
+  @ViewChild('searchInput') ElementRef searchInput;
+
   //-----------------------------
   // input
   //-----------------------------
@@ -59,6 +61,12 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
 
   @override @Input() void set className(String value) {
     super.className = value;
+  }
+
+  bool _moveSelectionOnTop = true;
+  bool get moveSelectionOnTop => _moveSelectionOnTop;
+  @Input() void set moveSelectionOnTop(bool value) {
+    _moveSelectionOnTop = value;
   }
 
   int _minCharsRequired = 3;
@@ -283,7 +291,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   Tuple2<bool, List<ListItem<T>>> _rebuildMergedDataProvider(Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) {
     final List<ListItem<T>> list = new List<ListItem<T>>();
 
-    if (tuple.item3 != null) {
+    if (moveSelectionOnTop && tuple.item3 != null) {
       tuple.item3.forEach((ListItem<T> listItem) {
         if (list.firstWhere((ListItem<T> item) => listItem.compareTo(item) == 0, orElse: () => null) == null) list.add(listItem);
       });

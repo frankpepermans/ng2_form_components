@@ -1,6 +1,6 @@
 <div [ngClass]="cssMap">
     <div class="drop-down-header">
-        <input type="text" [placeholder]="headerLabel" (input)="handleInput($event)" (focus)="handleFocus()" [value]="inputValue">
+        <input #searchInput type="text" [placeholder]="headerLabel" (input)="handleInput($event)" (focus)="handleFocus()" [value]="inputValue">
         <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>
         <i *ngIf="showLoading" class="fa fa-spinner fa-spin space-right"></i>
         <i *ngIf="!showLoading" [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
@@ -11,7 +11,7 @@
                     [resolveRendererHandler]="resolveRendererHandler"
                     [labelHandler]="labelHandler"
                     [allowMultiSelection]="allowMultiSelection"
-                    [moveSelectionOnTop]="true"
+                    [moveSelectionOnTop]="moveSelectionOnTop"
                     [dataProvider]="mergedDataProvider"
                     [selectedItems]="selectedItems"
                     [childOffset]="childOffset"
