@@ -15,6 +15,8 @@ import 'package:ng2_form_components/src/components/list_item.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart';
 
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
+
 import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase;
 
 @Component(
@@ -102,6 +104,8 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
   @override StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
+  @Output() Stream<ItemRendererEvent> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
+
   //-----------------------------
   // private properties
   //-----------------------------
@@ -110,6 +114,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   final StreamController<String> _headerLabel$ctrl = new StreamController<String>();
   final StreamController<bool> _openClose$ctrl = new StreamController<bool>.broadcast();
   final StreamController<bool> _beforeDestroyChild$ctrl = new StreamController<bool>.broadcast();
+  final StreamController<ItemRendererEvent> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent>.broadcast();
 
   StreamSubscription<String> _currentHeaderLabelSubscription;
   StreamSubscription<bool> _openCloseSubscription;
@@ -319,5 +324,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   }
 
   void updateSelectedItems(Iterable<ListItem<T>> items) => _selectedItems$ctrl.add(items);
+
+  void handleItemRendererEvent(ItemRendererEvent event) => _itemRendererEvent$ctrl.add(event);
 
 }

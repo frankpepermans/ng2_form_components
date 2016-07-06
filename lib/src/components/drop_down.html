@@ -16,6 +16,7 @@
                     [selectedItems]="selectedItems"
                     [childOffset]="childOffset"
                     (selectedItemsChanged)="updateSelectedItems($event)"
+                    (itemRendererEvent)="handleItemRendererEvent($event)"
                     (requestClose)="closeFromList()">
             </list-renderer>
         </div>
