@@ -432,5 +432,5 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     if (!allowMultiSelection) _clearChildHierarchies$ctrl.add((ListItem<Comparable> listItem) => true);
   }
 
-  Type listItemRendererHandler(_, [__]) => resolveRendererHandler(level);
+  Type listItemRendererHandler(_, [ListItem<Comparable> listItem]) => resolveRendererHandler(level, listItem);
 }
