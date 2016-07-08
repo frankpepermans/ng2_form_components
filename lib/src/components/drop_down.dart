@@ -323,6 +323,18 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     openOrClose();
   }
 
+  String getHierarchyOffset(ListItem<T> listItem) {
+    int offset = 0;
+
+    while (listItem.parent != null) {
+      listItem = listItem.parent;
+
+      offset += childOffset;
+    }
+
+    return '${offset}px';
+  }
+
   void updateSelectedItems(Iterable<ListItem<T>> items) => _selectedItems$ctrl.add(items);
 
   void handleItemRendererEvent(ItemRendererEvent event) => _itemRendererEvent$ctrl.add(event);

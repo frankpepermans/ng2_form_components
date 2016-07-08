@@ -31,6 +31,7 @@
                            [resolveRendererHandler]="resolveRendererHandler"
                            [resolveChildrenHandler]="resolveChildrenHandler"
                            [dataProvider]="resolveChildren(listItem)"
+                           [childOffset]="childOffset"
                            [hierarchySelectedItems]="hierarchySelectedItems"
                            [level]="level + 1"
                            (itemRendererEvent)="handleRendererEvent($event)">
