@@ -71,7 +71,11 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   }
 
   @override void ngAfterViewInit() {
-    dynamicComponentLoader.loadIntoLocation(resolveRendererHandler(0, listItem), elementRef, 'renderType', Injector.resolve(<Provider>[
+    final Type resolvedRendererType = resolveRendererHandler(0, listItem);
+
+    if (resolvedRendererType == null) throw new ArgumentError('Unable to resolve renderer for list item: ${listItem.runtimeType}');
+
+    dynamicComponentLoader.loadIntoLocation(resolvedRendererType, elementRef, 'renderType', Injector.resolve(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),
       new Provider(IsSelectedHandler, useValue: isSelected),

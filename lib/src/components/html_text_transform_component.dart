@@ -277,7 +277,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
 
   void _resetButtons() {
-    if (menu.buttons != null) {
+    if (menu?.buttons != null) {
       List<HTMLTextTransformation> allButtons = menu.buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
         prev.addAll(value);
 
@@ -291,7 +291,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _analyzeRange(Range range) {
-    if (menu.buttons != null) {
+    if (menu?.buttons != null) {
       final DocumentFragment fragment = range.cloneContents();
       final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
 
