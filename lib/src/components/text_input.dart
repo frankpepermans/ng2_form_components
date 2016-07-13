@@ -32,6 +32,8 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
   @Input() String actionContainerClassName;
   @Input() String actionIconClassName;
 
+  @Output() Stream<String> get valueChanged => _input$ctrl.stream;
+
   //-----------------------------
   // output
   //-----------------------------
