@@ -23,7 +23,7 @@ import 'package:ng2_form_components/src/components/item_renderers/default_hierar
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ItemRendererEvent, ListRendererEvent;
 
-import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase, StateService;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show ResolveChildrenHandler, ResolveRendererHandler;
 
@@ -31,6 +31,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
     directives: const [State, Hierarchy, HierarchyAnimation, ListItemRenderer, NgClass],
+    providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
 class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
@@ -156,14 +157,15 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   //-----------------------------
 
   Hierarchy(
-      @Inject(ElementRef) ElementRef element,
-      @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(element, changeDetector) {
-    super.resolveRendererHandler = (int level, [_]) => DefaultHierarchyListItemRenderer;
+    @Inject(ElementRef) ElementRef element,
+    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+    @Inject(StateService) StateService stateService) : super(element, changeDetector, stateService) {
+      super.resolveRendererHandler = (int level, [_]) => DefaultHierarchyListItemRenderer;
 
-    _initStreams();
+      _initStreams();
 
-    listRendererService.triggerEvent(new ItemRendererEvent<Hierarchy, T>('childRegistry', null, this));
-  }
+      listRendererService.triggerEvent(new ItemRendererEvent<Hierarchy, T>('childRegistry', null, this));
+    }
 
   //-----------------------------
   // ng2 life cycle

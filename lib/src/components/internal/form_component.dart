@@ -16,6 +16,8 @@ typedef Type ResolveRendererHandler(int level, [ListItem<Comparable> listItem]);
 abstract class FormComponent<T extends Comparable> implements StatefulComponent, OnDestroy {
 
   @override final ChangeDetectorRef changeDetector;
+  final ElementRef elementRef;
+  final StateService stateService;
   final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
 
   @override Stream<bool> get onDestroy => _onDestroy$ctrl.stream;
@@ -26,7 +28,9 @@ abstract class FormComponent<T extends Comparable> implements StatefulComponent,
   // constructor
   //-----------------------------
 
-  FormComponent(this.changeDetector);
+  FormComponent(this.changeDetector, this.elementRef, this.stateService) {
+    registerElement();
+  }
 
   //-----------------------------
   // static internal properties
@@ -38,6 +42,12 @@ abstract class FormComponent<T extends Comparable> implements StatefulComponent,
   // ng2 life cycle
   //-----------------------------
 
-  @override void ngOnDestroy() => _onDestroy$ctrl.add(true);
+  @override void registerElement() => stateService.registerComponentElementRef(this, elementRef);
+
+  @override void ngOnDestroy() {
+    stateService.unregisterComponentElementRef(elementRef);
+
+    _onDestroy$ctrl.add(true);
+  }
 
 }

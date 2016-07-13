@@ -15,12 +15,13 @@ import 'package:ng2_form_components/src/components/list_renderer.dart';
 import 'package:ng2_form_components/src/components/list_item.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple3, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple3, StatePhase, StateService;
 
 @Component(
     selector: 'auto-complete',
     templateUrl: 'auto_complete.html',
-    directives: const [ListRenderer, Tween, NgClass, NgIf],
+    directives: const <Type>[ListRenderer, Tween, NgClass, NgIf],
+    providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
 class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChanges, OnDestroy, AfterViewInit {
@@ -111,7 +112,10 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   // constructor
   //-----------------------------
 
-  AutoComplete(@Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
+  AutoComplete(
+      @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+      @Inject(ElementRef) ElementRef elementRef,
+      @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
     super.className = 'ng2-form-components-auto-complete';
 
     _initStreams();

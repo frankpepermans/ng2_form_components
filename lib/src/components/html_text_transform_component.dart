@@ -9,7 +9,7 @@ import 'package:tuple/tuple.dart';
 import 'package:angular2/angular2.dart';
 import 'package:dorm/dorm.dart' show Entity;
 
-import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, StatePhase, StateService;
 
 import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent;
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
@@ -21,6 +21,7 @@ import 'package:ng2_form_components/src/components/html_text_transform_menu.dart
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
   directives: const [NgClass],
+  providers: const <Type>[StateService],
   changeDetection: ChangeDetectionStrategy.OnPush
 )
 class HTMLTextTransformComponent extends FormComponent implements StatefulComponent, OnDestroy, AfterViewInit {
@@ -74,7 +75,12 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   // Constructor
   //-----------------------------
 
-  HTMLTextTransformComponent(@Inject(ElementRef) this.element, @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector);
+  HTMLTextTransformComponent(
+    @Inject(ElementRef) ElementRef elementRef,
+    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+    @Inject(StateService) StateService stateService) :
+      this.element = elementRef,
+      super(changeDetector, elementRef, stateService);
 
   //-----------------------------
   // ng2 life cycle

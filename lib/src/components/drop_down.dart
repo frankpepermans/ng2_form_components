@@ -17,12 +17,13 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService;
 
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
     directives: const [ListRenderer, Tween],
+    providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
 class DropDown<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
@@ -134,7 +135,10 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   // constructor
   //-----------------------------
 
-  DropDown(@Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
+  DropDown(
+    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+    @Inject(ElementRef) ElementRef elementRef,
+    @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
     _initStreams();
   }
 

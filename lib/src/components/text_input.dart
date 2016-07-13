@@ -10,14 +10,15 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService;
 
 typedef void TextInputAction(String inputValue);
 
 @Component(
     selector: 'text-input',
     templateUrl: 'text_input.html',
-    directives: const [NgClass, NgIf],
+    directives: const <Type>[NgClass, NgIf],
+    providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
 class TextInput<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy {
@@ -56,7 +57,10 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
   // constructor
   //-----------------------------
 
-  TextInput(@Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
+  TextInput(
+    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+    @Inject(ElementRef) ElementRef elementRef,
+    @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
     _initStreams();
   }
 

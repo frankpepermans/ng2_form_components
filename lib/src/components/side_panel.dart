@@ -12,12 +12,13 @@ import 'package:ng2_form_components/src/components/animation/side_panel_animatio
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService;
 
 @Component(
     selector: 'side-panel',
     templateUrl: 'side_panel.html',
-    directives: const [SidePanelAnimation],
+    directives: const <Type>[SidePanelAnimation],
+    providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
 class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDestroy, BeforeDestroyChild {
@@ -52,9 +53,12 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
   //-----------------------------
 
   SidePanel(
-      @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
-    _initStreams();
-  }
+    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+    @Inject(ElementRef) ElementRef elementRef,
+    @Inject(StateService) StateService stateService) :
+      super(changeDetector, elementRef, stateService) {
+        _initStreams();
+      }
 
   //-----------------------------
   // ng2 life cycle

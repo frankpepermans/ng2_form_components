@@ -17,7 +17,7 @@ import 'package:ng2_form_components/src/components/item_renderers/default_list_i
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent, ListRendererEvent;
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService;
 
 typedef bool IsSelectedHandler(ListItem<Comparable> listItem);
 typedef bool ClearSelectionWhereHandler(ListItem<Comparable> listItem);
@@ -57,7 +57,8 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
 @Component(
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
-    directives: const [ListItemRenderer],
+    directives: const <Type>[ListItemRenderer],
+    providers: const <Type>[StateService],
     pipes: const [SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
@@ -186,12 +187,15 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   //-----------------------------
 
   ListRenderer(
-    @Inject(ElementRef) this.element,
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector) : super(changeDetector) {
-    listRendererService.setRenderer(this);
+    @Inject(ElementRef) ElementRef elementRef,
+    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
+    @Inject(StateService) StateService stateService) :
+      this.element = elementRef,
+        super(changeDetector, elementRef, stateService) {
+          listRendererService.setRenderer(this);
 
-    _initStreams();
-  }
+          _initStreams();
+        }
 
   //-----------------------------
   // ng2 life cycle
