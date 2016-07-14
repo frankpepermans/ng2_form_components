@@ -1,3 +1,8 @@
 <div class="ng2-html-text-transform">
-    <div #content class="ng2-html-text-transform-text-area" contenteditable="true" spellcheck="false"></div>
+    <div #content
+         class="ng2-html-text-transform-text-area"
+         contenteditable="true"
+         spellcheck="false"
+         (blur)="handleBlur()"
+         (focus)="handleFocus()"></div>
 </div>

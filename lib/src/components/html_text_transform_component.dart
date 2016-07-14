@@ -53,6 +53,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   @Output() Stream<String> get transformation => _modelTransformation$ctrl.stream;
   @Output() Stream<bool> get hasSelectedRange => _hasSelectedRange$ctrl.stream;
+  @Output() Stream<bool> get blur => _blurTrigger$ctrl.stream;
+  @Output() Stream<bool> get focus => _focusTrigger$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -68,6 +70,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
   final StreamController<bool> _rangeTrigger$ctrl = new StreamController<bool>();
+  final StreamController<bool> _blurTrigger$ctrl = new StreamController<bool>();
+  final StreamController<bool> _focusTrigger$ctrl = new StreamController<bool>();
 
   bool _isDestroyCalled = false;
 
@@ -331,4 +335,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       changeDetector.markForCheck();
     }
   }
+
+  void handleFocus() => _focusTrigger$ctrl.add(true);
+
+  void handleBlur() => _blurTrigger$ctrl.add(true);
 }
