@@ -1,6 +1,7 @@
 library ng2_form_components.components.hierarchy;
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
 import 'package:dorm/dorm.dart' show Entity;
@@ -367,7 +368,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   void toggleChildren(ListItem<T> listItem, int index) {
     final List<ListItem<T>> openItems = <ListItem<T>>[];
-    final Map<ListItem<T>, bool> clone = <ListItem<T>, bool>{};
+    final Map<ListItem<T>, bool> clone = new LinkedHashMap<ListItem<T>, bool>(equals: (ListItem<T> itemA, ListItem<T> itemB) => itemA.compareTo(itemB) == 0);
     ListItem<T> match;
 
     forceAnimateOnOpen = true;
