@@ -12,6 +12,8 @@ import 'package:ng2_form_components/src/components/helpers/html_text_transformat
 )
 class HTMLTextTransformMenu {
 
+  final ChangeDetectorRef changeDetector;
+
   //-----------------------------
   // input
   //-----------------------------
@@ -34,7 +36,7 @@ class HTMLTextTransformMenu {
   // Constructor
   //-----------------------------
 
-  HTMLTextTransformMenu(@Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector);
+  HTMLTextTransformMenu(@Inject(ChangeDetectorRef) this.changeDetector);
 
   //-----------------------------
   // ng2 life cycle

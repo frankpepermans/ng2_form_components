@@ -160,9 +160,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       });
 
     _rangeTransform$ = _range$
-      .tap((_) => _resetButtons())
       .where(_hasValidRange)
-      .tap(_analyzeRange)
+      .map(_resetButtons)
+      .map(_analyzeRange)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
@@ -172,7 +172,13 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     _range$subscription = _rangeTransform$
       .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) => new Stream.fromFuture(tuple.item2.setup())
-        .map((HTMLTextTransformation transformation) => new Tuple2<Range, HTMLTextTransformation>(tuple.item1, transformation)))
+        .map((HTMLTextTransformation transformation) {
+          transformation.owner = tuple.item2;
+          transformation.doRemoveTag = tuple.item2.doRemoveTag;
+          transformation.outerContainer = tuple.item2.outerContainer;
+
+          return new Tuple2<Range, HTMLTextTransformation>(tuple.item1, transformation);
+        }))
       .where((Tuple2<Range, HTMLTextTransformation> tuple) => tuple.item2 != null)
       .listen(_transformContent);
 
@@ -286,7 +292,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
 
-  void _resetButtons() {
+  Range _resetButtons(Range forRange) {
     if (menu?.buttons != null) {
       List<HTMLTextTransformation> allButtons = menu.buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
         prev.addAll(value);
@@ -298,9 +304,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
       changeDetector.markForCheck();
     }
+
+    return forRange;
   }
 
-  void _analyzeRange(Range range) {
+  Range _analyzeRange(Range range) {
     if (menu?.buttons != null) {
       final DocumentFragment fragment = range.cloneContents();
       final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
@@ -333,7 +341,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       });
 
       changeDetector.markForCheck();
+
+      menu.changeDetector.markForCheck();
     }
+
+    return range;
   }
 
   void handleFocus() => _focusTrigger$ctrl.add(true);
