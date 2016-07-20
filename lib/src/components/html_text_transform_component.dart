@@ -53,6 +53,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   @Output() Stream<String> get transformation => _modelTransformation$ctrl.stream;
   @Output() Stream<bool> get hasSelectedRange => _hasSelectedRange$ctrl.stream;
+  @Output() Stream<String> get rangeText => _rangeToString$ctrl.stream;
   @Output() Stream<bool> get blur => _blurTrigger$ctrl.stream;
   @Output() Stream<bool> get focus => _focusTrigger$ctrl.stream;
 
@@ -72,6 +73,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final StreamController<bool> _rangeTrigger$ctrl = new StreamController<bool>();
   final StreamController<bool> _blurTrigger$ctrl = new StreamController<bool>();
   final StreamController<bool> _focusTrigger$ctrl = new StreamController<bool>();
+  final StreamController<String> _rangeToString$ctrl = new StreamController<String>();
 
   bool _isDestroyCalled = false;
 
@@ -161,6 +163,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     _rangeTransform$ = _range$
       .where(_hasValidRange)
+      .map(_extractSelectionToString)
       .map(_resetButtons)
       .map(_analyzeRange)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
@@ -291,6 +294,12 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
+
+  Range _extractSelectionToString(Range forRange) {
+    _rangeToString$ctrl.add(forRange.cloneContents().text);
+
+    return forRange;
+  }
 
   Range _resetButtons(Range forRange) {
     if (menu?.buttons != null) {
