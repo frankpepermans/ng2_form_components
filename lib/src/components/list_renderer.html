@@ -1,6 +1,6 @@
 <div [ngClass]="cssMap">
     <div class="fixed-pane">
-        <div class="data-group" *ngFor='#listItem of dataProvider | selectedItems:isSelected:moveSelectionOnTop; #i = index'>
+        <div class="data-group" *ngFor='let listItem of dataProvider | selectedItems:isSelected:moveSelectionOnTop; let i = index'>
             <div class="item selected">
                 <list-item-renderer
                     class="list-item-renderer"
@@ -17,7 +17,7 @@
         </div>
     </div>
     <div #scrollPane class="scroll-pane">
-        <div class="data-group" *ngFor='#listItem of dataProvider | unselectedItems:isSelected:moveSelectionOnTop; #i = index'>
+        <div class="data-group" *ngFor='let listItem of dataProvider | unselectedItems:isSelected:moveSelectionOnTop; let i = index'>
             <div class="item" [ngClass]="{'selected': isSelected(listItem), 'not-selectable': !listItem.selectable}">
                 <list-item-renderer
                     class="list-item-renderer"

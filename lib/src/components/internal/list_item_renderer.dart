@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:angular2/angular2.dart';
+import 'package:angular2/src/core/linker/view_utils.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
@@ -22,9 +23,12 @@ typedef void ListDragDropHandler(ListItem dragListItem, ListItem dropListItem);
     selector: 'list-item-renderer',
     template: '''
       <div #renderType></div>
-    '''
+    ''',
+    providers: const <Type>[ViewUtils]
 )
 class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy {
+
+  @ViewChild('renderType', read: ViewContainerRef) ViewContainerRef renderTypeTarget;
 
   //-----------------------------
   // input
@@ -46,6 +50,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   final DynamicComponentLoader dynamicComponentLoader;
   final ElementRef elementRef;
   final ChangeDetectorRef changeDetector;
+  final ViewUtils viewUtils;
+  final Injector injector;
 
   StreamSubscription<DropzoneEvent> _dropSubscription;
 
@@ -54,8 +60,10 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   //-----------------------------
 
   ListItemRenderer(
+    @Inject(Injector) this.injector,
     @Inject(DynamicComponentLoader) this.dynamicComponentLoader,
     @Inject(ElementRef) this.elementRef,
+    @Inject(ViewUtils) this.viewUtils,
     @Inject(ChangeDetectorRef) this.changeDetector);
 
   //-----------------------------
@@ -75,13 +83,14 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
     if (resolvedRendererType == null) throw new ArgumentError('Unable to resolve renderer for list item: ${listItem.runtimeType}');
 
-    dynamicComponentLoader.loadIntoLocation(resolvedRendererType, elementRef, 'renderType', Injector.resolve(<Provider>[
+    dynamicComponentLoader.loadNextToLocation(resolvedRendererType, renderTypeTarget, ReflectiveInjector.fromResolvedProviders(ReflectiveInjector.resolve(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),
       new Provider(IsSelectedHandler, useValue: isSelected),
       new Provider(GetHierarchyOffsetHandler, useValue: getHierarchyOffset),
-      new Provider(LabelHandler, useValue: labelHandler)
-    ])).then((ComponentRef ref) {
+      new Provider(LabelHandler, useValue: labelHandler),
+      new Provider(ViewUtils, useValue: viewUtils)
+    ]), injector)).then((ComponentRef ref) {
       if (dragDropHandler != null) {
         listRendererService.dragDropElements.add(<Element, ListItem<Comparable>>{elementRef.nativeElement: listItem});
 
