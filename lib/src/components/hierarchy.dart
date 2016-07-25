@@ -143,6 +143,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   final StreamController<Map<Hierarchy, List<ListItem<T>>>> _selection$Ctrl = new StreamController<Map<Hierarchy, List<ListItem<T>>>>.broadcast();
   final StreamController<List<ListItem<T>>> _openListItems$Ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<int> _beforeDestroyChild$ctrl = new StreamController<int>.broadcast();
+  final StreamController<bool> _domModified$ctrl = new StreamController<bool>.broadcast();
 
   Map<ListItem<T>, bool> _isOpenMap = <ListItem<T>, bool>{};
 
@@ -263,6 +264,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
+    window.removeEventListener('DOMSubtreeModified', _handleDomChange);
+
     _clearChildHierarchiesSubscription?.cancel();
     _registerChildHierarchySubscription?.cancel();
     _selectionBuilderSubscription?.cancel();
@@ -276,6 +279,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   //-----------------------------
 
   void _initStreams() {
+    window.addEventListener('DOMSubtreeModified', _handleDomChange);
+
     _clearChildHierarchiesSubscription = new rx.Observable<Tuple2<List<Hierarchy>, ClearSelectionWhereHandler>>.combineLatest([
       _childHierarchyList$ctrl.stream,
       _clearChildHierarchies$ctrl.stream
@@ -339,20 +344,29 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _selection$Ctrl.add(<Hierarchy, List<ListItem<T>>>{});
   }
 
+  void _handleDomChange(Event event) => _domModified$ctrl.add(true);
+
   void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
     if (selectedItems != null && selectedItems.isNotEmpty) {
       if (level == 0) selectedItems.forEach(handleSelection);
       else {
-        window.animationFrame.whenComplete(() {
-          selectedItems.forEach((ListItem<Comparable> listItem) {
-            rx.observable(listRendererService.rendererSelection$)
-                .take(1)
-                .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
-                .listen(handleRendererEvent);
+        new rx.Observable.merge(<Stream>[
+          rx.observable(_domModified$ctrl.stream)
+            .flatMapLatest((_) => new Stream<num>.fromFuture(window.animationFrame))
+            .debounce(const Duration(milliseconds: 50)),
+          new Stream.periodic(const Duration(milliseconds: 200))
+        ])
+          .take(1)
+          .listen((_) {
+            selectedItems.forEach((ListItem<Comparable> listItem) {
+              rx.observable(listRendererService.rendererSelection$)
+                  .take(1)
+                  .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
+                  .listen(handleRendererEvent);
 
-            listRendererService.triggerSelection(listItem);
+              listRendererService.triggerSelection(listItem);
+            });
           });
-        });
       }
     }
   }
