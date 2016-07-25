@@ -23,7 +23,8 @@
                  [index]="i"
                  [level]="level + 1"
                  class="item-group" *ngIf="isOpen(listItem)">
-                <hierarchy [state]="stateGroup" [stateId]="getStateId(i)"
+                <hierarchy #subHierarchy
+                           [state]="stateGroup" [stateId]="getStateId(i)"
                            [labelHandler]="labelHandler"
                            [dragDropHandler]="dragDropHandler"
                            [allowToggle]="allowToggle"

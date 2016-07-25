@@ -2,6 +2,7 @@ library ng2_form_components.components.hierarchy;
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
 import 'package:dorm/dorm.dart' show Entity;
@@ -36,6 +37,8 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
     changeDetection: ChangeDetectionStrategy.OnPush
 )
 class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
+
+  @ViewChild('subHierarchy') Hierarchy subHierarchy;
 
   @override @ViewChild('scrollPane') void set scrollPane(ElementRef value) {
     super.scrollPane = value;
@@ -148,10 +151,13 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   StreamSubscription<Map<Hierarchy, List<ListItem<T>>>> _selectionBuilderSubscription;
   StreamSubscription<Map<ListItem<T>, bool>> _beforeDestroyChildSubscription;
   StreamSubscription<int> _onBeforeDestroyChildSubscription;
+  StreamSubscription<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _responderSubscription;
 
   Stream<List<ListItem>> _selection$;
 
   bool forceAnimateOnOpen = false;
+
+  List<ListItem<T>> _receivedSelection;
 
   //-----------------------------
   // constructor
@@ -187,15 +193,21 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     }, asBroadcastStream: true);
   }
 
+  @override void ngAfterViewInit() {
+    super.ngAfterViewInit();
+
+    if (hierarchySelectedItems == null || hierarchySelectedItems.isEmpty) _processIncomingSelectedState(_receivedSelection);
+
+    hierarchySelectedItems = null;
+  }
+
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>> tuple = entity as SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>;
 
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    if (hierarchySelectedItems == null || hierarchySelectedItems.isEmpty) _processIncomingSelectedState(tuple.item2);
-
-    hierarchySelectedItems = null;
+    _receivedSelection = tuple.item2;
 
     tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
 
@@ -256,6 +268,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _selectionBuilderSubscription?.cancel();
     _beforeDestroyChildSubscription?.cancel();
     _onBeforeDestroyChildSubscription?.cancel();
+    _responderSubscription?.cancel();
   }
 
   //-----------------------------
@@ -319,6 +332,9 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
         return fold;
       });
 
+    _responderSubscription = listRendererService.responders$
+      .listen((List<ListRendererEvent<dynamic, Comparable<dynamic>>> events) => subHierarchy?.listRendererService?.respondEvents(events));
+
     _childHierarchyList$ctrl.add(const []);
     _selection$Ctrl.add(<Hierarchy, List<ListItem<T>>>{});
   }
@@ -327,8 +343,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     if (selectedItems != null && selectedItems.isNotEmpty) {
       if (level == 0) selectedItems.forEach(handleSelection);
       else {
-        //TODO: do this after a change detection has occurred instead
-        new Timer(const Duration(milliseconds: 100), () {
+        window.animationFrame.whenComplete(() {
           selectedItems.forEach((ListItem<Comparable> listItem) {
             rx.observable(listRendererService.rendererSelection$)
                 .take(1)
