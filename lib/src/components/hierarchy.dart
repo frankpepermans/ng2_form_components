@@ -223,14 +223,9 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     if (changes.containsKey('hierarchySelectedItems') && hierarchySelectedItems != null && hierarchySelectedItems.isNotEmpty) {
       hierarchySelectedItems.forEach((ListItem<Comparable> listItem) {
         listRendererService.rendererSelection$
-            .take(1)
-            .listen((_) {
-          listRendererService.triggerEvent(new ItemRendererEvent<bool, T>(
-              'selection',
-              listItem as ListItem<T>,
-              true)
-          );
-        });
+          .take(1)
+          .map((_) => new ItemRendererEvent<bool, T>('selection', listItem as ListItem<T>, true))
+          .listen(listRendererService.triggerEvent);
 
         listRendererService.triggerSelection(listItem);
       });
@@ -252,9 +247,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
         .map((_) => 0)
     ])
       .take(1)
-      .listen((_) {
-        completer.complete(argsCast.first);
-      });
+      .listen((_) => completer.complete(argsCast.first));
 
     await completer.future;
 
