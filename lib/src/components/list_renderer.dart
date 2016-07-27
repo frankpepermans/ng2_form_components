@@ -323,7 +323,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       _selectedItems$.startWith(const [])
     ], (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
       .where((Iterable<ListItem<T>> items) => items.isNotEmpty)
-      .listen((Iterable<ListItem<T>> items) => items.forEach((ListItem<T> listItem) => _incomingSelection$ctrl.add(listItem))) as StreamSubscription<List<ListItem<T>>>;
+      .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add)) as StreamSubscription<List<ListItem<T>>>;
 
     _rendererSelectionSubscription = listRendererService.rendererSelection$
       .listen((ListItem listItem) => handleSelection(listItem as ListItem<T>));
