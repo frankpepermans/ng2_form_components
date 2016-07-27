@@ -382,6 +382,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   }
 
   bool isOpen(ListItem<T> listItem) {
+    if (listItem.isAlwaysOpen) return true;
+
     bool result = false;
 
     _isOpenMap.forEach((ListItem<T> item, bool isOpen) {

@@ -37,6 +37,13 @@ class ListItem<T extends Comparable> extends Entity implements Comparable<ListIt
 
   bool selectable;
 
+  @Property(ISALWAYSOPEN_SYMBOL, 'isAlwaysOpen', bool, 'isAlwaysOpen')
+  @DefaultValue(false)
+  static const String ISALWAYSOPEN = 'isAlwaysOpen';
+  static const Symbol ISALWAYSOPEN_SYMBOL = const Symbol('entities.listItem.isAlwaysOpen');
+
+  bool isAlwaysOpen;
+
   //-----------------------------
   // constructor
   //-----------------------------
