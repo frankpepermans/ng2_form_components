@@ -25,9 +25,11 @@ void main() {
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: const [StateService],
-    directives: const [State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop]
+    directives: const [State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster]
 )
 class AppComponent {
+
+  @ViewChild('toaster') Toaster toaster;
 
   final ChangeDetectorRef changeDetector;
   final StateService stateService;
@@ -190,6 +192,8 @@ class AppComponent {
       level2A, level2B
     ]);
 
+    new Timer.periodic(const Duration(seconds: 5), (_) => _addRandomToastMessage());
+
     startRecording();
   }
 
@@ -208,6 +212,10 @@ class AppComponent {
   }
 
   String _oldAutoFillTextA, _oldAutoFillTextB;
+
+  void _addRandomToastMessage() {
+    toaster.addMessage('testing a new message!');
+  }
 
   void triggerMockServiceA(String autoFillText) {
     if (_oldAutoFillTextA == autoFillText) return;

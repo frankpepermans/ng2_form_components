@@ -1,0 +1,6 @@
+<div class="toaster">
+    <div tween class="toast" *ngFor='let message of messageQueue; let i = index' tweenStyleProperty="margin-bottom" [duration]="600" [startValue]="0" [endValue]="32">
+        <i class="fa fa-info fa-3x"></i>
+        <label>{{message.message}}</label>
+    </div>
+</div>

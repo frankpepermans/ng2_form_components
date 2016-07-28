@@ -12,6 +12,9 @@ export 'src/components/text_input.dart'
 export 'src/components/drop_down.dart'
     show DropDown;
 
+export 'src/components/toaster.dart'
+    show Toaster, ToastMessageType;
+
 export 'src/components/auto_complete.dart'
     show AutoComplete;
 
