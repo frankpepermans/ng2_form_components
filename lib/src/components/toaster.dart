@@ -67,6 +67,16 @@ class Toaster implements OnDestroy {
       .listen((_) => changeDetector.markForCheck());
   }
 
+  Map<String, bool> getToastCssMap(_ToastMessage message) {
+    switch (message.type) {
+      case ToastMessageType.INFO: return <String, bool>{'toast--info': true};
+      case ToastMessageType.WARNING: return <String, bool>{'toast--warning': true};
+      case ToastMessageType.ERROR: return <String, bool>{'toast--error': true};
+    }
+
+    return const {};
+  }
+
   String getBottomOffset(int index) => '${64 * index}px';
 }
 

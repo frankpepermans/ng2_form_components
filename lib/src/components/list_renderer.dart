@@ -364,7 +364,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     return false;
   }
 
-  void handleSelection(ListItem<Comparable> listItem) {
+  void handleSelection(ListItem<T> listItem) {
     _clearSelection$ctrl.add((ListItem listItem) => false);
     _incomingSelection$ctrl.add(listItem);
   }
