@@ -350,6 +350,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   // template methods
   //-----------------------------
 
+  bool isOpen(ListItem<T> listItem) => false;
+
   void clearSelection(ClearSelectionWhereHandler clearSelectionWhereHandler) => _clearSelection$ctrl.add(clearSelectionWhereHandler);
 
   bool isSelected(ListItem<T> listItem) {

@@ -374,7 +374,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     return '${id}_${level}_$index';
   }
 
-  bool isOpen(ListItem<T> listItem) {
+  @override bool isOpen(ListItem<T> listItem) {
     if (listItem.isAlwaysOpen) return true;
 
     bool result = false;
