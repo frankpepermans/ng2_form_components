@@ -326,7 +326,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add)) as StreamSubscription<List<ListItem<T>>>;
 
     _rendererSelectionSubscription = listRendererService.rendererSelection$
-      .listen((ListItem listItem) => handleSelection(listItem as ListItem<T>));
+      .listen((ListItem<Comparable> listItem) => handleSelection(listItem as ListItem<T>));
 
     _selectionStateSubscription = _selectedItems$.listen(_selectedItems$ctrl.add);
 
