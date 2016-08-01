@@ -5,18 +5,8 @@ import 'dart:html';
 import 'dart:collection';
 
 import 'package:rxdart/rxdart.dart' as rx;
-import 'package:tuple/tuple.dart';
 
 import 'package:angular2/angular2.dart';
-import 'package:dorm/dorm.dart' show Entity;
-
-import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, StatePhase, StateService;
-
-import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent;
-import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
-import 'package:ng2_form_components/src/components/helpers/html_transform.dart' show HTMLTransform;
-
-import 'package:ng2_form_components/src/components/html_text_transform_menu.dart';
 
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 

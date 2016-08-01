@@ -75,8 +75,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final StreamController<bool> _focusTrigger$ctrl = new StreamController<bool>();
   final StreamController<String> _rangeToString$ctrl = new StreamController<String>();
 
-  bool _isDestroyCalled = false;
-
   //-----------------------------
   // Constructor
   //-----------------------------
@@ -114,8 +112,6 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     super.ngOnDestroy();
 
     contentElement.nativeElement.removeEventListener('DOMSubtreeModified', _contentModifier);
-
-    _isDestroyCalled = true;
 
     _range$subscription?.cancel();
     _hasRangeSubscription?.cancel();

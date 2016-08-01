@@ -215,14 +215,16 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
-    if (changes.containsKey('dataProvider')) changeDetector.markForCheck();
+    bool doMarkForCheck = false;
+
+    if (changes.containsKey('dataProvider')) doMarkForCheck = true;
 
     if (changes.containsKey('selectedItems')) {
       internalSelectedItems.forEach(handleSelection);
 
       if (selectedItems != null) selectedItems.forEach(handleSelection);
 
-      changeDetector.markForCheck();
+      doMarkForCheck = true;
     }
 
     if (changes.containsKey('pageOffset')) {
@@ -234,6 +236,8 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     }
 
     if (changes.containsKey('rendererEvents')) listRendererService.respondEvents(rendererEvents);
+
+    if (doMarkForCheck) changeDetector.markForCheck();
   }
 
   @override

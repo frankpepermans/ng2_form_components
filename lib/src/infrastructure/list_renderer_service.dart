@@ -12,7 +12,7 @@ class ListRendererService {
   List<ListRendererEvent> lastResponders;
   ListRenderer renderer;
 
-  Stream<ListItem> get rendererSelection$ => _rendererSelection$ctrl.stream;
+  Stream<ListItem<Comparable>> get rendererSelection$ => _rendererSelection$ctrl.stream;
   Stream<ItemRendererEvent<dynamic, Comparable>> get event$ => _event$ctrl.stream;
   Stream<List<ListRendererEvent<dynamic, Comparable>>> get responders$ => _responder$ctrl.stream;
 
