@@ -89,6 +89,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       new Provider(IsSelectedHandler, useValue: isSelected),
       new Provider(GetHierarchyOffsetHandler, useValue: getHierarchyOffset),
       new Provider(LabelHandler, useValue: labelHandler),
+      new Provider('list-item-index', useValue: index),
       new Provider(ViewUtils, useValue: viewUtils)
     ]), injector)).then((ComponentRef ref) {
       if (dragDropHandler != null) {
