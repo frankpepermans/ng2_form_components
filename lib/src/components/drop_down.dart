@@ -159,11 +159,13 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple2<bool, Iterable<ListItem<T>>> tuple = entity as SerializableTuple2<bool, Iterable<ListItem<T>>>;
 
-    _selectedItems$ctrl.add(tuple.item2);
-
     if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
 
-    setSelectedItems(tuple.item2);
+    scheduleMicrotask(() {
+      _selectedItems$ctrl.add(tuple.item2);
+
+      setSelectedItems(tuple.item2);
+    });
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
