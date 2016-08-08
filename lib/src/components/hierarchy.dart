@@ -23,7 +23,7 @@ import 'package:ng2_form_components/src/components/animation/hierarchy_animation
 
 import 'package:ng2_form_components/src/components/item_renderers/default_hierarchy_list_item_renderer.dart' show DefaultHierarchyListItemRenderer;
 
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ItemRendererEvent, ListRendererEvent;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ItemRendererEvent, ListRendererEvent, ListRendererService;
 
 import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase, StateService;
 
@@ -82,6 +82,10 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
 
   @override @Input() void set pageOffset(int value) {
     super.pageOffset = value;
+  }
+
+  @override @Input() void set listRendererService(ListRendererService value) {
+    super.listRendererService = value;
   }
 
   int _level = 0;
@@ -152,7 +156,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   StreamSubscription<Map<Hierarchy, List<ListItem<T>>>> _selectionBuilderSubscription;
   StreamSubscription<Map<ListItem<T>, bool>> _beforeDestroyChildSubscription;
   StreamSubscription<int> _onBeforeDestroyChildSubscription;
-  StreamSubscription<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _responderSubscription;
 
   Stream<List<ListItem>> _selection$;
 
@@ -264,7 +267,6 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     _selectionBuilderSubscription?.cancel();
     _beforeDestroyChildSubscription?.cancel();
     _onBeforeDestroyChildSubscription?.cancel();
-    _responderSubscription?.cancel();
   }
 
   //-----------------------------
@@ -325,13 +327,10 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       .map((Map<Hierarchy, List<ListItem>> map) {
         final List<ListItem> fold = <ListItem>[];
 
-        map.values.forEach((List<ListItem> selectedItems) => fold.addAll(selectedItems));
+        map.values.forEach(fold.addAll);
 
         return fold;
       });
-
-    _responderSubscription = listRendererService.responders$
-      .listen((List<ListRendererEvent<dynamic, Comparable<dynamic>>> events) => subHierarchy?.listRendererService?.respondEvents(events));
 
     _childHierarchyList$ctrl.add(const []);
     _selection$Ctrl.add(<Hierarchy, List<ListItem<T>>>{});

@@ -136,6 +136,12 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     cssMap = <String, bool>{value: true};
   }
 
+  ListRendererService _listRendererService = new ListRendererService();
+  ListRendererService get listRendererService => _listRendererService;
+  @Input() void set listRendererService(ListRendererService value) {
+    _listRendererService = value;
+  }
+
   //-----------------------------
   // output
   //-----------------------------
@@ -157,7 +163,6 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
   rx.Observable<List<ListItem<T>>> _selectedItems$;
 
-  final ListRendererService listRendererService = new ListRendererService();
   final StreamController<List<ListItem<T>>> _selectedItems$ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<ListItem<T>> _incomingSelection$ctrl = new StreamController<ListItem<T>>();
   final StreamController<bool> _requestClose$ctrl = new StreamController<bool>();

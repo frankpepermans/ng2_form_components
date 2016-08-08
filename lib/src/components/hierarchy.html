@@ -25,6 +25,7 @@
                  class="item-group" *ngIf="isOpen(listItem)">
                 <hierarchy #subHierarchy
                            [state]="stateGroup" [stateId]="getStateId(i)"
+                           [listRendererService]="listRendererService"
                            [labelHandler]="labelHandler"
                            [dragDropHandler]="dragDropHandler"
                            [allowToggle]="allowToggle"
