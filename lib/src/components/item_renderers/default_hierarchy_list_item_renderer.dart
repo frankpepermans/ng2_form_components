@@ -65,13 +65,8 @@ class DefaultHierarchyListItemRenderer<T extends Comparable> implements DynamicL
   void triggerSelection() {
     listRendererService.rendererSelection$
       .take(1)
-      .listen((_) {
-        listRendererService.triggerEvent(new ItemRendererEvent<bool, T>(
-            'selection',
-            listItem as ListItem<T>,
-            true)
-        );
-      });
+      .map((_) => new ItemRendererEvent<bool, T>('selection', listItem as ListItem<T>, true))
+      .listen(listRendererService.triggerEvent);
 
     listRendererService.triggerSelection(listItem);
   }

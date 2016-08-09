@@ -10,7 +10,8 @@ import 'package:ng2_form_components/src/components/list_item.dart' show ListItem
 class ListRendererService {
 
   List<ListRendererEvent> lastResponders;
-  ListRenderer renderer;
+
+  final List<ListRenderer> renderers = <ListRenderer>[];
 
   Stream<ListItem<Comparable>> get rendererSelection$ => _rendererSelection$ctrl.stream;
   Stream<ItemRendererEvent<dynamic, Comparable>> get event$ => _event$ctrl.stream;
@@ -24,9 +25,9 @@ class ListRendererService {
 
   ListRendererService();
 
-  void setRenderer(ListRenderer renderer) {
-    this.renderer = renderer;
-  }
+  void addRenderer(ListRenderer renderer) => renderers.add(renderer);
+
+  bool removeRenderer(ListRenderer renderer) => renderers.remove(renderer);
 
   void triggerSelection(ListItem listItem) => _rendererSelection$ctrl.add(listItem);
 
@@ -38,6 +39,13 @@ class ListRendererService {
     lastResponders = events;
   }
 
+  bool isOpen(ListItem listItem) {
+    for (int i=0, len=renderers.length; i<len; i++) {
+      if (renderers[i].isOpen(listItem)) return true;
+    }
+
+    return false;
+  }
 }
 
 class ListRendererEvent<T, U extends Comparable> {

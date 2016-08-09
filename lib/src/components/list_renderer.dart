@@ -191,8 +191,6 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     @Inject(StateService) StateService stateService) :
       this.element = elementRef,
         super(changeDetector, elementRef, stateService) {
-          listRendererService.setRenderer(this);
-
           _initStreams();
         }
 
@@ -255,9 +253,13 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _domClickSubscription?.cancel();
     _rendererEventSubscription?.cancel();
     _clearSelectionSubscription?.cancel();
+
+    listRendererService.removeRenderer(this);
   }
 
   @override void ngAfterViewInit() {
+    listRendererService.addRenderer(this);
+
     _domClickSubscription = window.onMouseDown.listen((MouseEvent event) {
       Node target = event.target as Node;
 
