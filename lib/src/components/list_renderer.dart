@@ -310,7 +310,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _selectedItems$ = new rx.Observable<List<ListItem<T>>>.zip(<Stream>[
       _incomingSelection$ctrl.stream,
       rx.observable(_selectedItems$ctrl.stream)
-        .startWith(<Iterable<ListItem<T>>>[internalSelectedItems])
+        .startWith(<List<ListItem<T>>>[internalSelectedItems as List<ListItem<T>>])
     ], (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
       if (incoming == null) return new List<ListItem<T>>.unmodifiable(const []);
 

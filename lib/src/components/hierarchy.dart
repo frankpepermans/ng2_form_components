@@ -128,7 +128,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
   // output
   //-----------------------------
 
-  @override @Output() rx.Observable<List<ListItem<T>>> get selectedItemsChanged => rx.observable(_selection$) as rx.Observable<List<ListItem>>;
+  @override @Output() rx.Observable<List<ListItem<T>>> get selectedItemsChanged => rx.observable(_selection$) as rx.Observable<List<ListItem<T>>>;
   @override @Output() Stream<bool> get requestClose => super.requestClose;
   @override @Output() Stream<bool> get scrolledToBottom => super.scrolledToBottom;
   @override @Output() Stream<ItemRendererEvent<dynamic, Comparable>> get itemRendererEvent => super.itemRendererEvent;
@@ -186,12 +186,12 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     final Stream<SerializableTuple1<int>> scroll$ = super.provideState();
 
     return new rx.Observable.combineLatest([
-      rx.observable(scroll$).startWith(const <int>[0]),
+      rx.observable(scroll$).startWith(<SerializableTuple1<int>>[new SerializableTuple1<int>()..item1 = 0]),
       internalSelectedItemsChanged.startWith(const [const []]),
       rx.observable(_openListItems$Ctrl.stream).startWith(const [const []])
-    ], (int scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) {
+    ], (SerializableTuple1<int> scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) {
       return new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
-        ..item1 = scrollPosition
+        ..item1 = scrollPosition.item1
         ..item2 = selectedItems
         ..item3 = openItems;
     }, asBroadcastStream: true);
@@ -300,7 +300,7 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
       .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false)));
 
     _selectionBuilderSubscription = new rx.Observable<Map<Hierarchy, List<ListItem<T>>>>.zip([
-      rx.observable(_selection$Ctrl.stream).startWith(internalSelectedItems as List<ListItem<T>>),
+      rx.observable(_selection$Ctrl.stream).startWith(<Map<Hierarchy, List<ListItem<T>>>>[<Hierarchy, List<ListItem<T>>>{}]),
       rx.observable(_childHierarchyList$ctrl.stream)
         .flatMapLatest((List<Hierarchy> hierarchies) => new rx.Observable.merge((new List<Hierarchy>.from(hierarchies)..add(this))
           .map((Hierarchy hierarchy) => hierarchy.internalSelectedItemsChanged

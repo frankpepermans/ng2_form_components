@@ -262,7 +262,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
         .startWith(<bool>[isOpen])
         .distinct((bool vA, bool vB) => vA == vB)
         .flatMapLatest(_awaitCloseAnimation),
-      rx.observable(_selectedItems$ctrl.stream).startWith(<ListItem<T>>[])
+      rx.observable(_selectedItems$ctrl.stream).startWith(const [const []])
     ], (bool isOpen, Iterable<ListItem<T>> selectedItems) {
       if (!isOpen) return selectedItems;
 

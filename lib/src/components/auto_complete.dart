@@ -238,7 +238,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
 
     _inputChanged$ = rx.observable(_input$ctrl.stream)
       .debounce(const Duration(milliseconds: 50))
-      .where((String input) => input.length >= minCharsRequired) as Stream<String>;
+      .where((String input) => input.length >= minCharsRequired);
 
     final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream>[
       rx.observable(_focus$ctrl.stream)
