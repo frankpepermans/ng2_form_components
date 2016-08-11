@@ -95,11 +95,12 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       if (dragDropHandler != null) {
         listRendererService.dragDropElements.add(<Element, ListItem<Comparable>>{elementRef.nativeElement: listItem});
 
-        new Draggable(elementRef.nativeElement);
+        final Draggable draggable = new Draggable(elementRef.nativeElement);
 
-        final Dropzone dropZone = new Dropzone(elementRef.nativeElement, acceptor: new _SameListRendererAcceptor(listRendererService));
+        final Dropzone dropZone = new Dropzone(elementRef.nativeElement/*, acceptor: new _SameListRendererAcceptor(listRendererService)*/);
 
         _dropSubscription = dropZone.onDrop
+          .take(1)
           .listen((DropzoneEvent event) {
             final Map<Element, ListItem> pair = listRendererService.dragDropElements
               .firstWhere((Map<Element, ListItem> valuePair) => valuePair.containsKey(event.draggableElement), orElse: () => null);
