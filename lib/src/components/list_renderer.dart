@@ -80,6 +80,12 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _dragDropHandler = value;
   }
 
+  ListDragDropHandlerType _dragDropHandlerType = ListDragDropHandlerType.SORT;
+  ListDragDropHandlerType get dragDropHandlerType => _dragDropHandlerType;
+  @Input() void set dragDropHandlerType(ListDragDropHandlerType value) {
+    _dragDropHandlerType = value;
+  }
+
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
@@ -170,6 +176,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   final StreamController<bool> _scrolledToBottom$ctrl = new StreamController<bool>.broadcast();
   final StreamController<ItemRendererEvent> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
+  final StreamController<bool> _domChange$ctrl = new StreamController<bool>.broadcast();
 
   StreamSubscription<Iterable<ListItem<T>>> _internalSelectedItemsSubscription;
   StreamSubscription<List<ListItem<T>>> _clearSelectionSubscription;
@@ -178,6 +185,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   StreamSubscription<MouseEvent> _domClickSubscription;
   StreamSubscription<bool> _scrollPositionSubscription;
   StreamSubscription<ItemRendererEvent> _rendererEventSubscription;
+  StreamSubscription<bool> _domChangeSubscription;
 
   int _pendingScrollTop = 0;
 
@@ -198,7 +206,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => rx.observable(_scroll$ctrl.stream)
+  @override Stream<Entity> provideState() => _scroll$ctrl.stream
     .map((int scrollTop) => new SerializableTuple1<int>()..item1 = scrollTop);
 
   @override void receiveState(Entity entity, StatePhase phase) {
@@ -210,7 +218,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       if (scrollPane.nativeElement.scrollTop != tuple.item1) {
         _pendingScrollTop = tuple.item1;
 
-        _nextAnimationFrame();
+        _initDomChangeListener();
       }
     } else {
       _pendingScrollTop = tuple.item1;
@@ -247,12 +255,15 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   void ngOnDestroy() {
     super.ngOnDestroy();
 
+    element.nativeElement.removeEventListener('DOMSubtreeModified', _notifyDomChanged);
+
     _internalSelectedItemsSubscription?.cancel();
     _rendererSelectionSubscription?.cancel();
     _selectionStateSubscription?.cancel();
     _domClickSubscription?.cancel();
     _rendererEventSubscription?.cancel();
     _clearSelectionSubscription?.cancel();
+    _domChangeSubscription?.cancel();
 
     listRendererService.removeRenderer(this);
   }
@@ -274,7 +285,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
     scrollPane.nativeElement.scrollTop = _pendingScrollTop;
 
-    if (scrollPane != null) _nextAnimationFrame();
+    if (scrollPane != null) _initDomChangeListener();
 
     _initScrollPositionStream();
   }
@@ -282,6 +293,20 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   //-----------------------------
   // private methods
   //-----------------------------
+
+  void _initDomChangeListener() {
+    _domChangeSubscription?.cancel();
+
+    _domChangeSubscription = null;
+
+    if (_pendingScrollTop > 0 && scrollPane != null) _domChangeSubscription = _domChange$ctrl.stream
+      .timeout(const Duration(seconds: 3), onTimeout: (_) {
+        _domChangeSubscription?.cancel();
+
+        _domChangeSubscription = null;
+      })
+      .listen(_attemptRequiredScrollPosition);
+  }
 
   void _initScrollPositionStream() {
     if (scrollPane != null) {
@@ -343,18 +368,20 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
     _rendererEventSubscription = listRendererService.event$
       .listen(_itemRendererEvent$ctrl.add);
+
+    element.nativeElement.addEventListener('DOMSubtreeModified', _notifyDomChanged);
   }
 
-  void _nextAnimationFrame() {
-    window.animationFrame.then((num time) {
-      final int scrollTop = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
+  void _notifyDomChanged(_) => _domChange$ctrl.add(true);
 
-      scrollPane.nativeElement.scrollTop = scrollTop;
+  void _attemptRequiredScrollPosition(bool _) {
+    scrollPane.nativeElement.scrollTop = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
 
-      changeDetector.markForCheck();
+    if (scrollPane.nativeElement.scrollTop >= _pendingScrollTop) {
+      _domChangeSubscription?.cancel();
 
-      if (scrollPane.nativeElement.scrollTop != _pendingScrollTop) _nextAnimationFrame();
-    });
+      _domChangeSubscription = null;
+    }
   }
 
   //-----------------------------

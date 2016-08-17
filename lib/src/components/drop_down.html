@@ -6,7 +6,7 @@
             <i [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
         </div>
     </div>
-    <div *ngIf="isOpen && dataProvider?.isNotEmpty" class="drop-down-list">
+    <div *ngIf="isOpen && dataProvider != null && dataProvider.isNotEmpty" class="drop-down-list">
         <div tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">
             <list-renderer
                     [resolveRendererHandler]="resolveRendererHandler"
