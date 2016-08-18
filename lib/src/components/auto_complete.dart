@@ -178,6 +178,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   }
 
   void setInputValue(String value) {
+    if (searchInput != null) (searchInput.nativeElement as InputElement).value = value;
+
     inputValue = value;
 
     _inputCriteriaMet$ctrl.add(value.length >= minCharsRequired);
@@ -330,6 +332,8 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
     _inputCriteriaMet$ctrl.add(element.value.length >= minCharsRequired);
 
     _input$ctrl.add(element.value);
+
+    setSelectedItems(const []);
   }
 
 }

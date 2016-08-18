@@ -22,7 +22,7 @@ export 'src/components/list_renderer.dart'
     show ListRenderer;
 
 export 'src/components/internal/list_item_renderer.dart'
-    show ListDragDropHandler, ListDragDropHandlerType;
+    show ListDragDropHandler, ListDragDropHandlerType, DragDropTypeHandler;
 
 export 'src/components/side_panel.dart'
     show SidePanel;

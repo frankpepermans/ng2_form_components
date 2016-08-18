@@ -14,7 +14,7 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListDragDropHandler;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
-import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer, ListDragDropHandlerType;
+import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer, DragDropTypeHandler;
 
 import 'package:ng2_form_components/src/components/list_renderer.dart' show ListRenderer, ClearSelectionWhereHandler;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
@@ -56,8 +56,8 @@ class Hierarchy<T extends Comparable> extends ListRenderer<T> implements OnChang
     super.dragDropHandler = value;
   }
 
-  @override @Input() void set dragDropHandlerType(ListDragDropHandlerType value) {
-    super.dragDropHandlerType = value;
+  @override @Input() void set dragDropTypeHandler(DragDropTypeHandler value) {
+    super.dragDropTypeHandler = value;
   }
 
   @override @Input() void set dataProvider(List<ListItem<T>> value) {

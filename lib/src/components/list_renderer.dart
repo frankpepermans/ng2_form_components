@@ -80,10 +80,10 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _dragDropHandler = value;
   }
 
-  ListDragDropHandlerType _dragDropHandlerType = ListDragDropHandlerType.SORT;
-  ListDragDropHandlerType get dragDropHandlerType => _dragDropHandlerType;
-  @Input() void set dragDropHandlerType(ListDragDropHandlerType value) {
-    _dragDropHandlerType = value;
+  DragDropTypeHandler _dragDropTypeHandler = (_) => ListDragDropHandlerType.SORT;
+  DragDropTypeHandler get dragDropTypeHandler => _dragDropTypeHandler;
+  @Input() void set dragDropTypeHandler(DragDropTypeHandler value) {
+    _dragDropTypeHandler = value;
   }
 
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;

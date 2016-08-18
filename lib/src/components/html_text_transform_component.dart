@@ -29,7 +29,13 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   final ElementRef element;
   final HTMLTransform transformer = new HTMLTransform();
 
-  @ViewChild('content') ElementRef contentElement;
+  ElementRef _contentElement;
+  ElementRef get contentElement => _contentElement;
+  @ViewChild('content') void set contentElement(ElementRef value) {
+    _contentElement = value;
+
+    _setupListeners();
+  }
 
   //-----------------------------
   // input
@@ -66,6 +72,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   StreamSubscription<Tuple2<Range, HTMLTextTransformation>> _range$subscription;
   StreamSubscription<bool> _hasRangeSubscription;
   StreamSubscription<HTMLTextTransformation> _menuSubscription;
+  StreamSubscription<KeyboardEvent> _keyboardSubscription;
 
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
@@ -111,11 +118,33 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
-    contentElement.nativeElement.removeEventListener('DOMSubtreeModified', _contentModifier);
+    final Element element = _contentElement.nativeElement as Element;
+
+    element.removeEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription?.cancel();
     _hasRangeSubscription?.cancel();
     _menuSubscription?.cancel();
+    _keyboardSubscription?.cancel();
+  }
+
+  void _setupListeners() {
+    _keyboardSubscription?.cancel();
+
+    if (_contentElement != null) {
+      final Element element = _contentElement.nativeElement as Element;
+
+      _keyboardSubscription = element.onKeyDown
+        .listen(_handleKeyDown);
+    }
+  }
+
+  void _handleKeyDown(KeyboardEvent event) {
+    if (event.keyCode == 10 || event.keyCode == 13) {
+      event.preventDefault();
+
+      document.execCommand('insertHTML', false, '<br><br>');
+    }
   }
 
   //-----------------------------
@@ -167,7 +196,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
       );
 
-    contentElement.nativeElement.addEventListener('DOMSubtreeModified', _contentModifier);
+    final Element element = _contentElement.nativeElement as Element;
+
+    element.addEventListener('DOMSubtreeModified', _contentModifier);
 
     _range$subscription = _rangeTransform$
       .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) => new Stream.fromFuture(tuple.item2.setup())
@@ -327,9 +358,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       allButtons.forEach((HTMLTextTransformation transformation) {
         final String tag = transformer.toNodeNameFromTransformation(transformation);
 
-        transformation.doRemoveTag = encounteredElementFullNames.contains(tag);
+        transformation.doRemoveTag = transformation.allowRemove && encounteredElementFullNames.contains(tag);
 
-        if (!transformation.doRemoveTag && range.startContainer == range.endContainer) {
+        if (transformation.allowRemove && !transformation.doRemoveTag && range.startContainer == range.endContainer) {
           Node currentNode = range.startContainer;
 
           while (currentNode != null && currentNode != this.element.nativeElement) {

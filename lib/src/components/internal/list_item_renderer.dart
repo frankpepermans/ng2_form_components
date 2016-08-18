@@ -21,6 +21,7 @@ import 'package:dnd/dnd.dart';
 typedef bool IsSelectedHandler (ListItem listItem);
 typedef String GetHierarchyOffsetHandler(ListItem listItem);
 typedef void ListDragDropHandler(ListItem dragListItem, ListItem dropListItem, int offset);
+typedef ListDragDropHandlerType DragDropTypeHandler(ListItem listItem);
 
 enum ListDragDropHandlerType {
   SORT,
@@ -51,7 +52,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
   @Input() int index;
   @Input() LabelHandler labelHandler;
   @Input() ListDragDropHandler dragDropHandler;
-  @Input() ListDragDropHandlerType dragDropHandlerType;
+  @Input() DragDropTypeHandler dragDropTypeHandler;
   @Input() ListItem<T> listItem;
   @Input() IsSelectedHandler isSelected;
   @Input() GetHierarchyOffsetHandler getHierarchyOffset;
@@ -126,11 +127,13 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       new Provider(ViewUtils, useValue: viewUtils)
     ]), injector)).then((ComponentRef ref) {
       if (dragDropHandler != null) {
+        (ref.location.nativeElement as Element).className = 'dnd--child';
+
         listRendererService.dragDropElements.add(<Element, ListItem<Comparable>>{elementRef.nativeElement: listItem});
 
         new Draggable(elementRef.nativeElement, verticalOnly: true);
 
-        switch (dragDropHandlerType) {
+        switch (dragDropTypeHandler(listItem)) {
           case ListDragDropHandlerType.SWAP:
             _setupDragDropSwap();
 
@@ -140,8 +143,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
             break;
           case ListDragDropHandlerType.ALL:
-            _setupDragDropSort(ref.location.nativeElement);
             _setupDragDropSwap();
+            _setupDragDropSort(ref.location.nativeElement);
 
             break;
         }
@@ -155,7 +158,6 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
     final Dropzone dropZone = new Dropzone(elementRef.nativeElement);
 
     _dropSubscription = dropZone.onDrop
-      .take(1)
       .listen((DropzoneEvent event) {
         final Map<Element, ListItem> pair = listRendererService.dragDropElements
           .firstWhere((Map<Element, ListItem<Comparable>> valuePair) => valuePair.containsKey(event.draggableElement), orElse: () => null);
@@ -166,13 +168,12 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
   void _setupDragDropSort(Element rendererElement) {
     final Element element = elementRef.nativeElement;
-    final Element injectedContentElement = rendererElement.firstChild as Element;
-    final Dropzone dropZone = new Dropzone(element, overClass: 'dnd--empty');
+    final Element injectedContentElement = rendererElement.children.first;
+    final Dropzone dropZone = new Dropzone(element, overClass: 'dnd-owning-object');
 
     _shiftSubscription = rx.observable(_dragDropDisplay$ctrl.stream)
       .flatMapLatest((List<bool> indices) => rx.observable(dropZone.onDrop)
-        .map((DropzoneEvent event) => new Tuple2<Element, List<bool>>(event.dropzoneElement, indices)))
-      .take(1)
+        .map((DropzoneEvent event) => new Tuple2<Element, List<bool>>(event.draggableElement, indices)))
       .listen((Tuple2<Element, List<bool>> tuple) {
         final Map<Element, ListItem> pair = listRendererService.dragDropElements
           .firstWhere((Map<Element, ListItem<Comparable>> valuePair) => valuePair.containsKey(tuple.item1), orElse: () => null);
@@ -214,6 +215,6 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       });
   }
 
-  bool showSortingAreas() => dragDropHandlerType == ListDragDropHandlerType.ALL || dragDropHandlerType == ListDragDropHandlerType.SORT;
+  bool showSortingAreas() => dragDropTypeHandler(listItem) == ListDragDropHandlerType.ALL || dragDropTypeHandler(listItem) == ListDragDropHandlerType.SORT;
 
 }
