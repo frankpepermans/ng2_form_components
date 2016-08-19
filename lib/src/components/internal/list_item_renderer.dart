@@ -70,7 +70,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
   final StreamController<List<bool>> _dragDropDisplay$ctrl = new StreamController<List<bool>>.broadcast();
 
-  StreamSubscription<DropzoneEvent> _dropSubscription, _drpZoneLeaveSubscription;
+  StreamSubscription<DropzoneEvent> _dropSubscription;
+  StreamSubscription<List<bool>> _dropZoneLeaveSubscription;
   StreamSubscription<Tuple2<Element, List<bool>>> _shiftSubscription;
   StreamSubscription<MouseEvent> _showHooksSubscription;
   StreamSubscription<List<bool>> _dragDropDisplaySubscription;
@@ -107,7 +108,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
     _dropSubscription?.cancel();
     _shiftSubscription?.cancel();
-    _drpZoneLeaveSubscription?.cancel();
+    _dropZoneLeaveSubscription?.cancel();
     _showHooksSubscription?.cancel();
     _dragDropDisplaySubscription?.cancel();
   }
@@ -168,7 +169,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
   void _setupDragDropSort(Element rendererElement) {
     final Element element = elementRef.nativeElement;
-    final Element injectedContentElement = rendererElement.children.first;
+    final Element contentElement = rendererElement.children.first;
     final Dropzone dropZone = new Dropzone(element, overClass: 'dnd-owning-object');
 
     _shiftSubscription = rx.observable(_dragDropDisplay$ctrl.stream)
@@ -181,35 +182,24 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
         dragDropHandler(pair[tuple.item1], listItem, tuple.item2.first ? -1 : tuple.item2.last ? 1 : 0);
       });
 
-    _drpZoneLeaveSubscription = dropZone.onDragLeave
-      .listen((_) {
-        _dragDropDisplay$ctrl.add(const <bool>[false, false]);
-
-        changeDetector.markForCheck();
-      });
+    _dropZoneLeaveSubscription = element.onMouseLeave
+      .where((_) => dragdropAboveClass.values.contains(true) || dragdropBelowClass.values.contains(true))
+      .map((_) => const <bool>[false, false])
+      .listen(_dragDropDisplay$ctrl.add);
 
     _showHooksSubscription = rx.observable(dropZone.onDragEnter)
       .where((DropzoneEvent event) => event.draggableElement != element)
-      .flatMapLatest((_) => rx.observable(injectedContentElement.onMouseMove)
-        .takeUntil(dropZone.onDragLeave))
+      .flatMapLatest((_) => rx.observable(contentElement.onMouseMove)
+        .takeUntil(element.onMouseLeave))
       .listen((MouseEvent event) {
-        final num height = injectedContentElement.client.height;
-
-        if (event.offset.y < height / 2) {
-          _dragDropDisplay$ctrl.add(const <bool>[true, false]);
-        } else {
-          _dragDropDisplay$ctrl.add(const <bool>[false, true]);
-        }
-
-        changeDetector.markForCheck();
+        if (event.offset.y < contentElement.client.height ~/ 2) _dragDropDisplay$ctrl.add(const <bool>[true, false]);
+        else _dragDropDisplay$ctrl.add(const <bool>[false, true]);
       });
 
-    _dragDropDisplaySubscription = _dragDropDisplay$ctrl.stream
+    _dragDropDisplaySubscription = rx.observable(_dragDropDisplay$ctrl.stream)
       .listen((List<bool> indices) {
-        dragdropAboveClass = dragdropBelowClass = const <String, bool>{'dnd-sort-handler': false};
-
-        if (indices.first) dragdropAboveClass = const <String, bool>{'dnd-sort-handler': true};
-        if (indices.last) dragdropBelowClass = const <String, bool>{'dnd-sort-handler': true};
+        dragdropAboveClass = <String, bool>{'dnd-sort-handler': indices.first, 'dnd-sort-handler--out': !indices.first};
+        dragdropBelowClass = <String, bool>{'dnd-sort-handler': indices.last, 'dnd-sort-handler--out': !indices.last};
 
         changeDetector.markForCheck();
       });

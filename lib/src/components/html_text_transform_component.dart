@@ -91,7 +91,9 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(StateService) StateService stateService) :
       this.element = elementRef,
-      super(changeDetector, elementRef, stateService);
+      super(changeDetector, elementRef, stateService) {
+    document.execCommand('insertBrOnReturn');
+  }
 
   //-----------------------------
   // ng2 life cycle
@@ -162,7 +164,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   void _updateInnerHtmlTrusted(String result, [bool notifyStateListeners=true]) {
     model = result;
 
-    if (contentElement != null) contentElement.nativeElement.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
+    if (contentElement != null) {
+      final Element element = contentElement.nativeElement;
+
+      element.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
+    }
 
     if (notifyStateListeners) _modelTransformation$ctrl.add(result);
   }
@@ -199,6 +205,20 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     final Element element = _contentElement.nativeElement as Element;
 
     element.addEventListener('DOMSubtreeModified', _contentModifier);
+
+    rx.observable(element.onPaste)
+      .flatMapLatest((_) => _modelTransformation$ctrl.stream)
+      .listen((String value) {
+        if (value != null && value.length > 5 && value.trim().substring(0, 5) == '<div>') {
+          final DocumentFragment fragment = new DocumentFragment();
+
+          fragment.setInnerHtml(element.innerHtml
+              .replaceAll(r'<div>', '')
+              .replaceAll(r'</div>', '<br>'), treeSanitizer: NodeTreeSanitizer.trusted);
+
+          _updateInnerHtmlTrusted(fragment.innerHtml);
+        }
+      });
 
     _range$subscription = _rangeTransform$
       .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) => new Stream.fromFuture(tuple.item2.setup())
@@ -245,6 +265,39 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   }
 
   void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
+    final String tag = tuple.item2.tag.toLowerCase();
+
+    _rangeTrigger$ctrl.add(true);
+
+    switch (tag) {
+      case 'b':
+        document.execCommand('bold'); return;
+      case 'i':
+        document.execCommand('italic'); return;
+      case 'u':
+        document.execCommand('underline'); return;
+      case 'li':
+        document.execCommand('insertOrderedList'); return;
+      case 'justifyleft':
+        document.execCommand('justifyLeft'); return;
+      case 'justifycenter':
+        document.execCommand('justifyCenter'); return;
+      case 'justifyright':
+        document.execCommand('justifyRight'); return;
+      case 'header':
+        document.execCommand('fontSize', false, '32px'); return;
+      case 'clear':
+        document.execCommand('removeFormat'); return;
+      case 'undo':
+        document.execCommand('undo'); return;
+      case 'redo':
+        document.execCommand('redo'); return;
+      default:
+        _injectCustomTag(tuple);
+    }
+  }
+
+  void _injectCustomTag(Tuple2<Range, HTMLTextTransformation> tuple) {
     final StringBuffer buffer = new StringBuffer();
     final Range range = tuple.item1;
 
