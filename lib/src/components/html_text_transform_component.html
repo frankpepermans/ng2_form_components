@@ -1,7 +1,7 @@
 <div class="ng2-html-text-transform">
     <div #content
          class="ng2-html-text-transform-text-area"
-         contenteditable="true"
+         [contentEditable]="!isContentLocked"
          spellcheck="false"
          (blur)="handleBlur()"
          (focus)="handleFocus()"><pre></pre></div>

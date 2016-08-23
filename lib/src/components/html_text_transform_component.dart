@@ -17,6 +17,8 @@ import 'package:ng2_form_components/src/components/helpers/html_transform.dart' 
 
 import 'package:ng2_form_components/src/components/html_text_transform_menu.dart';
 
+typedef RangeModifier(Range range);
+
 @Component(
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
@@ -42,6 +44,8 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   //-----------------------------
 
   @Input() String model;
+  @Input() RangeModifier rangeModifier;
+  @Input() bool isContentLocked = false;
 
   HTMLTextTransformMenu _menu;
   HTMLTextTransformMenu get menu => _menu;
@@ -62,6 +66,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   @Output() Stream<String> get rangeText => _rangeToString$ctrl.stream;
   @Output() Stream<bool> get blur => _blurTrigger$ctrl.stream;
   @Output() Stream<bool> get focus => _focusTrigger$ctrl.stream;
+  @Output() Stream<Range> get rangeSelection => _activeRange$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -73,7 +78,11 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
   StreamSubscription<bool> _hasRangeSubscription;
   StreamSubscription<HTMLTextTransformation> _menuSubscription;
   StreamSubscription<KeyboardEvent> _keyboardSubscription;
+  StreamSubscription<KeyboardEvent> _noInputOnSelectionSubscription;
+  StreamSubscription<String> _pasteSubscription;
+  StreamSubscription<Range> _activeRangeSubscription;
 
+  final StreamController<Range> _activeRange$ctrl = new StreamController<Range>.broadcast();
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
@@ -124,10 +133,13 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     element.removeEventListener('DOMSubtreeModified', _contentModifier);
 
+    _activeRangeSubscription?.cancel();
     _range$subscription?.cancel();
     _hasRangeSubscription?.cancel();
     _menuSubscription?.cancel();
     _keyboardSubscription?.cancel();
+    _noInputOnSelectionSubscription?.cancel();
+    _pasteSubscription?.cancel();
   }
 
   void _setupListeners() {
@@ -175,27 +187,30 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
   void _initStreams() {
     _range$ = new rx.Observable.merge([
+      document.onMouseDown,
       document.onMouseUp,
+      document.onKeyDown,
       document.onKeyUp,
       rx.observable(_rangeTrigger$ctrl.stream),
     ], asBroadcastStream: true)
       .map((_) => window.getSelection())
       .map((Selection selection) {
-        final List<Range> ranges = <Range>[];
+        if (selection.rangeCount > 0) {
+          if (rangeModifier != null) return rangeModifier(selection.getRangeAt(0));
 
-        for (int i=0, len=selection.rangeCount; i<len; i++) {
-          Range range = selection.getRangeAt(i);
-
-          if (range.startContainer != range.endContainer || range.startOffset != range.endOffset) ranges.add(range);
+          return selection.getRangeAt(0);
         }
 
-        return (ranges.isNotEmpty) ? ranges.first : null;
+        return null;
       });
 
+    _activeRangeSubscription = _range$
+      .listen(_activeRange$ctrl.add);
+
     _rangeTransform$ = _range$
+      .map(_resetButtons)
       .where(_hasValidRange)
       .map(_extractSelectionToString)
-      .map(_resetButtons)
       .map(_analyzeRange)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
@@ -206,7 +221,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
     element.addEventListener('DOMSubtreeModified', _contentModifier);
 
-    rx.observable(element.onPaste)
+    _pasteSubscription = rx.observable(element.onPaste)
       .flatMapLatest((_) => _modelTransformation$ctrl.stream)
       .listen((String value) {
         if (value != null && value.length > 5 && value.trim().substring(0, 5) == '<div>') {
@@ -235,6 +250,17 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
     _hasRangeSubscription = _range$
       .map(_hasValidRange)
       .listen(_hasSelectedRange$ctrl.add);
+
+    _noInputOnSelectionSubscription = rx.observable(element.onMouseDown)
+      .flatMapLatest((_) => rx.observable(element.onKeyDown)
+        .map((KeyboardEvent event) {
+          event.preventDefault();
+
+          return event;
+        })
+        .takeUntil(element.onMouseUp)
+      )
+      .listen((_) {});
   }
 
   bool _hasValidRange(Range range) {
@@ -308,7 +334,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
 
       if (tuple.item2.outerContainer != null) {
         buffer.write('<tmp_tag>');
-        buffer.write(extractedContent.innerHtml);
+        buffer.write(tuple.item2.body != null ? tuple.item2.body : extractedContent.innerHtml);
         buffer.write('</tmp_tag>');
       } else {
         buffer.write(extractedContent.innerHtml);
@@ -317,7 +343,7 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
       tuple.item2.doRemoveTag = false;
     } else {
       buffer.write(_writeOpeningTag(tuple.item2));
-      buffer.write(extractedContent.innerHtml);
+      buffer.write(tuple.item2.body != null ? tuple.item2.body : extractedContent.innerHtml);
       buffer.write(_writeClosingTag(tuple.item2));
     }
 

@@ -28,7 +28,7 @@ export 'src/components/side_panel.dart'
     show SidePanel;
 
 export 'src/components/html_text_transform_component.dart'
-    show HTMLTextTransformComponent;
+    show HTMLTextTransformComponent, RangeModifier;
 
 export 'src/components/html_text_transform_menu.dart'
     show HTMLTextTransformMenu;

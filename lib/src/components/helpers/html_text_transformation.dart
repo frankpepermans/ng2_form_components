@@ -9,6 +9,7 @@ class HTMLTextTransformation {
 
   final String tag;
   final String label;
+  final String body;
   final Map<String, String> style;
   final Map<String, String> attributes;
   final String id;
@@ -42,9 +43,10 @@ class HTMLTextTransformation {
     if (owner != null) owner.outerContainer = value;
   }
 
-  HTMLTextTransformation(String tag, String label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled, bool allowRemove, AsyncTransformation setup, bool doRemoveTag, Node outerContainer}) :
+  HTMLTextTransformation(String tag, String label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled, bool allowRemove, AsyncTransformation setup, bool doRemoveTag, Node outerContainer, String body}) :
     this.tag = tag,
     this.label = label,
+    this.body = body,
     this.style = style,
     this.attributes = attributes,
     this.className = className,
@@ -52,7 +54,7 @@ class HTMLTextTransformation {
     this._enabled = enabled ?? true,
     this.setup = setup ?? (() => new Future<HTMLTextTransformation>.value(new HTMLTextTransformation(
         tag, label, style: style, className: className, attributes: attributes, id: id, enabled: enabled, allowRemove: allowRemove,
-        doRemoveTag: doRemoveTag, outerContainer: outerContainer
+        doRemoveTag: doRemoveTag, outerContainer: outerContainer, body: body
     ))),
     this.allowRemove = allowRemove ?? true,
     this._doRemoveTag = doRemoveTag ?? false,

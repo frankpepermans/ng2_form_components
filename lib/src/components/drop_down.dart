@@ -96,6 +96,8 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     _defaultHandler = value;
   }
 
+  @Input() bool resetAfterSelection = false;
+
   //-----------------------------
   // output
   //-----------------------------
@@ -341,7 +343,11 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     return '${offset}px';
   }
 
-  void updateSelectedItems(Iterable<ListItem<T>> items) => _selectedItems$ctrl.add(items);
+  void updateSelectedItems(Iterable<ListItem<T>> items) {
+    _selectedItems$ctrl.add(items);
+
+    if (resetAfterSelection) window.animationFrame.whenComplete(() => _selectedItems$ctrl.add(const []));
+  }
 
   void handleItemRendererEvent(ItemRendererEvent event) => _itemRendererEvent$ctrl.add(event);
 
