@@ -302,8 +302,10 @@ class HTMLTextTransformComponent extends FormComponent implements StatefulCompon
         document.execCommand('italic'); return;
       case 'u':
         document.execCommand('underline'); return;
-      case 'li':
+      case 'ol':
         document.execCommand('insertOrderedList'); return;
+      case 'ul':
+        document.execCommand('insertUnorderedList'); return;
       case 'justifyleft':
         document.execCommand('justifyLeft'); return;
       case 'justifycenter':
