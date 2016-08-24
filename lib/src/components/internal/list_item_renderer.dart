@@ -205,6 +205,14 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       });
   }
 
-  bool showSortingAreas() => dragDropTypeHandler(listItem) == ListDragDropHandlerType.ALL || dragDropTypeHandler(listItem) == ListDragDropHandlerType.SORT;
+  bool showSortingAreas() {
+    if (dragDropTypeHandler != null) {
+      final ListDragDropHandlerType type = dragDropTypeHandler(listItem);
+
+      return type == ListDragDropHandlerType.ALL || type == ListDragDropHandlerType.SORT;
+    }
+
+    return false;
+  }
 
 }

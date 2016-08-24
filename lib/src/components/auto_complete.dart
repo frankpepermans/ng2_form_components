@@ -333,7 +333,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
 
     _input$ctrl.add(element.value);
 
-    setSelectedItems(const []);
+    //setSelectedItems(const []);
   }
 
 }
