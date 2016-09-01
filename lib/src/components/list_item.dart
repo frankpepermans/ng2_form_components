@@ -3,7 +3,7 @@ library ng2_form_components.domain.list_item;
 import 'package:dorm/dorm.dart';
 
 @Ref('entities.listItem')
-class ListItem<T extends Comparable> extends Entity implements Comparable<ListItem> {
+class ListItem<T extends Comparable<dynamic>> extends Entity implements Comparable<ListItem<Comparable<dynamic>>> {
 
   @override String get refClassName => 'entities.listItem';
 
@@ -50,9 +50,9 @@ class ListItem<T extends Comparable> extends Entity implements Comparable<ListIt
 
   ListItem() : super();
 
-  static ListItem construct() => new ListItem();
+  static ListItem<Comparable<dynamic>> construct() => new ListItem<Comparable<dynamic>>();
 
-  @override int compareTo(ListItem other) {
+  @override int compareTo(ListItem<Comparable<dynamic>> other) {
     if (other != null && other.data != null) return other.data.compareTo(data);
 
     return -1;

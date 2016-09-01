@@ -24,8 +24,8 @@ void main() {
     selector: 'my-app',
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: const [StateService],
-    directives: const [State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster]
+    providers: const <Type>[StateService],
+    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster]
 )
 class AppComponent {
 
@@ -53,7 +53,7 @@ class AppComponent {
   StateRecordingSession recordingSession;
   bool isReplaying = false;
 
-  ResolveChildrenHandler resolveChildrenHandler = (int level, ListItem<Comparable> listItem) {
+  ResolveChildrenHandler resolveChildrenHandler = (int level, ListItem<Comparable<dynamic>> listItem) {
     final ListItem<HierarchyLevel> cast = listItem as ListItem<HierarchyLevel>;
     List<ListItem<HierarchyLevel>> result;
 
@@ -256,7 +256,7 @@ class AppComponent {
       ..selectable = true;
   }
 
-  void notifyItemRendererEvent(ItemRendererEvent event) => print(event.type);
+  void notifyItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => print(event.type);
 
   String listItemsAToString(List<ListItem<String>> items) => items.map((ListItem<String> item) => labelHandler(item.data)).join(', ');
 

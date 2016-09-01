@@ -21,7 +21,7 @@ class HTMLTextTransformation {
 
   bool _enabled;
   bool get enabled => _enabled;
-  void set enabled(bool value) {
+  set enabled(bool value) {
     _enabled = value;
 
     if (owner != null) owner.enabled = value;
@@ -29,7 +29,7 @@ class HTMLTextTransformation {
 
   bool _doRemoveTag = false;
   bool get doRemoveTag => _doRemoveTag;
-  void set doRemoveTag(bool value) {
+  set doRemoveTag(bool value) {
     _doRemoveTag = value;
 
     if (owner != null) owner.doRemoveTag = value;
@@ -37,7 +37,7 @@ class HTMLTextTransformation {
 
   Node _outerContainer;
   Node get outerContainer => _outerContainer;
-  void set outerContainer(Node value) {
+  set outerContainer(Node value) {
     _outerContainer = value;
 
     if (owner != null) owner.outerContainer = value;

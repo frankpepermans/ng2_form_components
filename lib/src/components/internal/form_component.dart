@@ -10,10 +10,10 @@ import 'package:ng2_form_components/src/components/list_item.dart';
 
 typedef String LabelHandler(dynamic data);
 
-typedef List<ListItem<Comparable>> ResolveChildrenHandler(int level, ListItem<Comparable> listItem);
-typedef Type ResolveRendererHandler(int level, [ListItem<Comparable> listItem]);
+typedef List<ListItem<Comparable<dynamic>>> ResolveChildrenHandler(int level, ListItem<Comparable<dynamic>> listItem);
+typedef Type ResolveRendererHandler(int level, [ListItem<Comparable<dynamic>> listItem]);
 
-abstract class FormComponent<T extends Comparable> implements StatefulComponent, OnDestroy {
+abstract class FormComponent<T extends Comparable<dynamic>> implements StatefulComponent, OnDestroy {
 
   @override final ChangeDetectorRef changeDetector;
   final ElementRef elementRef;
@@ -36,7 +36,7 @@ abstract class FormComponent<T extends Comparable> implements StatefulComponent,
   // static internal properties
   //-----------------------------
 
-  static final List<FormComponent> openFormComponents = <FormComponent>[];
+  static final List<FormComponent<Comparable<dynamic>>> openFormComponents = <FormComponent<Comparable<dynamic>>>[];
 
   //-----------------------------
   // ng2 life cycle
@@ -48,6 +48,8 @@ abstract class FormComponent<T extends Comparable> implements StatefulComponent,
     stateService.unregisterComponentElementRef(elementRef);
 
     _onDestroy$ctrl.add(true);
+
+    _onDestroy$ctrl.close();
   }
 
 }

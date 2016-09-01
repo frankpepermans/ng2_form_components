@@ -18,10 +18,10 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
 
 import 'package:dnd/dnd.dart';
 
-typedef bool IsSelectedHandler (ListItem listItem);
-typedef String GetHierarchyOffsetHandler(ListItem listItem);
-typedef void ListDragDropHandler(ListItem dragListItem, ListItem dropListItem, int offset);
-typedef ListDragDropHandlerType DragDropTypeHandler(ListItem listItem);
+typedef bool IsSelectedHandler (ListItem<Comparable<dynamic>> listItem);
+typedef String GetHierarchyOffsetHandler(ListItem<Comparable<dynamic>> listItem);
+typedef void ListDragDropHandler(ListItem<Comparable<dynamic>> dragListItem, ListItem<Comparable<dynamic>> dropListItem, int offset);
+typedef ListDragDropHandlerType DragDropTypeHandler(ListItem<Comparable<dynamic>> listItem);
 
 enum ListDragDropHandlerType {
   SORT,
@@ -38,7 +38,7 @@ enum ListDragDropHandlerType {
     ''',
     providers: const <Type>[ViewUtils]
 )
-class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy {
+class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnInit {
 
   @ViewChild('renderType', read: ViewContainerRef) ViewContainerRef renderTypeTarget;
   @ViewChild('dragdropAbove', read: ViewContainerRef) ViewContainerRef dragdropAbove;
@@ -78,6 +78,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
   Map<String, bool> dragdropAboveClass = const <String, bool>{'dnd-sort-handler': false}, dragdropBelowClass = const <String, bool>{'dnd-sort-handler': false};
 
+  bool _isChildComponentInjected = false;
+
   //-----------------------------
   // constructor
   //-----------------------------
@@ -101,8 +103,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       if (dragdropBelow != null) elements.add(dragdropBelow.element.nativeElement);
 
       elements.forEach((Element element) {
-        if (listRendererService.dragDropElements.contains(element))
-          listRendererService.dragDropElements.removeWhere((Map<Element, ListItem<Comparable>> valuePair) => valuePair.containsKey(element));
+        if (listRendererService.dragDropElements.where((Map<Element, ListItem<Comparable<dynamic>>> valuePair) => valuePair.containsKey(element)).isNotEmpty)
+          listRendererService.dragDropElements.removeWhere((Map<Element, ListItem<Comparable<dynamic>>> valuePair) => valuePair.containsKey(element));
       });
     }
 
@@ -111,9 +113,17 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
     _dropZoneLeaveSubscription?.cancel();
     _showHooksSubscription?.cancel();
     _dragDropDisplaySubscription?.cancel();
+
+    _dragDropDisplay$ctrl.close();
   }
 
-  @override void ngAfterViewInit() {
+  @override void ngOnInit() => _injectChildComponent();
+
+  void _injectChildComponent() {
+    if (_isChildComponentInjected || resolveRendererHandler == null || renderTypeTarget == null) return;
+
+    _isChildComponentInjected = true;
+
     final Type resolvedRendererType = resolveRendererHandler(0, listItem);
 
     if (resolvedRendererType == null) throw new ArgumentError('Unable to resolve renderer for list item: ${listItem.runtimeType}');
@@ -130,7 +140,7 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       if (dragDropHandler != null) {
         (ref.location.nativeElement as Element).className = 'dnd--child';
 
-        listRendererService.dragDropElements.add(<Element, ListItem<Comparable>>{elementRef.nativeElement: listItem});
+        listRendererService.dragDropElements.add(<Element, ListItem<Comparable<dynamic>>>{elementRef.nativeElement: listItem});
 
         new Draggable(elementRef.nativeElement, verticalOnly: true);
 
@@ -160,8 +170,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
 
     _dropSubscription = dropZone.onDrop
       .listen((DropzoneEvent event) {
-        final Map<Element, ListItem> pair = listRendererService.dragDropElements
-          .firstWhere((Map<Element, ListItem<Comparable>> valuePair) => valuePair.containsKey(event.draggableElement), orElse: () => null);
+        final Map<Element, ListItem<Comparable<dynamic>>> pair = listRendererService.dragDropElements
+          .firstWhere((Map<Element, ListItem<Comparable<dynamic>>> valuePair) => valuePair.containsKey(event.draggableElement), orElse: () => null);
 
         dragDropHandler(pair[event.draggableElement], listItem, 0);
     });
@@ -176,8 +186,8 @@ class ListItemRenderer<T extends Comparable> implements AfterViewInit, OnDestroy
       .flatMapLatest((List<bool> indices) => rx.observable(dropZone.onDrop)
         .map((DropzoneEvent event) => new Tuple2<Element, List<bool>>(event.draggableElement, indices)))
       .listen((Tuple2<Element, List<bool>> tuple) {
-        final Map<Element, ListItem> pair = listRendererService.dragDropElements
-          .firstWhere((Map<Element, ListItem<Comparable>> valuePair) => valuePair.containsKey(tuple.item1), orElse: () => null);
+        final Map<Element, ListItem<Comparable<dynamic>>> pair = listRendererService.dragDropElements
+          .firstWhere((Map<Element, ListItem<Comparable<dynamic>>> valuePair) => valuePair.containsKey(tuple.item1), orElse: () => null);
 
         dragDropHandler(pair[tuple.item1], listItem, tuple.item2.first ? -1 : tuple.item2.last ? 1 : 0);
       });

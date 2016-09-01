@@ -12,15 +12,15 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 )
 class SidePanelAnimation extends Tween implements OnInit {
 
-  @override @Input() void set duration(int value) {
+  @override @Input() set duration(int value) {
     super.duration = value;
   }
 
-  @override @Input() void set tweenStyleProperty(String value) {
+  @override @Input() set tweenStyleProperty(String value) {
     super.tweenStyleProperty = value;
   }
 
-  @override @Input() void set beforeDestroyChildTrigger(StreamController value) {
+  @override @Input() set beforeDestroyChildTrigger(StreamController<dynamic> value) {
     super.beforeDestroyChildTrigger = value as StreamController<bool>;
   }
 

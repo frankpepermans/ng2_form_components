@@ -41,6 +41,8 @@ class Toaster implements OnDestroy {
 
   @override void ngOnDestroy() {
     _toastMessageSubscription?.cancel();
+
+    _toastMessage$ctrl.close();
   }
 
   void addMessage(String message, {ToastMessageType type: ToastMessageType.INFO}) => _toastMessage$ctrl.add(new _ToastMessage(message, type, new Duration(milliseconds: messageDuration)));

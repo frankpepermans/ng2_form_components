@@ -22,11 +22,11 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, S
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
-    directives: const [ListRenderer, Tween],
+    directives: const <Type>[ListRenderer, Tween],
     providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class DropDown<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
+class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
 
   //-----------------------------
   // input
@@ -34,37 +34,37 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
   LabelHandler _labelHandler;
   LabelHandler get labelHandler => _labelHandler;
-  @Input() void set labelHandler(LabelHandler value) {
+  @Input() set labelHandler(LabelHandler value) {
     _labelHandler = value;
   }
 
   Iterable<ListItem<T>> _dataProvider;
   Iterable<ListItem<T>> get dataProvider => _dataProvider;
-  @Input() void set dataProvider(Iterable<ListItem<T>> value) {
+  @Input() set dataProvider(Iterable<ListItem<T>> value) {
     _dataProvider = value;
   }
 
   bool _updateHeaderLabelWithSelection = true;
   bool get updateHeaderLabelWithSelection => _updateHeaderLabelWithSelection;
-  @Input() void set updateHeaderLabelWithSelection(bool value) {
+  @Input() set updateHeaderLabelWithSelection(bool value) {
     _updateHeaderLabelWithSelection = value;
   }
 
   Iterable<ListItem<T>> _selectedItems = <ListItem<T>>[];
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
-  @Input() void set selectedItems(Iterable<ListItem<T>> value) {
+  @Input() set selectedItems(Iterable<ListItem<T>> value) {
     _selectedItems = value;
   }
 
   String _headerLabel;
   String get headerLabel => _headerLabel;
-  @Input() void set headerLabel(String value) {
+  @Input() set headerLabel(String value) {
     _headerLabel = value;
   }
 
   String _className = 'ng2-form-components-drop-down';
   String get className => _className;
-  @Input() void set className(String value) {
+  @Input() set className(String value) {
     _className = value;
 
     cssMap = <String, bool>{value: true};
@@ -74,25 +74,25 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
-  @Input() void set allowMultiSelection(bool value) {
+  @Input() set allowMultiSelection(bool value) {
     _allowMultiSelection = value;
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
-  @Input() void set childOffset(int value) {
+  @Input() set childOffset(int value) {
     _childOffset = value;
   }
 
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
-  @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+  @Input() set resolveRendererHandler(ResolveRendererHandler value) {
     _resolveRendererHandler = value;
   }
 
   Function _defaultHandler;
   Function get defaultHandler => _defaultHandler;
-  @Input() void set defaultHandler(Function value) {
+  @Input() set defaultHandler(Function value) {
     _defaultHandler = value;
   }
 
@@ -107,7 +107,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
   @override StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
-  @Output() Stream<ItemRendererEvent> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
+  @Output() Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -117,7 +117,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   final StreamController<String> _headerLabel$ctrl = new StreamController<String>();
   final StreamController<bool> _openClose$ctrl = new StreamController<bool>.broadcast();
   final StreamController<bool> _beforeDestroyChild$ctrl = new StreamController<bool>.broadcast();
-  final StreamController<ItemRendererEvent> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent>.broadcast();
+  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
 
   StreamSubscription<String> _currentHeaderLabelSubscription;
   StreamSubscription<bool> _openCloseSubscription;
@@ -148,7 +148,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest([
+  @override Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(<Iterable<ListItem<T>>>[selectedItems]),
       rx.observable(_openClose$ctrl.stream)
@@ -181,10 +181,10 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
   @override void ngAfterViewInit() => FormComponent.openFormComponents.add(this);
 
-  @override Stream<bool> ngBeforeDestroyChild([List args]) async* {
+  @override Stream<bool> ngBeforeDestroyChild([List<dynamic> args]) async* {
     final Completer<bool> completer = new Completer<bool>();
 
-    _beforeDestroyChildSubscription = new rx.Observable<bool>.merge([
+    _beforeDestroyChildSubscription = new rx.Observable<bool>.merge(<Stream<bool>>[
       beforeDestroyChild.stream
         .where((bool isDone) => isDone),
       onDestroy
@@ -210,6 +210,12 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     _beforeDestroyChildSubscription?.cancel();
 
     FormComponent.openFormComponents.remove(this);
+
+    _selectedItems$ctrl.close();
+    _headerLabel$ctrl.close();
+    _openClose$ctrl.close();
+    _beforeDestroyChild$ctrl.close();
+    _itemRendererEvent$ctrl.close();
   }
 
   //-----------------------------
@@ -229,7 +235,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = new rx.Observable.combineLatest(<Stream>[
+    _currentHeaderLabelSubscription = new rx.Observable<String>.combineLatest(<Stream<dynamic>>[
       rx.observable(_headerLabel$ctrl.stream).startWith(const <String>['']),
       rx.observable(_selectedItems$ctrl.stream).startWith(const [])
     ], (String label, Iterable<ListItem<T>> selectedItems) {
@@ -244,7 +250,7 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
       currentHeaderLabel = headerLabel;
 
       changeDetector.markForCheck();
-    }) as StreamSubscription<String>;
+    });
 
     _openCloseSubscription = rx.observable(_openClose$ctrl.stream)
       .distinct((bool vA, bool vB) => vA == vB)
@@ -254,12 +260,14 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
 
         if (isOpen) {
           FormComponent.openFormComponents
-            .where((FormComponent component) => (component != this && component is DropDown && component.isOpen))
-            .forEach((FormComponent component) => (component as DropDown).openOrClose());
+            .where((FormComponent<Comparable<dynamic>> component) => (component != this && component is DropDown))
+            .map((FormComponent<Comparable<dynamic>> component) => component as DropDown<Comparable<dynamic>>)
+            .where((DropDown<Comparable<dynamic>> component) => component.isOpen)
+            .forEach((FormComponent<Comparable<dynamic>> component) => (component as DropDown<Comparable<dynamic>>).openOrClose());
         }
       });
 
-    _selectedItemsSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest([
+    _selectedItemsSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest(<Stream<dynamic>>[
       rx.observable(_openClose$ctrl.stream)
         .startWith(<bool>[isOpen])
         .distinct((bool vA, bool vB) => vA == vB)
@@ -349,6 +357,6 @@ class DropDown<T extends Comparable> extends FormComponent<T> implements OnChang
     if (resetAfterSelection) window.animationFrame.whenComplete(() => _selectedItems$ctrl.add(const []));
   }
 
-  void handleItemRendererEvent(ItemRendererEvent event) => _itemRendererEvent$ctrl.add(event);
+  void handleItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => _itemRendererEvent$ctrl.add(event);
 
 }

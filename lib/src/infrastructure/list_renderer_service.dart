@@ -9,37 +9,37 @@ import 'package:ng2_form_components/src/components/list_item.dart' show ListItem
 
 class ListRendererService {
 
-  List<ListRendererEvent> lastResponders;
+  List<ListRendererEvent<dynamic, Comparable<dynamic>>> lastResponders;
 
-  final List<ListRenderer> renderers = <ListRenderer>[];
+  final List<ListRenderer<Comparable<dynamic>>> renderers = <ListRenderer<Comparable<dynamic>>>[];
 
-  Stream<ListItem<Comparable>> get rendererSelection$ => _rendererSelection$ctrl.stream;
-  Stream<ItemRendererEvent<dynamic, Comparable>> get event$ => _event$ctrl.stream;
-  Stream<List<ListRendererEvent<dynamic, Comparable>>> get responders$ => _responder$ctrl.stream;
+  Stream<ListItem<Comparable<dynamic>>> get rendererSelection$ => _rendererSelection$ctrl.stream;
+  Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get event$ => _event$ctrl.stream;
+  Stream<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> get responders$ => _responder$ctrl.stream;
 
-  final List<Map<Element, ListItem<Comparable>>> dragDropElements = <Map<Element, ListItem<Comparable>>>[];
+  final List<Map<Element, ListItem<Comparable<dynamic>>>> dragDropElements = <Map<Element, ListItem<Comparable<dynamic>>>>[];
 
-  final StreamController<ListItem> _rendererSelection$ctrl = new StreamController<ListItem>.broadcast();
-  final StreamController<ItemRendererEvent> _event$ctrl = new StreamController<ItemRendererEvent>.broadcast();
-  final StreamController<List<ListRendererEvent>> _responder$ctrl = new StreamController<List<ListRendererEvent>>.broadcast();
+  final StreamController<ListItem<Comparable<dynamic>>> _rendererSelection$ctrl = new StreamController<ListItem<Comparable<dynamic>>>.broadcast();
+  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _event$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
+  final StreamController<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _responder$ctrl = new StreamController<List<ListRendererEvent<dynamic, Comparable<dynamic>>>>.broadcast();
 
   ListRendererService();
 
-  void addRenderer(ListRenderer renderer) => renderers.add(renderer);
+  void addRenderer(ListRenderer<Comparable<dynamic>> renderer) => renderers.add(renderer);
 
-  bool removeRenderer(ListRenderer renderer) => renderers.remove(renderer);
+  bool removeRenderer(ListRenderer<Comparable<dynamic>> renderer) => renderers.remove(renderer);
 
-  void triggerSelection(ListItem listItem) => _rendererSelection$ctrl.add(listItem);
+  void triggerSelection(ListItem<Comparable<dynamic>> listItem) => _rendererSelection$ctrl.add(listItem);
 
-  void triggerEvent(ItemRendererEvent event) => _event$ctrl.add(event);
+  void triggerEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => _event$ctrl.add(event);
 
-  void respondEvents(List<ListRendererEvent> events) {
+  void respondEvents(List<ListRendererEvent<dynamic, Comparable<dynamic>>> events) {
     _responder$ctrl.add(events);
 
     lastResponders = events;
   }
 
-  bool isOpen(ListItem listItem) {
+  bool isOpen(ListItem<Comparable<dynamic>> listItem) {
     for (int i=0, len=renderers.length; i<len; i++) {
       if (renderers[i].isOpen(listItem)) return true;
     }
@@ -48,7 +48,7 @@ class ListRendererService {
   }
 }
 
-class ListRendererEvent<T, U extends Comparable> {
+class ListRendererEvent<T, U extends Comparable<dynamic>> {
 
   final String type;
   final ListItem<U> listItem;
@@ -58,7 +58,7 @@ class ListRendererEvent<T, U extends Comparable> {
 
 }
 
-class ItemRendererEvent<T, U extends Comparable> {
+class ItemRendererEvent<T, U extends Comparable<dynamic>> {
 
   final String type;
   final ListItem<U> listItem;

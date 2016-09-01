@@ -17,7 +17,7 @@ class DragDrop implements OnDestroy, AfterViewInit {
 
   DragDropHandler _handler;
   DragDropHandler get handler => _handler;
-  @Input() void set handler(DragDropHandler value) {
+  @Input() set handler(DragDropHandler value) {
     _handler = value;
   }
 
@@ -31,7 +31,7 @@ class DragDrop implements OnDestroy, AfterViewInit {
 
   List<Element> list;
 
-  StreamSubscription _dropStreamSubscription;
+  StreamSubscription<DropzoneEvent> _dropStreamSubscription;
 
   DragDrop(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
     nativeElement = element.nativeElement as Element;
@@ -44,7 +44,7 @@ class DragDrop implements OnDestroy, AfterViewInit {
 
   @override void ngAfterViewInit() {
     if (handler != null) {
-      final ddId = _dragDropSessionId++;
+      final int ddId = _dragDropSessionId++;
 
       list = <Element>[];
 

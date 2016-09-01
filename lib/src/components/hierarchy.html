@@ -23,7 +23,7 @@
                  [beforeDestroyChildTrigger]="beforeDestroyChild"
                  [index]="i"
                  [level]="level + 1"
-                 class="item-group" *ngIf="isOpen(listItem)">
+                 class="item-group" *ngIf="isOpen(listItem) && resolveChildren(listItem).isNotEmpty">
                 <hierarchy #subHierarchy
                            [state]="stateGroup" [stateId]="getStateId(i)"
                            [listRendererService]="listRendererService"

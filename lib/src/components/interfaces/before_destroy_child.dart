@@ -6,5 +6,5 @@ abstract class BeforeDestroyChild {
 
   StreamController<dynamic> get beforeDestroyChild;
 
-  Stream<dynamic> ngBeforeDestroyChild([List args]);
+  Stream<dynamic> ngBeforeDestroyChild([List<dynamic> args]);
 }

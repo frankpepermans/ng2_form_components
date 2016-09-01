@@ -12,11 +12,11 @@ export 'package:ng2_form_components/src/components/toaster.dart';
 export 'package:ng2_form_components/src/components/text_input.dart';
 export 'package:ng2_form_components/src/components/side_panel.dart';
 
-const List<List<Type>> COMMON_DIRECTIVES = const [
+const List<List<Type>> COMMON_DIRECTIVES = const <List<Type>>[
   COMPONENT_DIRECTIVES
 ];
 
-const List<Type> COMPONENT_DIRECTIVES = const [
+const List<Type> COMPONENT_DIRECTIVES = const <Type>[
   ListRenderer,
   Hierarchy,
   DropDown,

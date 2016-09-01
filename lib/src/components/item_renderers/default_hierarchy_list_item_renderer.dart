@@ -22,7 +22,7 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
     ''',
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class DefaultHierarchyListItemRenderer<T extends Comparable> implements DynamicListItemRenderer, OnDestroy {
+class DefaultHierarchyListItemRenderer<T extends Comparable<dynamic>> implements DynamicListItemRenderer, OnDestroy {
 
   //-----------------------------
   // input
@@ -30,12 +30,12 @@ class DefaultHierarchyListItemRenderer<T extends Comparable> implements DynamicL
 
   final ListRendererService listRendererService;
   final ChangeDetectorRef changeDetector;
-  final ListItem listItem;
+  final ListItem<Comparable<dynamic>> listItem;
   final IsSelectedHandler isSelected;
   final GetHierarchyOffsetHandler getHierarchyOffset;
   final LabelHandler labelHandler;
 
-  StreamSubscription<List<ListRendererEvent>> _eventSubscription;
+  StreamSubscription<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _eventSubscription;
 
   //-----------------------------
   // constructor
@@ -58,7 +58,7 @@ class DefaultHierarchyListItemRenderer<T extends Comparable> implements DynamicL
 
   void _initStreams() {
     _eventSubscription = listRendererService.responders$
-      .where((List<ListRendererEvent> events) => events.firstWhere((ListRendererEvent event) => event.type == 'selectionChanged', orElse: () => null) != null)
+      .where((List<ListRendererEvent<dynamic, Comparable<dynamic>>> events) => events.firstWhere((ListRendererEvent<dynamic, Comparable<dynamic>> event) => event.type == 'selectionChanged', orElse: () => null) != null)
       .listen((_) => changeDetector.markForCheck());
   }
 

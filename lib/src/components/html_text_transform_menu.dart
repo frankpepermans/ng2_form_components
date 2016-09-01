@@ -10,7 +10,7 @@ import 'package:ng2_form_components/src/components/helpers/html_text_transformat
     templateUrl: 'html_text_transform_menu.html',
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class HTMLTextTransformMenu {
+class HTMLTextTransformMenu implements OnDestroy {
 
   final ChangeDetectorRef changeDetector;
 
@@ -41,6 +41,10 @@ class HTMLTextTransformMenu {
   //-----------------------------
   // ng2 life cycle
   //-----------------------------
+
+  @override void ngOnDestroy() {
+    _transformation$ctrl.close();
+  }
 
   //-----------------------------
   // template methods

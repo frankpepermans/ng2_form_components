@@ -9,41 +9,41 @@ import 'package:angular2/animate.dart';
 @Directive(
     selector: '[tween]'
 )
-class Tween implements OnInit {
+class Tween implements OnInit, OnDestroy {
 
   int _duration = 600;
   int get duration => _duration;
-  @Input() void set duration(int value) {
+  @Input() set duration(int value) {
     _duration = value;
   }
 
   String _tweenStyleProperty = 'top';
   String get tweenStyleProperty => _tweenStyleProperty;
-  @Input() void set tweenStyleProperty(String value) {
+  @Input() set tweenStyleProperty(String value) {
     _tweenStyleProperty = value;
   }
 
-  StreamController _beforeDestroyChildTrigger;
-  StreamController get beforeDestroyChildTrigger => _beforeDestroyChildTrigger;
-  @Input() void set beforeDestroyChildTrigger(StreamController value) {
+  StreamController<dynamic> _beforeDestroyChildTrigger;
+  StreamController<dynamic> get beforeDestroyChildTrigger => _beforeDestroyChildTrigger;
+  @Input() set beforeDestroyChildTrigger(StreamController<dynamic> value) {
     _beforeDestroyChildTrigger = value;
   }
 
   int _startValue = -1;
   int get startValue => _startValue;
-  @Input() void set startValue(int value) {
+  @Input() set startValue(int value) {
     _startValue = value;
   }
 
   int _endValue = -1;
   int get endValue => _endValue;
-  @Input() void set endValue(int value) {
+  @Input() set endValue(int value) {
     _endValue = value;
   }
 
   bool _hasCloseAnimation = true;
   bool get hasCloseAnimation => _hasCloseAnimation;
-  @Input() void set hasCloseAnimation(bool value) {
+  @Input() set hasCloseAnimation(bool value) {
     _hasCloseAnimation = value;
   }
 
@@ -52,6 +52,8 @@ class Tween implements OnInit {
 
   Element nativeElement;
   CssAnimationBuilder cssAnimationBuilder;
+
+  StreamSubscription<dynamic> _beforeDestroyChildTriggerSubscription;
 
   Tween(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
     nativeElement = element.nativeElement as Element;
@@ -63,7 +65,11 @@ class Tween implements OnInit {
 
     window.animationFrame.whenComplete(tweenOpen);
 
-    if (hasCloseAnimation && beforeDestroyChildTrigger != null) beforeDestroyChildTrigger.stream.take(1).listen(tweenClose);
+    if (hasCloseAnimation && beforeDestroyChildTrigger != null) _beforeDestroyChildTriggerSubscription = beforeDestroyChildTrigger.stream.take(1).listen(tweenClose);
+  }
+
+  @override void ngOnDestroy() {
+    _beforeDestroyChildTriggerSubscription?.cancel();
   }
 
   void tweenOpen() {

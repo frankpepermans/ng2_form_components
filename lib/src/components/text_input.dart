@@ -96,6 +96,9 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
     _inputSubscription.cancel();
 
     super.ngOnDestroy();
+
+    _input$ctrl.close();
+    _action$ctrl.close();
   }
 
   //-----------------------------

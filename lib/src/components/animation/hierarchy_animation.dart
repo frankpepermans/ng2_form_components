@@ -13,41 +13,44 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 @Directive(
     selector: '[hierarchy-tween]'
 )
-class HierarchyAnimation extends Tween implements OnInit {
+class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
 
-  @override @Input() void set duration(int value) {
+  @override @Input() set duration(int value) {
     super.duration = value;
   }
 
-  @override @Input() void set tweenStyleProperty(String value) {
+  @override @Input() set tweenStyleProperty(String value) {
     super.tweenStyleProperty = value;
   }
 
-  @override @Input() void set beforeDestroyChildTrigger(StreamController value) {
+  @override @Input() set beforeDestroyChildTrigger(StreamController<dynamic> value) {
     super.beforeDestroyChildTrigger = value as StreamController<int>;
   }
 
   int _index;
   int get index => _index;
-  @Input() void set index(int value) {
+  @Input() set index(int value) {
     _index = value;
   }
 
   int _level;
   int get level => _level;
-  @Input() void set level(int value) {
+  @Input() set level(int value) {
     _level = value;
   }
 
   bool _forceAnimateOnOpen = false;
   bool get forceAnimateOnOpen => _forceAnimateOnOpen;
-  @Input() void set forceAnimateOnOpen(bool value) {
+  @Input() set forceAnimateOnOpen(bool value) {
     _forceAnimateOnOpen = value;
   }
 
   static List<HierarchyAnimation> animations = <HierarchyAnimation>[];
 
   final StreamController<num> _animation$ctrl = new StreamController<num>.broadcast();
+
+  StreamSubscription<dynamic> _beforeDestroyChildTriggerSubscription;
+  StreamSubscription<num> _openSubscription;
 
   bool _animationBegan = false;
 
@@ -67,14 +70,23 @@ class HierarchyAnimation extends Tween implements OnInit {
       _nextAnimationFrame();
     }
 
-    if (beforeDestroyChildTrigger != null) beforeDestroyChildTrigger.stream
+    if (beforeDestroyChildTrigger != null) _beforeDestroyChildTriggerSubscription = beforeDestroyChildTrigger.stream
       .where((int index) => index == this.index)
       .take(1)
       .listen(tweenClose);
   }
 
+  @override void ngOnDestroy() {
+    super.ngOnDestroy();
+
+    _openSubscription?.cancel();
+    _beforeDestroyChildTriggerSubscription?.cancel();
+
+    _animation$ctrl.close();
+  }
+
   @override void tweenOpen() {
-    rx.observable(_animation$ctrl.stream)
+    _openSubscription = rx.observable(_animation$ctrl.stream)
       .where((_) => animations.isNotEmpty && animations.first.level == level)
       .take(1)
       .listen((_) {

@@ -19,12 +19,12 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
 
 import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService;
 
-typedef bool IsSelectedHandler(ListItem<Comparable> listItem);
-typedef bool ClearSelectionWhereHandler(ListItem<Comparable> listItem);
+typedef bool IsSelectedHandler(ListItem<Comparable<dynamic>> listItem);
+typedef bool ClearSelectionWhereHandler(ListItem<Comparable<dynamic>> listItem);
 
 @Pipe(name: 'selectedItems')
 @Injectable()
-class SelectedItemsPipe<T extends Comparable> implements PipeTransform {
+class SelectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransform {
 
   const SelectedItemsPipe();
 
@@ -37,7 +37,7 @@ class SelectedItemsPipe<T extends Comparable> implements PipeTransform {
 
 @Pipe(name: 'unselectedItems')
 @Injectable()
-class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
+class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransform {
 
   const UnselectedItemsPipe();
 
@@ -53,14 +53,14 @@ class UnselectedItemsPipe<T extends Comparable> implements PipeTransform {
     templateUrl: 'list_renderer.html',
     directives: const <Type>[ListItemRenderer],
     providers: const <Type>[StateService],
-    pipes: const [SelectedItemsPipe, UnselectedItemsPipe],
+    pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
+class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
 
   ElementRef _scrollPane;
   ElementRef get scrollPane => _scrollPane;
-  @ViewChild('scrollPane') void set scrollPane(ElementRef value) {
+  @ViewChild('scrollPane') set scrollPane(ElementRef value) {
     _scrollPane = value;
   }
 
@@ -70,73 +70,73 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
   LabelHandler _labelHandler;
   LabelHandler get labelHandler => _labelHandler;
-  @Input() void set labelHandler(LabelHandler value) {
+  @Input() set labelHandler(LabelHandler value) {
     _labelHandler = value;
   }
 
   ListDragDropHandler _dragDropHandler;
   ListDragDropHandler get dragDropHandler => _dragDropHandler;
-  @Input() void set dragDropHandler(ListDragDropHandler value) {
+  @Input() set dragDropHandler(ListDragDropHandler value) {
     _dragDropHandler = value;
   }
 
   DragDropTypeHandler _dragDropTypeHandler = (_) => ListDragDropHandlerType.SORT;
   DragDropTypeHandler get dragDropTypeHandler => _dragDropTypeHandler;
-  @Input() void set dragDropTypeHandler(DragDropTypeHandler value) {
+  @Input() set dragDropTypeHandler(DragDropTypeHandler value) {
     _dragDropTypeHandler = value;
   }
 
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
-  @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+  @Input() set resolveRendererHandler(ResolveRendererHandler value) {
     _resolveRendererHandler = value;
   }
 
   List<ListItem<T>> _dataProvider = <ListItem<T>>[];
   List<ListItem<T>> get dataProvider => _dataProvider;
-  @Input() void set dataProvider(List<ListItem<T>> value) {
+  @Input() set dataProvider(List<ListItem<T>> value) {
     _dataProvider = value;
   }
 
   List<ListItem<T>> _selectedItems = <ListItem<T>>[];
   List<ListItem<T>> get selectedItems => _selectedItems;
-  @Input() void set selectedItems(List<ListItem<T>> value) {
+  @Input() set selectedItems(List<ListItem<T>> value) {
     _selectedItems = value;
   }
 
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
-  @Input() void set allowMultiSelection(bool value) {
+  @Input() set allowMultiSelection(bool value) {
     _allowMultiSelection = value;
   }
 
   bool _moveSelectionOnTop = false;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
-  @Input() void set moveSelectionOnTop(bool value) {
+  @Input() set moveSelectionOnTop(bool value) {
     _moveSelectionOnTop = value;
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
-  @Input() void set childOffset(int value) {
+  @Input() set childOffset(int value) {
     _childOffset = value;
   }
 
-  List<ListRendererEvent> _rendererEvents;
-  List<ListRendererEvent> get rendererEvents => _rendererEvents;
-  @Input() void set rendererEvents(List<ListRendererEvent<dynamic, Comparable>> value) {
+  List<ListRendererEvent<dynamic, Comparable<dynamic>>> _rendererEvents;
+  List<ListRendererEvent<dynamic, Comparable<dynamic>>> get rendererEvents => _rendererEvents;
+  @Input() set rendererEvents(List<ListRendererEvent<dynamic, Comparable<dynamic>>> value) {
     _rendererEvents = value;
   }
 
   int _pageOffset = 0;
   int get pageOffset => _pageOffset;
-  @Input() void set pageOffset(int value) {
+  @Input() set pageOffset(int value) {
     _pageOffset = value;
   }
 
   String _className = 'ng2-form-components-list-renderer';
   String get className => _className;
-  @Input() void set className(String value) {
+  @Input() set className(String value) {
     _className = value;
 
     cssMap = <String, bool>{value: true};
@@ -144,7 +144,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
 
   ListRendererService _listRendererService = new ListRendererService();
   ListRendererService get listRendererService => _listRendererService;
-  @Input() void set listRendererService(ListRendererService value) {
+  @Input() set listRendererService(ListRendererService value) {
     _listRendererService = value;
   }
 
@@ -155,7 +155,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   @Output() rx.Observable<List<ListItem<T>>> get selectedItemsChanged => _selectedItems$;
   @Output() Stream<bool> get requestClose => _requestClose$ctrl.stream;
   @Output() Stream<bool> get scrolledToBottom => _scrolledToBottom$ctrl.stream;
-  @Output() Stream<ItemRendererEvent> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
+  @Output() Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -174,17 +174,17 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   final StreamController<bool> _requestClose$ctrl = new StreamController<bool>();
   final StreamController<int> _scroll$ctrl = new StreamController<int>.broadcast();
   final StreamController<bool> _scrolledToBottom$ctrl = new StreamController<bool>.broadcast();
-  final StreamController<ItemRendererEvent> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent>.broadcast();
+  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
   final StreamController<bool> _domChange$ctrl = new StreamController<bool>.broadcast();
 
   StreamSubscription<Iterable<ListItem<T>>> _internalSelectedItemsSubscription;
   StreamSubscription<List<ListItem<T>>> _clearSelectionSubscription;
-  StreamSubscription<ListItem> _rendererSelectionSubscription;
+  StreamSubscription<ListItem<Comparable<dynamic>>> _rendererSelectionSubscription;
   StreamSubscription<List<ListItem<T>>> _selectionStateSubscription;
   StreamSubscription<MouseEvent> _domClickSubscription;
   StreamSubscription<bool> _scrollPositionSubscription;
-  StreamSubscription<ItemRendererEvent> _rendererEventSubscription;
+  StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _rendererEventSubscription;
   StreamSubscription<bool> _domChangeSubscription;
 
   int _pendingScrollTop = 0;
@@ -266,6 +266,15 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _domChangeSubscription?.cancel();
 
     listRendererService.removeRenderer(this);
+
+    _selectedItems$ctrl.close();
+    _incomingSelection$ctrl.close();
+    _requestClose$ctrl.close();
+    _scroll$ctrl.close();
+    _scrolledToBottom$ctrl.close();
+    _itemRendererEvent$ctrl.close();
+    _clearSelection$ctrl.close();
+    _domChange$ctrl.close();
   }
 
   @override void ngAfterViewInit() {
@@ -327,12 +336,12 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     _internalSelectedItemsSubscription = _selectedItems$ctrl.stream.listen((Iterable<ListItem<T>> items) {
       internalSelectedItems = items;
 
-      listRendererService.respondEvents(<ListRendererEvent<Iterable<ListItem<T>>, Comparable>>[new ListRendererEvent<Iterable<ListItem<T>>, Comparable>('selectionChanged', null, items)]);
+      listRendererService.respondEvents(<ListRendererEvent<Iterable<ListItem<T>>, Comparable<dynamic>>>[new ListRendererEvent<Iterable<ListItem<T>>, Comparable<dynamic>>('selectionChanged', null, items)]);
 
       changeDetector.markForCheck();
     });
 
-    _selectedItems$ = new rx.Observable<List<ListItem<T>>>.zip(<Stream>[
+    _selectedItems$ = new rx.Observable<List<ListItem<T>>>.zip(<Stream<dynamic>>[
       _incomingSelection$ctrl.stream,
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(<List<ListItem<T>>>[internalSelectedItems as List<ListItem<T>>])
@@ -354,7 +363,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       return new List<ListItem<T>>.unmodifiable(newList);
     }, asBroadcastStream: true);
 
-    _clearSelectionSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest([
+    _clearSelectionSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest(<Stream<dynamic>>[
       _clearSelection$ctrl.stream,
       _selectedItems$.startWith(const [])
     ], (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
@@ -362,7 +371,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
       .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add)) as StreamSubscription<List<ListItem<T>>>;
 
     _rendererSelectionSubscription = listRendererService.rendererSelection$
-      .listen((ListItem<Comparable> listItem) => handleSelection(listItem as ListItem<T>));
+      .listen((ListItem<Comparable<dynamic>> listItem) => handleSelection(listItem as ListItem<T>));
 
     _selectionStateSubscription = _selectedItems$.listen(_selectedItems$ctrl.add);
 
@@ -372,7 +381,9 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
     element.nativeElement.addEventListener('DOMSubtreeModified', _notifyDomChanged);
   }
 
-  void _notifyDomChanged(_) => _domChange$ctrl.add(true);
+  void _notifyDomChanged(_) {
+    if (!_domChange$ctrl.isClosed) _domChange$ctrl.add(true);
+  }
 
   void _attemptRequiredScrollPosition(bool _) {
     scrollPane.nativeElement.scrollTop = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
@@ -405,7 +416,7 @@ class ListRenderer<T extends Comparable> extends FormComponent<T> implements OnC
   }
 
   void handleSelection(ListItem<T> listItem) {
-    _clearSelection$ctrl.add((ListItem listItem) => false);
+    _clearSelection$ctrl.add((_) => false);
     _incomingSelection$ctrl.add(listItem);
   }
 

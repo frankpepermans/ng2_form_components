@@ -24,7 +24,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableT
     providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChanges, OnDestroy, AfterViewInit {
+class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements OnChanges, OnDestroy, AfterViewInit {
 
   @ViewChild('searchInput') ElementRef searchInput;
 
@@ -32,47 +32,47 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   // input
   //-----------------------------
 
-  @override @Input() void set labelHandler(LabelHandler value) {
+  @override @Input() set labelHandler(LabelHandler value) {
     super.labelHandler = value;
   }
 
-  @override @Input() void set dataProvider(Iterable<ListItem<T>> value) {
+  @override @Input() set dataProvider(Iterable<ListItem<T>> value) {
     super.dataProvider = value;
   }
 
-  @override @Input() void set selectedItems(Iterable<ListItem<T>> value) {
+  @override @Input() set selectedItems(Iterable<ListItem<T>> value) {
     super.selectedItems = value;
   }
 
-  @override @Input() void set headerLabel(String value) {
+  @override @Input() set headerLabel(String value) {
     super.headerLabel = value;
   }
 
-  @override @Input() void set allowMultiSelection(bool value) {
+  @override @Input() set allowMultiSelection(bool value) {
     super.allowMultiSelection = value;
   }
 
-  @override @Input() void set childOffset(int value) {
+  @override @Input() set childOffset(int value) {
     super.childOffset = value;
   }
 
-  @override @Input() void set resolveRendererHandler(ResolveRendererHandler value) {
+  @override @Input() set resolveRendererHandler(ResolveRendererHandler value) {
     super.resolveRendererHandler = value;
   }
 
-  @override @Input() void set className(String value) {
+  @override @Input() set className(String value) {
     super.className = value;
   }
 
   bool _moveSelectionOnTop = true;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
-  @Input() void set moveSelectionOnTop(bool value) {
+  @Input() set moveSelectionOnTop(bool value) {
     _moveSelectionOnTop = value;
   }
 
   int _minCharsRequired = 3;
   int get minCharsRequired => _minCharsRequired;
-  @Input() void set minCharsRequired(int value) {
+  @Input() set minCharsRequired(int value) {
     _minCharsRequired = value;
   }
 
@@ -129,7 +129,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
   Stream<Entity> provideState() {
     final rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>> superProvider = super.provideState() as rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>;
 
-    return new rx.Observable<SerializableTuple3<bool, Iterable<ListItem<T>>, String>>.combineLatest([
+    return new rx.Observable<SerializableTuple3<bool, Iterable<ListItem<T>>, String>>.combineLatest(<Stream<dynamic>>[
       superProvider,
       rx.observable(_input$ctrl.stream)
         .startWith(const <String>[''])
@@ -175,6 +175,11 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
     if (_mergedDataProviderChangedSubscription != null) _mergedDataProviderChangedSubscription.cancel();
     if (_inputChangedSubscription != null) _inputChangedSubscription.cancel();
     if (_currentHeaderLabelSubscription != null) _currentHeaderLabelSubscription.cancel();
+
+    _input$ctrl.close();
+    _dataProviderChanged$ctrl.close();
+    _inputCriteriaMet$ctrl.close();
+    _focus$ctrl.close();
   }
 
   void setInputValue(String value) {
@@ -242,7 +247,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
       .debounce(const Duration(milliseconds: 50))
       .where((String input) => input.length >= minCharsRequired);
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream>[
+    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream<dynamic>>[
       rx.observable(_focus$ctrl.stream)
         .distinct((bool bA, bool bB) => bA == bB)
         .startWith(const <bool>[false]),
@@ -251,7 +256,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
         .startWith(<Iterable<ListItem<T>>>[null])
     ], (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, dataProvider, selectedItems, true), asBroadcastStream: true);
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream>[
+    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream<dynamic>>[
       rx.observable(_focus$ctrl.stream)
         .distinct((bool bA, bool bB) => bA == bB)
         .startWith(const <bool>[false]),
@@ -261,7 +266,7 @@ class AutoComplete<T extends Comparable> extends DropDown<T> implements OnChange
         .startWith(<Iterable<ListItem<T>>>[null])
     ], (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false), asBroadcastStream: true);
 
-    final rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> merged$ = new rx.Observable.merge(<Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>>[
+    final rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> merged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.merge(<Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>>[
       mergedDataProviderChanged$,
       mergedSelectedItemsChangedChanged$
     ], asBroadcastStream: true);

@@ -21,7 +21,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDestroy, BeforeDestroyChild {
+class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, BeforeDestroyChild {
 
   //-----------------------------
   // input
@@ -29,7 +29,7 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
 
   String _orientation = 'right';
   String get orientation => _orientation;
-  @Input() void set orientation(String value) {
+  @Input() set orientation(String value) {
     _orientation = value;
   }
 
@@ -82,9 +82,13 @@ class SidePanel<T extends Comparable> extends FormComponent<T> implements OnDest
 
     _beforeDestroyChildSubscription?.cancel();
     _toggleStateSubscription?.cancel();
+
+    _beforeDestroyChild$ctrl.close();
+    _isOpen$ctrl.close();
+    _toggle$ctrl.close();
   }
 
-  @override Stream<bool> ngBeforeDestroyChild([List args]) async* {
+  @override Stream<bool> ngBeforeDestroyChild([List<dynamic> args]) async* {
     final Completer<bool> completer = new Completer<bool>();
 
     beforeDestroyChild.add(true);
