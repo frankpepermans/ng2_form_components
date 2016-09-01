@@ -38,7 +38,7 @@ enum ListDragDropHandlerType {
     ''',
     providers: const <Type>[ViewUtils]
 )
-class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnInit {
+class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnInit, OnChanges {
 
   @ViewChild('renderType', read: ViewContainerRef) ViewContainerRef renderTypeTarget;
   @ViewChild('dragdropAbove', read: ViewContainerRef) ViewContainerRef dragdropAbove;
@@ -69,12 +69,16 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
   final Injector injector;
 
   final StreamController<List<bool>> _dragDropDisplay$ctrl = new StreamController<List<bool>>.broadcast();
+  final StreamController<ComponentRef> _componentRef$ctrl = new StreamController<ComponentRef>.broadcast();
+  final StreamController<ListDragDropHandler> _dragDropHandler$ctrl = new StreamController<ListDragDropHandler>.broadcast();
+  final StreamController<DragDropTypeHandler> _dragDropTypeHandler$ctrl = new StreamController<DragDropTypeHandler>.broadcast();
 
   StreamSubscription<DropzoneEvent> _dropSubscription;
   StreamSubscription<List<bool>> _dropZoneLeaveSubscription;
   StreamSubscription<Tuple2<Element, List<bool>>> _shiftSubscription;
   StreamSubscription<MouseEvent> _showHooksSubscription;
   StreamSubscription<List<bool>> _dragDropDisplaySubscription;
+  StreamSubscription<Tuple3<ComponentRef, ListDragDropHandler, DragDropTypeHandler>> _setupDragDropSubscription;
 
   Map<String, bool> dragdropAboveClass = const <String, bool>{'dnd-sort-handler': false}, dragdropBelowClass = const <String, bool>{'dnd-sort-handler': false};
 
@@ -95,6 +99,11 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
   // ng2 life cycle
   //-----------------------------
 
+  @override void ngOnChanges(Map<String, SimpleChange> changes) {
+    if (changes.containsKey('dragDropHandler') && dragDropHandler != null) _dragDropHandler$ctrl.add(dragDropHandler);
+    if (changes.containsKey('dragDropTypeHandler') && dragDropTypeHandler != null) _dragDropTypeHandler$ctrl.add(dragDropTypeHandler);
+  }
+
   @override void ngOnDestroy() {
     if (dragDropHandler != null) {
       final List<Element> elements = <Element>[elementRef.nativeElement];
@@ -113,8 +122,12 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
     _dropZoneLeaveSubscription?.cancel();
     _showHooksSubscription?.cancel();
     _dragDropDisplaySubscription?.cancel();
+    _setupDragDropSubscription?.cancel();
 
     _dragDropDisplay$ctrl.close();
+    _componentRef$ctrl.close();
+    _dragDropHandler$ctrl.close();
+    _dragDropTypeHandler$ctrl.close();
   }
 
   @override void ngOnInit() => _injectChildComponent();
@@ -128,6 +141,17 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
 
     if (resolvedRendererType == null) throw new ArgumentError('Unable to resolve renderer for list item: ${listItem.runtimeType}');
 
+    _setupDragDropSubscription = new rx.Observable<Tuple3<ComponentRef, ListDragDropHandler, DragDropTypeHandler>>.combineLatest(<Stream<dynamic>>[
+      _componentRef$ctrl.stream,
+      rx.observable(_dragDropHandler$ctrl.stream)
+        .startWith(<ListDragDropHandler>[dragDropHandler]),
+      rx.observable(_dragDropTypeHandler$ctrl.stream)
+        .startWith(<DragDropTypeHandler>[dragDropTypeHandler])
+    ], (ComponentRef ref, ListDragDropHandler dragDropHandler, DragDropTypeHandler dragDropTypeHandler) => new Tuple3<ComponentRef, ListDragDropHandler, DragDropTypeHandler>(ref, dragDropHandler, dragDropTypeHandler))
+      .where((Tuple3<ComponentRef, ListDragDropHandler, DragDropTypeHandler> tuple) => tuple.item1 != null && tuple.item2 != null && tuple.item3 != null)
+      .take(1)
+      .listen(_setupDragDrop);
+
     dynamicComponentLoader.loadNextToLocation(resolvedRendererType, renderTypeTarget, ReflectiveInjector.fromResolvedProviders(ReflectiveInjector.resolve(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),
@@ -137,29 +161,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
       new Provider('list-item-index', useValue: index),
       new Provider(ViewUtils, useValue: viewUtils)
     ]), injector)).then((ComponentRef ref) {
-      if (dragDropHandler != null) {
-        (ref.location.nativeElement as Element).className = 'dnd--child';
-
-        listRendererService.dragDropElements.add(<Element, ListItem<Comparable<dynamic>>>{elementRef.nativeElement: listItem});
-
-        new Draggable(elementRef.nativeElement, verticalOnly: true);
-
-        switch (dragDropTypeHandler(listItem)) {
-          case ListDragDropHandlerType.SWAP:
-            _setupDragDropSwap();
-
-            break;
-          case ListDragDropHandlerType.SORT:
-            _setupDragDropSort(ref.location.nativeElement);
-
-            break;
-          case ListDragDropHandlerType.ALL:
-            _setupDragDropSwap();
-            _setupDragDropSort(ref.location.nativeElement);
-
-            break;
-        }
-      }
+      _componentRef$ctrl.add(ref);
 
       changeDetector.markForCheck();
     });
@@ -223,6 +225,30 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
     }
 
     return false;
+  }
+
+  void _setupDragDrop(Tuple3<ComponentRef, ListDragDropHandler, DragDropTypeHandler> tuple) {
+    (tuple.item1.location.nativeElement as Element).className = 'dnd--child';
+
+    listRendererService.dragDropElements.add(<Element, ListItem<Comparable<dynamic>>>{elementRef.nativeElement: listItem});
+
+    new Draggable(elementRef.nativeElement, verticalOnly: true);
+
+    switch (tuple.item3(listItem)) {
+      case ListDragDropHandlerType.SWAP:
+        _setupDragDropSwap();
+
+        break;
+      case ListDragDropHandlerType.SORT:
+        _setupDragDropSort(tuple.item1.location.nativeElement);
+
+        break;
+      case ListDragDropHandlerType.ALL:
+        _setupDragDropSwap();
+        _setupDragDropSort(tuple.item1.location.nativeElement);
+
+        break;
+    }
   }
 
 }

@@ -57,6 +57,9 @@ export 'src/components/animation/tween.dart'
 export 'src/components/helpers/drag_drop.dart'
     show DragDrop, DragDropHandler;
 
+export 'src/components/form_input.dart'
+    show FormInput;
+
 export 'src/infrastructure/list_renderer_service.dart'
     show ListRendererService, ItemRendererEvent, ListRendererEvent;
 

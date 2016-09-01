@@ -401,7 +401,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
   bool isOpen(ListItem<T> listItem) => false;
 
-  void clearSelection(ClearSelectionWhereHandler clearSelectionWhereHandler) => _clearSelection$ctrl.add(clearSelectionWhereHandler);
+  void clearSelection(ClearSelectionWhereHandler clearSelectionWhereHandler) {
+    if (!_clearSelection$ctrl.isClosed) _clearSelection$ctrl.add(clearSelectionWhereHandler);
+  }
 
   bool isSelected(ListItem<T> listItem) {
     if (listItem == null || internalSelectedItems == null) return false;

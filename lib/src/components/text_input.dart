@@ -21,7 +21,7 @@ typedef void TextInputAction(String inputValue);
     providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush
 )
-class TextInput<T extends Comparable> extends FormComponent<T> implements OnChanges, OnDestroy {
+class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy {
 
   //-----------------------------
   // input
@@ -33,11 +33,11 @@ class TextInput<T extends Comparable> extends FormComponent<T> implements OnChan
   @Input() String actionContainerClassName;
   @Input() String actionIconClassName;
 
-  @Output() Stream<String> get valueChanged => _input$ctrl.stream;
-
   //-----------------------------
   // output
   //-----------------------------
+
+  @Output() Stream<String> get valueChanged => _input$ctrl.stream;
 
   //-----------------------------
   // private properties
