@@ -96,6 +96,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   List<ListItem<T>> get dataProvider => _dataProvider;
   @Input() set dataProvider(List<ListItem<T>> value) {
     _dataProvider = value;
+
+    _dataProvider$ctrl.add(value);
   }
 
   List<ListItem<T>> _selectedItems = <ListItem<T>>[];
@@ -177,6 +179,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
   final StreamController<bool> _domChange$ctrl = new StreamController<bool>.broadcast();
+  final StreamController<List<ListItem<T>>> _dataProvider$ctrl = new StreamController<List<ListItem<T>>>.broadcast();
 
   StreamSubscription<Iterable<ListItem<T>>> _internalSelectedItemsSubscription;
   StreamSubscription<List<ListItem<T>>> _clearSelectionSubscription;
@@ -186,6 +189,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   StreamSubscription<bool> _scrollPositionSubscription;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _rendererEventSubscription;
   StreamSubscription<bool> _domChangeSubscription;
+  StreamSubscription<int> _scrollAfterDataProviderSubscription;
 
   int _pendingScrollTop = 0;
 
@@ -264,6 +268,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _rendererEventSubscription?.cancel();
     _clearSelectionSubscription?.cancel();
     _domChangeSubscription?.cancel();
+    _scrollAfterDataProviderSubscription.cancel();
 
     listRendererService.removeRenderer(this);
 
@@ -275,6 +280,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _itemRendererEvent$ctrl.close();
     _clearSelection$ctrl.close();
     _domChange$ctrl.close();
+    _dataProvider$ctrl.close();
   }
 
   @override void ngAfterViewInit() {
@@ -308,13 +314,18 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     _domChangeSubscription = null;
 
-    if (_pendingScrollTop > 0 && scrollPane != null) _domChangeSubscription = _domChange$ctrl.stream
+    if (_pendingScrollTop > 0 && scrollPane != null) _domChangeSubscription = rx.observable(_domChange$ctrl.stream)
       .timeout(const Duration(seconds: 3), onTimeout: (_) {
         _domChangeSubscription?.cancel();
 
         _domChangeSubscription = null;
       })
+      .flatMapLatest((bool value) => _animationFrame().take(1).map((_) => value))
       .listen(_attemptRequiredScrollPosition);
+  }
+
+  Stream<num> _animationFrame() async* {
+    yield await window.animationFrame;
   }
 
   void _initScrollPositionStream() {
@@ -377,6 +388,18 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     _rendererEventSubscription = listRendererService.event$
       .listen(_itemRendererEvent$ctrl.add);
+
+    _scrollAfterDataProviderSubscription = rx.observable(_scroll$ctrl.stream)
+      .flatMapLatest((int scrollTop) => _dataProvider$ctrl.stream.map((_) => scrollTop))
+      .listen((int scrollTop) {
+        scrollPane.nativeElement.scrollTop = scrollTop;
+
+        if (scrollPane.nativeElement.scrollTop != scrollTop) {
+          _pendingScrollTop = scrollTop;
+
+          _initDomChangeListener();
+        }
+    });
 
     element.nativeElement.addEventListener('DOMSubtreeModified', _notifyDomChanged);
   }

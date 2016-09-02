@@ -338,9 +338,49 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     }
   }
 
+  List<Node> _listAllNodes(Node node, {List<Node> allNodes}) {
+    allNodes.add(node);
+
+    node.childNodes.forEach((Node childNode) => _listAllNodes(childNode, allNodes: allNodes));
+
+    return allNodes;
+  }
+
   void _injectCustomTag(Tuple2<Range, HTMLTextTransformation> tuple) {
     final StringBuffer buffer = new StringBuffer();
     final Range range = tuple.item1;
+    final List<Node> allNodes = <Node>[];
+    bool isRangeModified = false;
+
+    _listAllNodes(range.commonAncestorContainer, allNodes: allNodes);
+
+    allNodes.forEach((Node node) {
+      if (node is Element) {
+        if (node.nodeName.toLowerCase() == 'li') {
+          if (node.contains(range.startContainer)) {
+            range.setStartBefore(node);
+
+            isRangeModified = true;
+          } else if (node.contains(range.endContainer)) {
+            range.setEndAfter(node);
+
+            isRangeModified = true;
+          } else if (node == range.commonAncestorContainer) {
+            range.setStartBefore(node);
+            range.setEndAfter(node);
+
+            isRangeModified = true;
+          }
+        }
+      }
+    });
+
+    if (isRangeModified) {
+      final Selection selection = window.getSelection();
+
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
 
     final DocumentFragment extractedContent = range.extractContents();
 
