@@ -174,8 +174,9 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
       .listen((DropzoneEvent event) {
         final Map<Element, ListItem<Comparable<dynamic>>> pair = listRendererService.dragDropElements
           .firstWhere((Map<Element, ListItem<Comparable<dynamic>>> valuePair) => valuePair.containsKey(event.draggableElement), orElse: () => null);
+        final ListItem<Comparable<dynamic>> draggableListItem = pair[event.draggableElement];
 
-        dragDropHandler(pair[event.draggableElement], listItem, 0);
+        if (draggableListItem.compareTo(listItem) != 0) dragDropHandler(draggableListItem, listItem, 0);
     });
   }
 
