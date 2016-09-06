@@ -159,6 +159,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   @Output() Stream<bool> get scrolledToBottom => _scrolledToBottom$ctrl.stream;
   @Output() Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
 
+  Stream<bool> get domChange$ => _domChange$ctrl.stream;
+
   //-----------------------------
   // private properties
   //-----------------------------
@@ -191,6 +193,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   StreamSubscription<bool> _domChangeSubscription;
   StreamSubscription<int> _scrollAfterDataProviderSubscription;
 
+  MutationObserver observer;
   int _pendingScrollTop = 0;
 
   //-----------------------------
@@ -259,7 +262,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   void ngOnDestroy() {
     super.ngOnDestroy();
 
-    element.nativeElement.removeEventListener('DOMSubtreeModified', _notifyDomChanged);
+    observer.disconnect();
 
     _internalSelectedItemsSubscription?.cancel();
     _rendererSelectionSubscription?.cancel();
@@ -317,6 +320,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     if (_pendingScrollTop > 0 && scrollPane != null) _domChangeSubscription = rx.observable(_domChange$ctrl.stream)
       .timeout(const Duration(seconds: 3), onTimeout: (_) {
         _domChangeSubscription?.cancel();
+        observer.disconnect();
 
         _domChangeSubscription = null;
       })
@@ -376,7 +380,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     _clearSelectionSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest(<Stream<dynamic>>[
       _clearSelection$ctrl.stream,
-      _selectedItems$.startWith(const [])
+      _selectedItems$.startWith(const [const []])
     ], (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
       .where((Iterable<ListItem<T>> items) => items.isNotEmpty)
       .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add)) as StreamSubscription<List<ListItem<T>>>;
@@ -401,10 +405,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
         }
     });
 
-    element.nativeElement.addEventListener('DOMSubtreeModified', _notifyDomChanged);
+    observer = new MutationObserver(notifyDomChanged)
+      ..observe(element.nativeElement, subtree: true, childList: true);
   }
 
-  void _notifyDomChanged(_) {
+  void notifyDomChanged(List<MutationRecord> records, _) {
     if (!_domChange$ctrl.isClosed) _domChange$ctrl.add(true);
   }
 

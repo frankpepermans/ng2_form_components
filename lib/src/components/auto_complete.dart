@@ -144,7 +144,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
 
   @override
   void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple3<bool, Iterable<ListItem<T>>, String> tuple = entity as SerializableTuple3<bool, Iterable<ListItem<T>>, String>;
+    final SerializableTuple3<bool, List<Entity>, String> tuple = entity as SerializableTuple3<bool, List<Entity>, String>;
 
     if (phase == StatePhase.REPLAY) _focus$ctrl.add(true);
 
@@ -156,7 +156,9 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       _input$ctrl.add(tuple.item3);
     }
 
-    super.receiveState(new SerializableTuple2<bool, Iterable<ListItem<T>>>()
+    tuple.item2.forEach((_) => print(_.runtimeType));
+
+    super.receiveState(new SerializableTuple2<bool, List<Entity>>()
       ..item1 = tuple.item1
       ..item2 = tuple.item2, phase);
   }
@@ -261,7 +263,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
         .distinct((bool bA, bool bB) => bA == bB)
         .startWith(const <bool>[false]),
       rx.observable(_input$ctrl.stream)
-        .startWith(const [null]),
+        .startWith(const <String>[null]),
       rx.observable(selectedItemsChanged)
         .startWith(<Iterable<ListItem<T>>>[null])
     ], (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false), asBroadcastStream: true);

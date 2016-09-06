@@ -93,6 +93,8 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   final StreamController<bool> _focusTrigger$ctrl = new StreamController<bool>();
   final StreamController<Range> _rangeToString$ctrl = new StreamController<Range>();
 
+  MutationObserver observer;
+
   //-----------------------------
   // Constructor
   //-----------------------------
@@ -131,9 +133,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
-    final Element element = _contentElement.nativeElement as Element;
-
-    element.removeEventListener('DOMSubtreeModified', _contentModifier);
+    observer.disconnect();
 
     _activeRangeSubscription?.cancel();
     _range$subscription?.cancel();
@@ -230,7 +230,8 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
       );
 
-    element.addEventListener('DOMSubtreeModified', _contentModifier);
+    observer = new MutationObserver(_contentModifier)
+      ..observe(element, characterData: true, subtree: true);
 
     _pasteSubscription = rx.observable(element.onPaste)
       .flatMapLatest((_) => _modelTransformation$ctrl.stream)
@@ -295,7 +296,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
   }
 
-  void _contentModifier(Event event) {
+  void _contentModifier(List<MutationRecord> records, _) {
     if (!_modelTransformation$ctrl.isClosed) {
       model = contentElement.nativeElement.innerHtml;
 

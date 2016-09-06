@@ -66,7 +66,7 @@ class Toaster implements OnDestroy {
       case ToastMessageType.ERROR: return <String, bool>{'toast--error': true};
     }
 
-    return const {};
+    return const <String, bool>{};
   }
 
   String getBottomOffset(int index) => '${64 * index}px';

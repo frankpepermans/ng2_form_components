@@ -159,14 +159,17 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
       ..item2 = items);
 
   @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple2<bool, Iterable<ListItem<T>>> tuple = entity as SerializableTuple2<bool, Iterable<ListItem<T>>>;
+    final SerializableTuple2<bool, List<Entity>> tuple = entity as SerializableTuple2<bool, List<Entity>>;
+    final List<ListItem<T>> listCast = <ListItem<T>>[];
 
     if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
 
-    scheduleMicrotask(() {
-      _selectedItems$ctrl.add(tuple.item2);
+    tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
-      setSelectedItems(tuple.item2);
+    scheduleMicrotask(() {
+      _selectedItems$ctrl.add(listCast);
+
+      setSelectedItems(listCast);
     });
   }
 
@@ -237,7 +240,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   void _initStreams() {
     _currentHeaderLabelSubscription = new rx.Observable<String>.combineLatest(<Stream<dynamic>>[
       rx.observable(_headerLabel$ctrl.stream).startWith(const <String>['']),
-      rx.observable(_selectedItems$ctrl.stream).startWith(const [])
+      rx.observable(_selectedItems$ctrl.stream).startWith(const [const []])
     ], (String label, Iterable<ListItem<T>> selectedItems) {
       if (updateHeaderLabelWithSelection && selectedItems != null && selectedItems.isNotEmpty) {
         return (selectedItems.length == 1) ?

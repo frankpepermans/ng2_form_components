@@ -29,8 +29,6 @@ import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, Serial
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show ResolveChildrenHandler, ResolveRendererHandler;
 
-import 'package:ng2_form_components/src/utils/window_listeners.dart';
-
 @Component(
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
@@ -146,7 +144,6 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   //-----------------------------
 
   final Map<ListItem<T>, List<ListItem<T>>> _resolvedChildren = <ListItem<T>, List<ListItem<T>>>{};
-  final WindowListeners windowListeners = new WindowListeners();
 
   final StreamController<Tuple2<Hierarchy<Comparable<dynamic>>, bool>> _childHierarchies$ctrl = new StreamController<Tuple2<Hierarchy<Comparable<dynamic>>, bool>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearChildHierarchies$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
@@ -158,7 +155,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   Map<ListItem<T>, bool> _isOpenMap = <ListItem<T>, bool>{};
 
-  StreamSubscription<bool> _windowDOMSubtreeModifiedListener;
+  StreamSubscription<bool> _windowMutationListener;
   StreamSubscription<Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler>> _clearChildHierarchiesSubscription;
   StreamSubscription<Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>> _registerChildHierarchySubscription;
   StreamSubscription<Map<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>> _selectionBuilderSubscription;
@@ -214,16 +211,26 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   }
 
   @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>> tuple = entity as SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>;
+    final SerializableTuple3<int, List<Entity>, List<Entity>> tuple = entity as SerializableTuple3<int, List<Entity>, List<Entity>>;
+    final List<ListItem<T>> listCast = <ListItem<T>>[];
+    final List<ListItem<T>> listCast2 = <ListItem<T>>[];
+
+    tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
-    _receivedSelection = tuple.item2;
+    _receivedSelection = listCast;
 
-    tuple.item3.forEach((ListItem<T> listItem) => _isOpenMap[listItem] = true);
+    tuple.item3.forEach((Entity entity) {
+      final ListItem<T> listItem = entity as ListItem<T>;
 
-    _openListItems$Ctrl.add(tuple.item3);
+      _isOpenMap[listItem] = true;
+
+      listCast2.add(listItem);
+    });
+
+    _openListItems$Ctrl.add(listCast2);
 
     changeDetector.markForCheck();
   }
@@ -268,7 +275,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
-    _windowDOMSubtreeModifiedListener?.cancel();
+    _windowMutationListener?.cancel();
     _clearChildHierarchiesSubscription?.cancel();
     _registerChildHierarchySubscription?.cancel();
     _selectionBuilderSubscription?.cancel();
@@ -289,7 +296,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   //-----------------------------
 
   void _initStreams() {
-    _windowDOMSubtreeModifiedListener = windowListeners.windowDOMSubtreeModified
+    _windowMutationListener = domChange$
       .listen(_handleDomChange);
 
     _clearChildHierarchiesSubscription = new rx.Observable<Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler>>.combineLatest(<Stream<dynamic>>[
@@ -377,6 +384,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
               listRendererService.triggerSelection(listItem);
             });
+
+            observer.disconnect();
           });
       }
     }

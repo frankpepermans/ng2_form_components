@@ -5,10 +5,10 @@ import 'dart:html';
 
 class WindowListeners {
 
-  Stream<bool> get windowDOMSubtreeModified => _windowDOMSubtreeModified.stream;
+  Stream<bool> get windowMutation => _windowMutation.stream;
   Stream<bool> get windowResize => _windowResize.stream;
 
-  final StreamController<bool> _windowDOMSubtreeModified = new StreamController<bool>.broadcast();
+  final StreamController<bool> _windowMutation = new StreamController<bool>.broadcast();
   final StreamController<bool> _windowResize = new StreamController<bool>.broadcast();
 
   static WindowListeners _instance;
@@ -22,12 +22,13 @@ class WindowListeners {
   }
 
   WindowListeners._internal() {
-    window.addEventListener('DOMSubtreeModified', _onDOMSubtreeModified);
+    new MutationObserver(_onModified).observe(document, subtree: true, childList: true, attributes: true, characterData: true);
+
     window.addEventListener('resize', _onWindowResize);
   }
 
 
-  void _onDOMSubtreeModified(_) => _windowDOMSubtreeModified.add(true);
+  void _onModified(__, _) => _windowMutation.add(true);
 
   void _onWindowResize(_) => _windowResize.add(true);
 

@@ -191,8 +191,9 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
       .listen((Tuple2<Element, List<bool>> tuple) {
         final Map<Element, ListItem<Comparable<dynamic>>> pair = listRendererService.dragDropElements
           .firstWhere((Map<Element, ListItem<Comparable<dynamic>>> valuePair) => valuePair.containsKey(tuple.item1), orElse: () => null);
+        final ListItem<Comparable<dynamic>> draggableListItem = pair[tuple.item1];
 
-        dragDropHandler(pair[tuple.item1], listItem, tuple.item2.first ? -1 : tuple.item2.last ? 1 : 0);
+        if (draggableListItem.compareTo(listItem) != 0) dragDropHandler(pair[tuple.item1], listItem, tuple.item2.first ? -1 : tuple.item2.last ? 1 : 0);
       });
 
     _dropZoneLeaveSubscription = element.onMouseLeave

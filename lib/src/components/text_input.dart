@@ -47,7 +47,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   StreamSubscription<String> _inputSubscription;
 
-  Map<String, bool> actionContainerClassMap = const {}, actionIconClassMap = const {};
+  Map<String, bool> actionContainerClassMap = const <String, bool>{}, actionIconClassMap = const <String, bool>{};
 
   //-----------------------------
   // public properties
@@ -69,7 +69,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   @override Stream<Entity> provideState() {
-    return new rx.Observable<SerializableTuple2<String, bool>>.merge([
+    return new rx.Observable<SerializableTuple2<String, bool>>.merge(<Stream<SerializableTuple2<String, bool>>>[
       _input$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = false),
       _action$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = true)
     ]);
