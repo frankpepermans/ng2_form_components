@@ -159,7 +159,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
       ..item2 = items);
 
   @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple2<bool, List<Entity>> tuple = entity as SerializableTuple2<bool, List<Entity>>;
+    final SerializableTuple2<bool, Iterable<Entity>> tuple = entity as SerializableTuple2<bool, Iterable<Entity>>;
     final List<ListItem<T>> listCast = <ListItem<T>>[];
 
     if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));

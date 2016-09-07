@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:angular2/angular2.dart';
-import 'package:angular2/animate.dart';
 
 @Directive(
     selector: '[tween]'
@@ -47,17 +46,15 @@ class Tween implements OnInit, OnDestroy {
     _hasCloseAnimation = value;
   }
 
-  final AnimationBuilder animationBuilder;
   final ElementRef element;
 
+  Timer _openTimer;
   Element nativeElement;
-  CssAnimationBuilder cssAnimationBuilder;
 
   StreamSubscription<dynamic> _beforeDestroyChildTriggerSubscription;
 
-  Tween(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
+  Tween(@Inject(ElementRef) this.element) {
     nativeElement = element.nativeElement as Element;
-    cssAnimationBuilder = animationBuilder.css();
   }
 
   @override void ngOnInit() {
@@ -76,28 +73,27 @@ class Tween implements OnInit, OnDestroy {
     final int t0 = startValue == -1 ? -nativeElement.clientHeight : startValue;
     final int t1 = endValue == -1 ? 0 : endValue;
 
-    cssAnimationBuilder.setDuration(duration);
+    nativeElement.style.setProperty(tweenStyleProperty, '${t0}px');
+    nativeElement.style.visibility = 'visible';
+    nativeElement.style.transition = '$tweenStyleProperty ${duration / 1000}s ease-out';
 
-    cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      tweenStyleProperty: '${t0}px',
-      'visibility': 'visible'
-    });
+    animationFrame$()
+      .take(1)
+      .listen((_) {
+        nativeElement.style.setProperty(tweenStyleProperty, '${t1}px');
+      });
 
-    cssAnimationBuilder.setToStyles(<String, dynamic>{
-      tweenStyleProperty: '${t1}px'
-    });
+    _openTimer?.cancel();
 
     if (hasCloseAnimation) {
-      cssAnimationBuilder.start(nativeElement)
-        ..onComplete(() {
-          nativeElement.style.removeProperty(tweenStyleProperty);
-          nativeElement.style.removeProperty('visibility');
-        });
+      _openTimer = new Timer(new Duration(milliseconds: duration), () {
+        nativeElement.style.removeProperty(tweenStyleProperty);
+        nativeElement.style.removeProperty('visibility');
+      });
     } else {
-      cssAnimationBuilder.start(nativeElement)
-        ..onComplete(() {
-          nativeElement.style.removeProperty('visibility');
-        });
+      _openTimer = new Timer(new Duration(milliseconds: duration), () {
+        nativeElement.style.removeProperty('visibility');
+      });
     }
   }
 
@@ -105,21 +101,24 @@ class Tween implements OnInit, OnDestroy {
     final int t0 = startValue == -1 ? 0 : startValue;
     final int t1 = endValue == -1 ? -nativeElement.clientHeight : endValue;
 
-    cssAnimationBuilder.setDuration(duration);
+    nativeElement.style.setProperty(tweenStyleProperty, '${t0}px');
 
-    cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      tweenStyleProperty: '${t0}px'
-    });
+    animationFrame$()
+      .take(1)
+      .listen((_) {
+        nativeElement.style.setProperty(tweenStyleProperty, '${t1}px');
 
-    cssAnimationBuilder.setToStyles(<String, dynamic>{
-      tweenStyleProperty: '${t1}px'
-    });
+        _openTimer?.cancel();
 
-    cssAnimationBuilder.start(nativeElement)
-      ..onComplete(() {
-        nativeElement.style.removeProperty(tweenStyleProperty);
+        new Timer(new Duration(milliseconds: duration), () {
+          nativeElement.style.removeProperty(tweenStyleProperty);
 
-        beforeDestroyChildTrigger.add(true);
+          beforeDestroyChildTrigger.add(true);
+        });
       });
+  }
+
+  Stream<num> animationFrame$() async* {
+    yield await window.animationFrame;
   }
 }

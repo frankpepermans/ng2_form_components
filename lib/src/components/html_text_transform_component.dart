@@ -83,6 +83,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   StreamSubscription<KeyboardEvent> _noInputOnSelectionSubscription;
   StreamSubscription<String> _pasteSubscription;
   StreamSubscription<Range> _activeRangeSubscription;
+  StreamSubscription<String> _contentSubscription;
 
   final StreamController<Range> _activeRange$ctrl = new StreamController<Range>.broadcast();
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
@@ -92,6 +93,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   final StreamController<bool> _blurTrigger$ctrl = new StreamController<bool>();
   final StreamController<bool> _focusTrigger$ctrl = new StreamController<bool>();
   final StreamController<Range> _rangeToString$ctrl = new StreamController<Range>();
+  final StreamController<String> _content$ctrl = new StreamController<String>.broadcast();
 
   MutationObserver observer;
 
@@ -142,6 +144,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _keyboardSubscription?.cancel();
     _noInputOnSelectionSubscription?.cancel();
     _pasteSubscription?.cancel();
+    _contentSubscription?.cancel();
 
     _activeRange$ctrl.close();
     _transformation$ctrl.close();
@@ -151,6 +154,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _blurTrigger$ctrl.close();
     _focusTrigger$ctrl.close();
     _rangeToString$ctrl.close();
+    _content$ctrl.close();
   }
 
   void _setupListeners() {
@@ -187,17 +191,22 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   void _updateInnerHtmlTrusted(String result, [bool notifyStateListeners=true]) {
     model = result;
 
-    if (contentElement != null) {
-      final Element element = contentElement.nativeElement;
-
-      element.setInnerHtml(result, treeSanitizer: NodeTreeSanitizer.trusted);
-    }
+    _content$ctrl.add(result);
 
     if (notifyStateListeners) _modelTransformation$ctrl.add(result);
   }
 
   void _initStreams() {
     final Element element = _contentElement.nativeElement as Element;
+
+    _contentSubscription = rx.observable(_content$ctrl.stream)
+      .startWith(<String>[model])
+      .distinct((String a, String b) => a.compareTo(b) == 0)
+      .listen((String newContent) {
+        final Element element = _contentElement.nativeElement as Element;
+
+        element.setInnerHtml(newContent, treeSanitizer: NodeTreeSanitizer.trusted);
+    });
 
     _range$ = new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
       element.onMouseDown,
@@ -238,6 +247,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       .listen((String value) {
         if (value != null && value.length > 5 && value.trim().substring(0, 5) == '<div>') {
           final DocumentFragment fragment = new DocumentFragment();
+          final Element element = _contentElement.nativeElement as Element;
 
           fragment.setInnerHtml(element.innerHtml
               .replaceAll(r'<div>', '')
@@ -465,15 +475,22 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
   Range _resetButtons(Range forRange) {
     if (menu?.buttons != null) {
+      bool isChanged = false;
       List<HTMLTextTransformation> allButtons = menu.buttons.fold(<HTMLTextTransformation>[], (List<HTMLTextTransformation> prev, List<HTMLTextTransformation> value) {
         prev.addAll(value);
 
         return prev;
       });
 
-      allButtons.forEach((HTMLTextTransformation transformation) => transformation.doRemoveTag = false);
+      allButtons.forEach((HTMLTextTransformation transformation) {
+        if (transformation.doRemoveTag) {
+          transformation.doRemoveTag = false;
 
-      changeDetector.markForCheck();
+          isChanged = true;
+        }
+      });
+
+      if (isChanged) changeDetector.markForCheck();
     }
 
     return forRange;

@@ -6,7 +6,6 @@ import 'dart:html';
 import 'package:rxdart/rxdart.dart' as rx;
 
 import 'package:angular2/angular2.dart';
-import 'package:angular2/animate.dart';
 
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 
@@ -53,10 +52,10 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   StreamSubscription<num> _openSubscription;
 
   bool _animationBegan = false;
+  Timer _openTimer;
 
   HierarchyAnimation(
-      @Inject(AnimationBuilder) AnimationBuilder animationBuilder,
-      @Inject(ElementRef) ElementRef element) : super(animationBuilder, element);
+      @Inject(ElementRef) ElementRef element) : super(element);
 
   @override void ngOnInit() {
     if (forceAnimateOnOpen) {
@@ -90,27 +89,27 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
       .where((_) => animations.isNotEmpty && animations.first.level == level)
       .take(1)
       .listen((_) {
-        final CssAnimationBuilder cssAnimationBuilder = animationBuilder.css();
+        final int toHeight = nativeElement.clientHeight;
 
-        cssAnimationBuilder.setDuration(duration);
+        nativeElement.style.height = '0px';
+        nativeElement.style.visibility = 'visible';
+        nativeElement.style.position = 'relative';
+        nativeElement.style.transition = 'height ${duration / 1000}s ease-out';
 
-        cssAnimationBuilder.setFromStyles(<String, dynamic>{
-          'height': '0px',
-          'visibility': 'visible',
-          'position': 'relative'
-        });
+        animationFrame$()
+          .take(1)
+          .listen((_) {
+            nativeElement.style.height = '${toHeight}px';
 
-        cssAnimationBuilder.setToStyles(<String, dynamic>{
-          'height': '${nativeElement.clientHeight}px'
-        });
+            _openTimer?.cancel();
 
-        cssAnimationBuilder.start(nativeElement)
-          ..onComplete(() {
-            nativeElement.style.removeProperty('height');
-            nativeElement.style.removeProperty('visibility');
-            nativeElement.style.removeProperty('position');
+            _openTimer = new Timer(new Duration(milliseconds: duration), () {
+              nativeElement.style.removeProperty('height');
+              nativeElement.style.removeProperty('visibility');
+              nativeElement.style.removeProperty('position');
 
-            animations.remove(this);
+              animations.remove(this);
+            });
           });
 
         _animationBegan = true;
@@ -118,27 +117,27 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   }
 
   @override void tweenClose(_) {
-    cssAnimationBuilder.setDuration(duration);
+    nativeElement.style.height = '${nativeElement.clientHeight}px';
+    nativeElement.style.visibility = 'visible';
+    nativeElement.style.position = 'relative';
+    nativeElement.style.transition = 'height ${duration / 1000}s ease-out';
 
-    cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      'height': '${nativeElement.clientHeight}px',
-      'visibility': 'visible',
-      'position': 'relative'
-    });
+    animationFrame$()
+      .take(1)
+      .listen((_) {
+        nativeElement.style.height = '0';
 
-    cssAnimationBuilder.setToStyles(<String, dynamic>{
-      'height': '0px'
-    });
+        _openTimer?.cancel();
 
-    cssAnimationBuilder.start(nativeElement)
-      ..onComplete(() {
-        nativeElement.style.removeProperty('height');
-        nativeElement.style.removeProperty('visibility');
-        nativeElement.style.removeProperty('position');
+        new Timer(new Duration(milliseconds: duration), () {
+          nativeElement.style.removeProperty('height');
+          nativeElement.style.removeProperty('visibility');
+          nativeElement.style.removeProperty('position');
 
-        animations.remove(this);
+          animations.remove(this);
 
-        beforeDestroyChildTrigger.add(index);
+          beforeDestroyChildTrigger.add(index);
+        });
       });
   }
 

@@ -3,7 +3,6 @@ library ng2_form_components.components.animation.side_panel_animation;
 import 'dart:async';
 
 import 'package:angular2/angular2.dart';
-import 'package:angular2/animate.dart';
 
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 
@@ -25,46 +24,42 @@ class SidePanelAnimation extends Tween implements OnInit {
   }
 
   SidePanelAnimation(
-      @Inject(AnimationBuilder) AnimationBuilder animationBuilder,
-      @Inject(ElementRef) ElementRef element) : super(animationBuilder, element) {
+      @Inject(ElementRef) ElementRef element) : super(element) {
     tweenStyleProperty = 'width';
   }
 
   @override void tweenOpen() {
-    cssAnimationBuilder.setDuration(duration);
+    nativeElement.style.setProperty(tweenStyleProperty, '0');
+    nativeElement.style.visibility = 'visible';
+    nativeElement.style.transition = '$tweenStyleProperty ${duration / 1000}s ease-out';
 
-    cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      tweenStyleProperty: '0',
-      'visibility': 'visible'
-    });
+    animationFrame$()
+      .take(1)
+      .listen((_) {
+        nativeElement.style.setProperty(tweenStyleProperty, '${nativeElement.clientWidth}px');
 
-    cssAnimationBuilder.setToStyles(<String, dynamic>{
-      tweenStyleProperty: '${nativeElement.clientWidth}px'
-    });
-
-    cssAnimationBuilder.start(nativeElement)
-      ..onComplete(() {
-        nativeElement.style.removeProperty(tweenStyleProperty);
-        nativeElement.style.removeProperty('visibility');
+        new Timer(new Duration(milliseconds: duration), () {
+          nativeElement.style.removeProperty(tweenStyleProperty);
+          nativeElement.style.removeProperty('visibility');
+        });
       });
   }
 
   @override void tweenClose(_) {
-    cssAnimationBuilder.setDuration(duration);
+    nativeElement.style.setProperty(tweenStyleProperty, '${nativeElement.clientWidth}px');
+    nativeElement.style.visibility = 'visible';
+    nativeElement.style.transition = '$tweenStyleProperty ${duration / 1000}s ease-out';
 
-    cssAnimationBuilder.setFromStyles(<String, dynamic>{
-      tweenStyleProperty: '${nativeElement.clientWidth}px'
-    });
+    animationFrame$()
+      .take(1)
+      .listen((_) {
+        nativeElement.style.setProperty(tweenStyleProperty, '0');
 
-    cssAnimationBuilder.setToStyles(<String, dynamic>{
-      tweenStyleProperty: '0'
-    });
+        new Timer(new Duration(milliseconds: duration), () {
+          nativeElement.style.removeProperty(tweenStyleProperty);
 
-    cssAnimationBuilder.start(nativeElement)
-      ..onComplete(() {
-        nativeElement.style.removeProperty(tweenStyleProperty);
-
-        beforeDestroyChildTrigger.add(true);
+          beforeDestroyChildTrigger.add(true);
+        });
       });
   }
 

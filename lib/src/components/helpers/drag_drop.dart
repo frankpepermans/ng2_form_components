@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:angular2/angular2.dart';
-import 'package:angular2/animate.dart';
 
 import 'package:dnd/dnd.dart';
 
@@ -23,19 +22,16 @@ class DragDrop implements OnDestroy, AfterViewInit {
 
   static int _dragDropSessionId = 1;
 
-  final AnimationBuilder animationBuilder;
   final ElementRef element;
 
   Element nativeElement;
-  CssAnimationBuilder cssAnimationBuilder;
 
   List<Element> list;
 
   StreamSubscription<DropzoneEvent> _dropStreamSubscription;
 
-  DragDrop(@Inject(AnimationBuilder) this.animationBuilder, @Inject(ElementRef) this.element) {
+  DragDrop(@Inject(ElementRef) this.element) {
     nativeElement = element.nativeElement as Element;
-    cssAnimationBuilder = animationBuilder.css();
   }
 
   @override void ngOnDestroy() {

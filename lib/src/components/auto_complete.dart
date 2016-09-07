@@ -144,7 +144,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
 
   @override
   void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple3<bool, List<Entity>, String> tuple = entity as SerializableTuple3<bool, List<Entity>, String>;
+    final SerializableTuple3<bool, Iterable<Entity>, String> tuple = entity as SerializableTuple3<bool, Iterable<Entity>, String>;
 
     if (phase == StatePhase.REPLAY) _focus$ctrl.add(true);
 
