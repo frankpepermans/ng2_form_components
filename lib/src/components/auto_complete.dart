@@ -156,8 +156,6 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       _input$ctrl.add(tuple.item3);
     }
 
-    tuple.item2.forEach((_) => print(_.runtimeType));
-
     super.receiveState(new SerializableTuple2<bool, List<Entity>>()
       ..item1 = tuple.item1
       ..item2 = tuple.item2, phase);

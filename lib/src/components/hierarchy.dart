@@ -248,7 +248,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
         listRendererService.triggerSelection(listItem);
       });
 
-      changeDetector.markForCheck();
+      //changeDetector.markForCheck();
     }
   }
 

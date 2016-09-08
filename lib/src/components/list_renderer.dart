@@ -233,16 +233,16 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
-    bool doMarkForCheck = false;
+    //bool doMarkForCheck = false;
 
-    if (changes.containsKey('dataProvider')) doMarkForCheck = true;
+    //if (changes.containsKey('dataProvider')) doMarkForCheck = true;
 
     if (changes.containsKey('selectedItems')) {
       internalSelectedItems.forEach(handleSelection);
 
       if (selectedItems != null) selectedItems.forEach(handleSelection);
 
-      doMarkForCheck = true;
+      //doMarkForCheck = true;
     }
 
     if (changes.containsKey('pageOffset')) {
@@ -255,7 +255,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     if (changes.containsKey('rendererEvents')) listRendererService.respondEvents(rendererEvents);
 
-    if (doMarkForCheck) changeDetector.markForCheck();
+    //if (doMarkForCheck) changeDetector.markForCheck();
   }
 
   @override
@@ -330,6 +330,13 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
   Stream<num> _animationFrame() async* {
     yield await window.animationFrame;
+  }
+
+  void scrollIntoView(T entry) {
+    listRendererService.respondEvents(
+      <ListRendererEvent<T, T>>[
+        new ListRendererEvent<T, T>('scrollIntoView', null, entry)
+      ]);
   }
 
   void _initScrollPositionStream() {
@@ -439,7 +446,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     for (int i=0, len=internalSelectedItems.length; i<len; i++) {
       final ListItem<T> item  = internalSelectedItems.elementAt(i);
 
-      if (item != null && listItem.compareTo(item) == 0) return true;
+      if (item != null && listItem.compareTo(item) == 0) {
+        return true;
+      }
     }
 
     return false;
