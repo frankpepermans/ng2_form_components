@@ -194,6 +194,12 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
     changeDetector.markForCheck();
   }
 
+  @override void clear() {
+    super.clear();
+
+    setInputValue('');
+  }
+
   //-----------------------------
   // private methods
   //-----------------------------

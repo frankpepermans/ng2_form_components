@@ -136,7 +136,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
 
           animations.remove(this);
 
-          beforeDestroyChildTrigger.add(index);
+          if (!beforeDestroyChildTrigger.isClosed) beforeDestroyChildTrigger.add(index);
         });
       });
   }
@@ -144,7 +144,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   void _nextAnimationFrame() {
     window.animationFrame.then((num time) {
       if (!_animationBegan) {
-        _animation$ctrl.add(time);
+        if (!_animation$ctrl.isClosed) _animation$ctrl.add(time);
 
         _nextAnimationFrame();
       }

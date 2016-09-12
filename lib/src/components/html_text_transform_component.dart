@@ -231,9 +231,9 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     _rangeTransform$ = _range$
       .map(_resetButtons)
+      .map(_analyzeRange)
       .where(_hasValidRange)
       .map(_extractSelectionToString)
-      .map(_analyzeRange)
       .flatMapLatest((Range range) => _transformation$ctrl.stream
         .take(1)
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
@@ -303,7 +303,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     if (!isOwnRange) return false;
 
-    return ((range.startContainer == range.endContainer) && (range.startOffset == range.endOffset)) ? false : true;
+    return true;
   }
 
   void _contentModifier(List<MutationRecord> records, _) {
@@ -317,36 +317,43 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
     final String tag = tuple.item2.tag.toLowerCase();
 
-    _rangeTrigger$ctrl.add(true);
-
     switch (tag) {
       case 'b':
-        document.execCommand('bold'); return;
+        _execDocumentCommand('bold'); return;
       case 'i':
-        document.execCommand('italic'); return;
+        _execDocumentCommand('italic'); return;
       case 'u':
-        document.execCommand('underline'); return;
+        _execDocumentCommand('underline'); return;
       case 'ol':
-        document.execCommand('insertOrderedList'); return;
+        _execDocumentCommand('insertOrderedList'); return;
       case 'ul':
-        document.execCommand('insertUnorderedList'); return;
+        _execDocumentCommand('insertUnorderedList'); return;
       case 'justifyleft':
-        document.execCommand('justifyLeft'); return;
+        _execDocumentCommand('justifyLeft'); return;
       case 'justifycenter':
-        document.execCommand('justifyCenter'); return;
+        _execDocumentCommand('justifyCenter'); return;
       case 'justifyright':
-        document.execCommand('justifyRight'); return;
+        _execDocumentCommand('justifyRight'); return;
       case 'header':
-        document.execCommand('fontSize', false, '32px'); return;
+        _execDocumentCommand('fontSize', false, '32px'); return;
       case 'clear':
-        document.execCommand('removeFormat'); return;
+        _execDocumentCommand('removeFormat'); return;
       case 'undo':
-        document.execCommand('undo'); return;
+        _execDocumentCommand('undo'); return;
       case 'redo':
-        document.execCommand('redo'); return;
+        _execDocumentCommand('redo'); return;
       default:
-        _injectCustomTag(tuple);
+        if ((tuple.item1.startContainer != tuple.item1.endContainer) || (tuple.item1.startOffset != tuple.item1.endOffset)) {
+          _injectCustomTag(tuple);
+          _rangeTrigger$ctrl.add(true);
+        }
     }
+  }
+
+  void _execDocumentCommand(String command, [bool showUI = null, String value = null]) {
+    document.execCommand(command, showUI, value);
+
+    _rangeTrigger$ctrl.add(true);
   }
 
   List<Node> _listAllNodes(Node node, {List<Node> allNodes}) {
@@ -497,7 +504,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   }
 
   Range _analyzeRange(Range range) {
-    if (menu?.buttons != null) {
+    if (menu?.buttons != null && range != null) {
       final DocumentFragment fragment = range.cloneContents();
       final List<String> encounteredElementFullNames = transformer.listChildTagsByFullName(fragment);
 

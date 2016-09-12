@@ -26,10 +26,16 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
   // input
   //-----------------------------
+  TextInputAction _action;
+  TextInputAction get action => _action;
+  @Input() set action(TextInputAction value) {
+    _action = value;
+
+    _textInputAction$ctrl.add(value);
+  }
 
   @Input() String placeHolder;
   @Input() String inputValue;
-  @Input() TextInputAction action;
   @Input() String actionContainerClassName;
   @Input() String actionIconClassName;
 
@@ -44,8 +50,10 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   final StreamController<String> _input$ctrl = new StreamController<String>.broadcast(), _action$ctrl = new StreamController<String>.broadcast();
+  final StreamController<TextInputAction> _textInputAction$ctrl = new StreamController<TextInputAction>.broadcast();
 
   StreamSubscription<String> _inputSubscription;
+  StreamSubscription<KeyboardEvent> _enterKeySubscription;
 
   Map<String, bool> actionContainerClassMap = const <String, bool>{}, actionIconClassMap = const <String, bool>{};
 
@@ -61,8 +69,8 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(ElementRef) ElementRef elementRef,
     @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
-    _initStreams();
-  }
+      _initStreams();
+    }
 
   //-----------------------------
   // ng2 life cycle
@@ -80,7 +88,14 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
     inputValue = tuple.item1;
 
-    if (tuple.item2 && inputValue != null && inputValue.isNotEmpty && action != null) action(inputValue);
+    if (tuple.item2 && inputValue != null && inputValue.isNotEmpty) {
+      if (action != null) action(inputValue);
+      else {
+        _textInputAction$ctrl.stream
+          .take(1)
+          .listen((TextInputAction action) => action(inputValue));
+      }
+    }
 
     changeDetector.markForCheck();
   }
@@ -94,11 +109,19 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @override
   void ngOnDestroy() {
     _inputSubscription.cancel();
+    _enterKeySubscription.cancel();
 
     super.ngOnDestroy();
 
     _input$ctrl.close();
     _action$ctrl.close();
+    _textInputAction$ctrl.close();
+  }
+
+  void clear() {
+    _input$ctrl.add('');
+
+    if (action != null) action('');
   }
 
   //-----------------------------
@@ -106,10 +129,19 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   void _initStreams() {
+    final Element element = elementRef.nativeElement;
+
     _inputSubscription = _input$ctrl.stream
       .listen((String inputValue) {
         this.inputValue = inputValue;
+
+        changeDetector.markForCheck();
       });
+
+    _enterKeySubscription = element.onKeyDown
+      .where((_) => action != null)
+      .where((KeyboardEvent event) => event.keyCode == KeyCode.ENTER)
+      .listen((_) => action(inputValue));
   }
 
   //-----------------------------

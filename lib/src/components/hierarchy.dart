@@ -98,6 +98,12 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     _level = value;
   }
 
+  bool _autoOpenChildren = false;
+  bool get autoOpenChildren => _autoOpenChildren;
+  @Input() set autoOpenChildren(bool value) {
+    _autoOpenChildren = value;
+  }
+
   List<ListItem<Comparable<dynamic>>> _hierarchySelectedItems;
   List<ListItem<Comparable<dynamic>>> get hierarchySelectedItems => _hierarchySelectedItems;
   @Input() set hierarchySelectedItems(List<ListItem<Comparable<dynamic>>> value) {
@@ -193,7 +199,9 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     return new rx.Observable<SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
       rx.observable(scroll$).startWith(<SerializableTuple1<int>>[new SerializableTuple1<int>()..item1 = 0]),
       internalSelectedItemsChanged.startWith(const [const []]),
-      rx.observable(_openListItems$Ctrl.stream).startWith(const [const []])
+      rx.observable(_openListItems$Ctrl.stream)
+        .where((_) => !autoOpenChildren)
+        .startWith(const [const []])
     ], (SerializableTuple1<int> scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) {
       return new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
         ..item1 = scrollPosition.item1
@@ -399,6 +407,16 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     final String id = (stateId != null) ? stateId : index.toString();
 
     return '${id}_${level}_$index';
+  }
+
+  bool resolveOpenState(ListItem<T> listItem, int index) {
+    if (autoOpenChildren) {
+      final bool containsKey = _isOpenMap.containsKey(listItem);
+
+      if (!containsKey || (containsKey && !_isOpenMap[listItem])) toggleChildren(listItem, index);
+    }
+
+    return true;
   }
 
   @override bool isOpen(ListItem<T> listItem) {

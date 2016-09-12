@@ -113,7 +113,7 @@ class Tween implements OnInit, OnDestroy {
         new Timer(new Duration(milliseconds: duration), () {
           nativeElement.style.removeProperty(tweenStyleProperty);
 
-          beforeDestroyChildTrigger.add(true);
+          if (!beforeDestroyChildTrigger.isClosed) beforeDestroyChildTrigger.add(true);
         });
       });
   }

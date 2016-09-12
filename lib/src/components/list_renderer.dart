@@ -344,8 +344,10 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       if (_scrollPositionSubscription != null) _scrollPositionSubscription.cancel();
 
       _scrollPositionSubscription = rx.observable(scrollPane.nativeElement.onScroll)
-        .map((_) => scrollPane.nativeElement.scrollTop)
-        .tap(_scroll$ctrl.add)
+        .map((_) => (scrollPane.nativeElement as Element).scrollTop)
+        .tap((int scrollTop) {
+          if (!_scroll$ctrl.isClosed) _scroll$ctrl.add(scrollTop);
+        })
         .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.nativeElement.scrollHeight, scrollTop >= scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight - 20))
         .where((Tuple2<int, bool> tuple) => tuple.item2)
         .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)

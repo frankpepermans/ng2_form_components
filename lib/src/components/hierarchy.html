@@ -23,7 +23,7 @@
                  [beforeDestroyChildTrigger]="beforeDestroyChild"
                  [index]="i"
                  [level]="level + 1"
-                 class="item-group" *ngIf="isOpen(listItem) && resolveChildren(listItem).isNotEmpty">
+                 class="item-group" *ngIf="resolveOpenState(listItem, i) && isOpen(listItem) && resolveChildren(listItem).isNotEmpty">
                 <hierarchy #subHierarchy
                            [state]="stateGroup" [stateId]="getStateId(i)"
                            [listRendererService]="listRendererService"
@@ -32,6 +32,7 @@
                            [dragDropTypeHandler]="dragDropTypeHandler"
                            [allowToggle]="allowToggle"
                            [allowMultiSelection]="allowMultiSelection"
+                           [autoOpenChildren]="autoOpenChildren"
                            [resolveRendererHandler]="resolveRendererHandler"
                            [resolveChildrenHandler]="resolveChildrenHandler"
                            [dataProvider]="resolveChildren(listItem)"
