@@ -80,12 +80,6 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _dragDropHandler = value;
   }
 
-  DragDropTypeHandler _dragDropTypeHandler = (_) => ListDragDropHandlerType.SORT;
-  DragDropTypeHandler get dragDropTypeHandler => _dragDropTypeHandler;
-  @Input() set dragDropTypeHandler(DragDropTypeHandler value) {
-    _dragDropTypeHandler = value;
-  }
-
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input() set resolveRendererHandler(ResolveRendererHandler value) {

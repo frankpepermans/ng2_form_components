@@ -1,7 +1,6 @@
 library ng2_form_components.infrastructure.list_renderer_service;
 
 import 'dart:async';
-import 'dart:html';
 
 import 'package:ng2_form_components/src/components/list_renderer.dart';
 
@@ -16,8 +15,6 @@ class ListRendererService {
   Stream<ListItem<Comparable<dynamic>>> get rendererSelection$ => _rendererSelection$ctrl.stream;
   Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get event$ => _event$ctrl.stream;
   Stream<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> get responders$ => _responder$ctrl.stream;
-
-  final List<Map<Element, ListItem<Comparable<dynamic>>>> dragDropElements = <Map<Element, ListItem<Comparable<dynamic>>>>[];
 
   final StreamController<ListItem<Comparable<dynamic>>> _rendererSelection$ctrl = new StreamController<ListItem<Comparable<dynamic>>>.broadcast();
   final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _event$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();

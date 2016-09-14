@@ -11,10 +11,8 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart' show BeforeDestroyChild;
 
-import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListDragDropHandler;
-
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
-import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer, DragDropTypeHandler;
+import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer, ListDragDropHandler;
 
 import 'package:ng2_form_components/src/components/list_renderer.dart' show ListRenderer, ClearSelectionWhereHandler;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
@@ -54,10 +52,6 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   @override @Input() set dragDropHandler(ListDragDropHandler value) {
     super.dragDropHandler = value;
-  }
-
-  @override @Input() set dragDropTypeHandler(DragDropTypeHandler value) {
-    super.dragDropTypeHandler = value;
   }
 
   @override @Input() set dataProvider(List<ListItem<T>> value) {

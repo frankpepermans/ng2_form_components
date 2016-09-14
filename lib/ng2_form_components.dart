@@ -21,8 +21,8 @@ export 'src/components/auto_complete.dart'
 export 'src/components/list_renderer.dart'
     show ListRenderer;
 
-export 'src/components/internal/list_item_renderer.dart'
-    show ListDragDropHandler, ListDragDropHandlerType, DragDropTypeHandler;
+export 'src/infrastructure/drag_drop_service.dart'
+    show DragDropService;
 
 export 'src/components/side_panel.dart'
     show SidePanel;
@@ -46,7 +46,7 @@ export 'src/components/item_renderers/default_list_item_renderer.dart'
     show DefaultListItemRenderer;
 
 export 'src/components/internal/list_item_renderer.dart'
-    show IsSelectedHandler, GetHierarchyOffsetHandler;
+    show IsSelectedHandler, GetHierarchyOffsetHandler, ListDragDropHandler, ListDragDropHandlerType;
 
 export 'src/components/item_renderers/default_hierarchy_list_item_renderer.dart'
     show DefaultHierarchyListItemRenderer;
@@ -55,7 +55,7 @@ export 'src/components/animation/tween.dart'
     show Tween;
 
 export 'src/components/helpers/drag_drop.dart'
-    show DragDrop, DragDropHandler;
+    show DragDrop;
 
 export 'src/components/form_input.dart'
     show FormInput;
