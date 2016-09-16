@@ -78,6 +78,8 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
+    animations.remove(this);
+
     _openSubscription?.cancel();
     _beforeDestroyChildTriggerSubscription?.cancel();
 

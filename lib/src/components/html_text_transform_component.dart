@@ -74,6 +74,8 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   // private properties
   //-----------------------------
 
+  static bool _HAS_MODIFIED_INSERT_LINE_RULE = false;
+
   rx.Observable<Range> _range$;
   rx.Observable<Tuple2<Range, HTMLTextTransformation>> _rangeTransform$;
   StreamSubscription<Tuple2<Range, HTMLTextTransformation>> _range$subscription;
@@ -84,9 +86,11 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   StreamSubscription<String> _pasteSubscription;
   StreamSubscription<Range> _activeRangeSubscription;
   StreamSubscription<String> _contentSubscription;
+  StreamSubscription<String> _mutationObserverSubscription;
 
   final StreamController<Range> _activeRange$ctrl = new StreamController<Range>.broadcast();
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
+  final StreamController<String> _mutationObserver$ctrl = new StreamController<String>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
   final StreamController<bool> _rangeTrigger$ctrl = new StreamController<bool>();
@@ -107,7 +111,11 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     @Inject(StateService) StateService stateService) :
       this.element = elementRef,
       super(changeDetector, elementRef, stateService) {
-    document.execCommand('insertBrOnReturn');
+    if (!_HAS_MODIFIED_INSERT_LINE_RULE) {
+      _HAS_MODIFIED_INSERT_LINE_RULE = true;
+
+      document.execCommand('insertBrOnReturn');
+    }
   }
 
   //-----------------------------
@@ -145,6 +153,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _noInputOnSelectionSubscription?.cancel();
     _pasteSubscription?.cancel();
     _contentSubscription?.cancel();
+    _mutationObserverSubscription?.cancel();
 
     _activeRange$ctrl.close();
     _transformation$ctrl.close();
@@ -155,6 +164,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _focusTrigger$ctrl.close();
     _rangeToString$ctrl.close();
     _content$ctrl.close();
+    _mutationObserver$ctrl.close();
   }
 
   void _setupListeners() {
@@ -208,6 +218,18 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         element.setInnerHtml(newContent, treeSanitizer: NodeTreeSanitizer.trusted);
     });
 
+    _mutationObserverSubscription = rx.observable(_mutationObserver$ctrl.stream)
+      .debounce(const Duration(milliseconds: 80))
+      .listen((String content) {
+        if (!_modelTransformation$ctrl.isClosed) {
+          if (model == null || model.compareTo(contentElement.nativeElement.innerHtml) != 0) {
+            model = contentElement.nativeElement.innerHtml;
+
+            _modelTransformation$ctrl.add(model);
+          }
+        }
+      });
+
     _range$ = new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
       element.onMouseDown,
       element.onMouseUp,
@@ -240,7 +262,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       );
 
     observer = new MutationObserver(_contentModifier)
-      ..observe(element, characterData: true, subtree: true);
+      ..observe(element, characterData: true, subtree: true, characterDataOldValue: true, childList: true);
 
     _pasteSubscription = rx.observable(element.onPaste)
       .flatMapLatest((_) => _modelTransformation$ctrl.stream)
@@ -307,11 +329,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   }
 
   void _contentModifier(List<MutationRecord> records, _) {
-    if (!_modelTransformation$ctrl.isClosed) {
-      model = contentElement.nativeElement.innerHtml;
-
-      _modelTransformation$ctrl.add(model);
-    }
+    if (!_mutationObserver$ctrl.isClosed) _mutationObserver$ctrl.add(contentElement.nativeElement.innerHtml);
   }
 
   void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {

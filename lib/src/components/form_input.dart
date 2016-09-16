@@ -38,6 +38,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   @Output() Stream<String> get inputValue => _inputValue$ctrl.stream;
+  @Output() Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -45,6 +46,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   StreamController<String> _inputValue$ctrl = new StreamController<String>.broadcast();
   StreamController<String> _inputType$ctrl = new StreamController<String>.broadcast();
+  StreamController<FocusEvent> _focusEvent$ctrl = new StreamController<FocusEvent>.broadcast();
 
   StreamSubscription<String> _inputTypeSubscription;
 
@@ -134,5 +136,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
     _inputValue$ctrl.add(valueToSet);
   }
+
+  void handleFocus(FocusEvent event) => _focusEvent$ctrl.add(event);
 
 }

@@ -1,4 +1,4 @@
-<input *ngIf="inputType == 'text'" type="text" class="ng2-form-components-form-input--input-text" [value]="startValue" (input)="handleInput($event)">
-<input *ngIf="inputType == 'date'" type="date" class="ng2-form-components-form-input--input-date" [value]="startValue" (input)="handleInput($event)">
-<input *ngIf="inputType == 'numeric'" type="number" class="ng2-form-components-form-input--input-number" [value]="startValue" (input)="handleInput($event)">
-<input *ngIf="inputType == 'amount'" type="number" class="ng2-form-components-form-input--input-amount" [value]="startValue" (input)="handleInput($event)">
+<input *ngIf="inputType == 'text'" type="text" class="ng2-form-components-form-input--input-text" [value]="startValue" (input)="handleInput($event)" (focus)="handleFocus($event)">
+<input *ngIf="inputType == 'date'" type="date" class="ng2-form-components-form-input--input-date" [value]="startValue" (input)="handleInput($event)" (focus)="handleFocus($event)">
+<input *ngIf="inputType == 'numeric'" type="number" class="ng2-form-components-form-input--input-number" [value]="startValue" (input)="handleInput($event)" (focus)="handleFocus($event)">
+<input *ngIf="inputType == 'amount'" type="number" class="ng2-form-components-form-input--input-amount" [value]="startValue" (input)="handleInput($event)" (focus)="handleFocus($event)">

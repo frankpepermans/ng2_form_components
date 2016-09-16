@@ -214,12 +214,14 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
 
     if (scrollPane != null) {
-      scrollPane.nativeElement.scrollTop = tuple.item1;
+      if (tuple.item1 > 0) {
+        scrollPane.nativeElement.scrollTop = tuple.item1;
 
-      if (scrollPane.nativeElement.scrollTop != tuple.item1) {
-        _pendingScrollTop = tuple.item1;
+        if (scrollPane.nativeElement.scrollTop != tuple.item1) {
+          _pendingScrollTop = tuple.item1;
 
-        _initDomChangeListener();
+          _initDomChangeListener();
+        }
       }
     } else {
       _pendingScrollTop = tuple.item1;
@@ -295,7 +297,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       _requestClose$ctrl.add(true);
     });
 
-    scrollPane.nativeElement.scrollTop = _pendingScrollTop;
+    if (_pendingScrollTop > 0) scrollPane.nativeElement.scrollTop = _pendingScrollTop;
 
     if (scrollPane != null) _initDomChangeListener();
 
@@ -346,7 +348,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
         .where((Tuple2<int, bool> tuple) => tuple.item2)
         .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
         .map((Tuple2<int, bool> tuple) => tuple.item2)
-        .listen(_scrolledToBottom$ctrl.add);
+        .listen((bool value) {
+          if (!_scrolledToBottom$ctrl.isClosed) _scrolledToBottom$ctrl.add(value);
+        });
     }
   }
 
@@ -417,9 +421,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   }
 
   void _attemptRequiredScrollPosition(bool _) {
-    scrollPane.nativeElement.scrollTop = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
+    final num targetPosition = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
 
-    if (scrollPane.nativeElement.scrollTop >= _pendingScrollTop) {
+    scrollPane.nativeElement.scrollTop = targetPosition;
+
+    if (targetPosition >= _pendingScrollTop) {
       _domChangeSubscription?.cancel();
 
       _domChangeSubscription = null;

@@ -404,11 +404,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   }
 
   bool resolveOpenState(ListItem<T> listItem, int index) {
-    if (autoOpenChildren) {
-      final bool containsKey = _isOpenMap.containsKey(listItem);
-
-      if (!containsKey || (containsKey && !_isOpenMap[listItem])) toggleChildren(listItem, index);
-    }
+    if (autoOpenChildren && !_isOpenMap.containsKey(listItem)) toggleChildren(listItem, index);
 
     return true;
   }
