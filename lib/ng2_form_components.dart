@@ -19,7 +19,7 @@ export 'src/components/auto_complete.dart'
     show AutoComplete;
 
 export 'src/components/list_renderer.dart'
-    show ListRenderer;
+    show ListRenderer, NgForTracker;
 
 export 'src/infrastructure/drag_drop_service.dart'
     show DragDropService;

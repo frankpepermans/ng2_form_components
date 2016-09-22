@@ -223,6 +223,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
 
   void clear() {
     _selectedItems$ctrl.add(const []);
+
+    setSelectedItems(const []);
   }
 
   //-----------------------------

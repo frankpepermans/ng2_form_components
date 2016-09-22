@@ -69,6 +69,8 @@ class Toaster implements OnDestroy {
     return const <String, bool>{};
   }
 
+  String tracker(int index, _ToastMessage message) => message.message;
+
   String getBottomOffset(int index) => '${64 * index}px';
 }
 

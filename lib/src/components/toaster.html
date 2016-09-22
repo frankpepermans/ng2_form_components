@@ -1,5 +1,5 @@
 <div class="toaster">
-    <div class="toast" *ngFor='let message of messageQueue; let i = index' [ngClass]="getToastCssMap(message)">
+    <div class="toast" *ngFor='let message of messageQueue; let i = index; trackBy: tracker' [ngClass]="getToastCssMap(message)">
         <i class="fa fa-info fa-3x"></i>
         <label>{{message.message}}</label>
     </div>

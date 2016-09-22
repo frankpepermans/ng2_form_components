@@ -24,10 +24,10 @@ void main() {
     selector: 'my-app',
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(DragDropService, useClass: NoDragDropService)],
     directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster]
 )
-class AppComponent {
+class AppComponent {NgFor
 
   @ViewChild('toaster') Toaster toaster;
 
@@ -265,4 +265,12 @@ class AppComponent {
   void handleRange(bool hasRange) {
     print(hasRange);
   }
+}
+
+class NoDragDropService extends DragDropService {
+
+  @override ListDragDropHandlerType typeHandler(ListItem<Comparable<dynamic>> listItem) => ListDragDropHandlerType.NONE;
+
+  @override String resolveDropClassName(ListItem<Comparable<dynamic>> dropListItem) => 'ngDragDrop--drop-inside';
+
 }

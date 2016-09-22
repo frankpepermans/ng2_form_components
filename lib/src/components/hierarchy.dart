@@ -14,7 +14,7 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer, ListDragDropHandler;
 
-import 'package:ng2_form_components/src/components/list_renderer.dart' show ListRenderer, ClearSelectionWhereHandler;
+import 'package:ng2_form_components/src/components/list_renderer.dart' show ListRenderer, ClearSelectionWhereHandler, NgForTracker;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
 
 import 'package:ng2_form_components/src/components/animation/hierarchy_animation.dart' show HierarchyAnimation;
@@ -108,6 +108,10 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   List<int> get levelsThatBreak => _levelsThatBreak;
   @Input() set levelsThatBreak(List<int> value) {
     _levelsThatBreak = value;
+  }
+
+  @override @Input() set ngForTracker(NgForTracker value) {
+    super.ngForTracker = value;
   }
 
   ResolveChildrenHandler _resolveChildrenHandler;

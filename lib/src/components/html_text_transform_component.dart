@@ -11,13 +11,13 @@ import 'package:dorm/dorm.dart' show Entity;
 
 import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, StatePhase, StateService;
 
-import 'package:ng2_form_components/ng2_form_components.dart' show FormComponent;
+import 'package:ng2_form_components/src/components/internal/form_component.dart' show FormComponent;
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
 import 'package:ng2_form_components/src/components/helpers/html_transform.dart' show HTMLTransform;
 
-import 'package:ng2_form_components/src/components/html_text_transform_menu.dart';
+import 'package:ng2_form_components/src/components/html_text_transform_menu.dart' show HTMLTextTransformMenu;
 
-import 'package:ng2_form_components/src/utils/window_listeners.dart';
+import 'package:ng2_form_components/src/utils/window_listeners.dart' show WindowListeners;
 
 typedef Range RangeModifier(Range range);
 
@@ -199,8 +199,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   //-----------------------------
 
   void _updateInnerHtmlTrusted(String result, [bool notifyStateListeners=true]) {
-    model = result;
-
     _content$ctrl.add(result);
 
     if (notifyStateListeners) _modelTransformation$ctrl.add(result);

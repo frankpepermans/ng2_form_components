@@ -21,6 +21,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
 
 typedef bool IsSelectedHandler(ListItem<Comparable<dynamic>> listItem);
 typedef bool ClearSelectionWhereHandler(ListItem<Comparable<dynamic>> listItem);
+typedef dynamic NgForTracker(int index, ListItem<Comparable<dynamic>> listItem);
 
 @Pipe(name: 'selectedItems')
 @Injectable()
@@ -78,6 +79,12 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   ListDragDropHandler get dragDropHandler => _dragDropHandler;
   @Input() set dragDropHandler(ListDragDropHandler value) {
     _dragDropHandler = value;
+  }
+
+  NgForTracker _ngForTracker;
+  NgForTracker get ngForTracker => _ngForTracker;
+  @Input() set ngForTracker(NgForTracker value) {
+    _ngForTracker = value;
   }
 
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
