@@ -57,6 +57,8 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   Map<String, bool> actionContainerClassMap = const <String, bool>{}, actionIconClassMap = const <String, bool>{};
 
+  String _internalValue;
+
   //-----------------------------
   // public properties
   //-----------------------------
@@ -86,14 +88,14 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple2<String, bool> tuple = entity as SerializableTuple2<String, bool>;
 
-    inputValue = tuple.item1;
+    inputValue = _internalValue = tuple.item1;
 
-    if (tuple.item2 && inputValue != null && inputValue.isNotEmpty) {
-      if (action != null) action(inputValue);
+    if (tuple.item2 && _internalValue != null && _internalValue.isNotEmpty) {
+      if (action != null) action(_internalValue);
       else {
         _textInputAction$ctrl.stream
           .take(1)
-          .listen((TextInputAction action) => action(inputValue));
+          .listen((TextInputAction action) => action(_internalValue));
       }
     }
 
@@ -122,6 +124,10 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _input$ctrl.add('');
 
     if (action != null) action('');
+
+    inputValue = '';
+
+    changeDetector.markForCheck();
   }
 
   //-----------------------------
@@ -133,15 +139,13 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
     _inputSubscription = _input$ctrl.stream
       .listen((String inputValue) {
-        this.inputValue = inputValue;
-
-        changeDetector.markForCheck();
+        _internalValue = inputValue;
       });
 
     _enterKeySubscription = element.onKeyDown
       .where((_) => action != null)
       .where((KeyboardEvent event) => event.keyCode == KeyCode.ENTER)
-      .listen((_) => action(inputValue));
+      .listen((_) => action(_internalValue));
   }
 
   //-----------------------------
@@ -156,9 +160,9 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   void doAction() {
     if (action != null) {
-      _action$ctrl.add(inputValue);
+      _action$ctrl.add(_internalValue);
 
-      action(inputValue);
+      action(_internalValue);
     }
   }
 

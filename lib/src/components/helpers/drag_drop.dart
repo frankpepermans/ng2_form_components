@@ -149,7 +149,7 @@ class DragDrop implements OnDestroy {
   void _createDropHandler(ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
     final Element element = elementRef.nativeElement;
 
-    renderer.setElementAttribute(element, 'draggable', 'true');
+    element.setAttribute('draggable', 'true');
 
     _sortHandlerSubscription = rx.observable(element.onDragOver)
       .listen((MouseEvent event) {
@@ -170,7 +170,7 @@ class DragDrop implements OnDestroy {
   void _createSortHandlers(ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
     final Element element = elementRef.nativeElement;
 
-    renderer.setElementAttribute(element, 'draggable', 'true');
+    element.setAttribute('draggable', 'true');
 
     _dropHandlerSubscription = rx.observable(element.onDragOver)
       .listen((MouseEvent event) {

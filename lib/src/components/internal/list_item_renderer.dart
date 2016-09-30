@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:angular2/angular2.dart';
-import 'package:angular2/src/core/linker/view_utils.dart';
 
 import 'package:tuple/tuple.dart';
 
@@ -64,7 +63,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
   final DynamicComponentLoader dynamicComponentLoader;
   final ElementRef elementRef;
   final ChangeDetectorRef changeDetector;
-  final ViewUtils viewUtils;
   final Injector injector;
   final Renderer renderer;
   final DragDropService dragDropService;
@@ -83,7 +81,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
     @Inject(DynamicComponentLoader) this.dynamicComponentLoader,
     @Inject(ElementRef) this.elementRef,
     @Inject(Renderer) this.renderer,
-    @Inject(ViewUtils) this.viewUtils,
     @Inject(ChangeDetectorRef) this.changeDetector,
     @Inject(DragDropService) this.dragDropService);
 
@@ -113,8 +110,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
       new Provider(IsSelectedHandler, useValue: isSelected),
       new Provider(GetHierarchyOffsetHandler, useValue: getHierarchyOffset),
       new Provider(LabelHandler, useValue: labelHandler),
-      new Provider('list-item-index', useValue: index),
-      new Provider(ViewUtils, useValue: viewUtils)
+      new Provider('list-item-index', useValue: index)
     ]), injector)).then((ComponentRef ref) {
       if (dragDropHandler != null) {
         final ListDragDropHandlerType dragDropType = dragDropService.typeHandler(listItem);
@@ -122,7 +118,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
         if (dragDropType != ListDragDropHandlerType.NONE) {
           renderer.setElementClass(ref.location.nativeElement, 'ngDragDrop--target', true);
 
-          renderer.setElementStyle(ref.location.nativeElement, 'order', '1');
+          (ref.location.nativeElement as Element).style.order = '1';
         }
       }
 

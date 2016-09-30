@@ -27,7 +27,7 @@ void main() {
     providers: const <dynamic>[StateService, const Provider(DragDropService, useClass: NoDragDropService)],
     directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster]
 )
-class AppComponent {NgFor
+class AppComponent {
 
   @ViewChild('toaster') Toaster toaster;
 

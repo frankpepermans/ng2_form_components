@@ -192,10 +192,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   //-----------------------------
 
   @override Stream<Entity> provideState() {
-    final Stream<SerializableTuple1<int>> scroll$ = super.provideState();
-
     return new rx.Observable<SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
-      rx.observable(scroll$).startWith(<SerializableTuple1<int>>[new SerializableTuple1<int>()..item1 = 0]),
+      rx.observable(super.provideState()).startWith(<SerializableTuple1<int>>[new SerializableTuple1<int>()..item1 = 0]),
       internalSelectedItemsChanged.startWith(const [const []]),
       rx.observable(_openListItems$Ctrl.stream)
         .where((_) => !autoOpenChildren)
@@ -230,7 +228,6 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     tuple.item3.forEach((Entity entity) {
       final ListItem<T> listItem = entity as ListItem<T>;
-
       _isOpenMap[listItem] = true;
 
       listCast2.add(listItem);
@@ -402,9 +399,9 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   //-----------------------------
 
   String getStateId(int index) {
-    final String id = (stateId != null) ? stateId : index.toString();
+    if (stateId != null) return '${stateId}_${level}_$index';
 
-    return '${id}_${level}_$index';
+    return '${index}_$level';
   }
 
   bool resolveOpenState(ListItem<T> listItem, int index) {
@@ -418,9 +415,15 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     bool result = false;
 
-    _isOpenMap.forEach((ListItem<T> item, bool isOpen) {
-      if (item.compareTo(listItem) == 0) result = isOpen;
-    });
+    for (int i=0, len=_isOpenMap.keys.length; i<len; i++) {
+      ListItem<T> item = _isOpenMap.keys.elementAt(i);
+
+      if (item.compareTo(listItem) == 0) {
+        result = _isOpenMap[item];
+
+        break;
+      }
+    }
 
     return result;
   }

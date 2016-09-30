@@ -209,11 +209,12 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     _contentSubscription = rx.observable(_content$ctrl.stream)
       .startWith(<String>[model])
-      .distinct((String a, String b) => a.compareTo(b) == 0)
       .listen((String newContent) {
         final Element element = _contentElement.nativeElement as Element;
 
         element.setInnerHtml(newContent, treeSanitizer: NodeTreeSanitizer.trusted);
+
+        _contentModifier(null, null);
     });
 
     _mutationObserverSubscription = rx.observable(_mutationObserver$ctrl.stream)
@@ -260,7 +261,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       );
 
     observer = new MutationObserver(_contentModifier)
-      ..observe(element, characterData: true, subtree: true, characterDataOldValue: true, childList: true);
+      ..observe(element, characterData: true, subtree: true, characterDataOldValue: true, childList: true, attributes: true);
 
     _pasteSubscription = rx.observable(element.onPaste)
       .flatMapLatest((_) => _modelTransformation$ctrl.stream)
@@ -300,7 +301,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
           return event;
         })
-        .takeUntil(element.onMouseUp)
+        .takeUntil(document.onMouseUp)
       )
       .listen((_) {});
   }
@@ -350,6 +351,8 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         _execDocumentCommand('justifyCenter'); return;
       case 'justifyright':
         _execDocumentCommand('justifyRight'); return;
+      case 'justifyfull':
+        _execDocumentCommand('justifyFull'); return;
       case 'header':
         _execDocumentCommand('fontSize', false, '32px'); return;
       case 'clear':
