@@ -57,6 +57,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   @override @Input() set dataProvider(List<ListItem<T>> value) {
     forceAnimateOnOpen = false;
 
+    _cleanupOpenMap();
+
     super.dataProvider = value;
   }
 
@@ -198,12 +200,11 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       rx.observable(_openListItems$Ctrl.stream)
         .where((_) => !autoOpenChildren)
         .startWith(const [const []])
-    ], (SerializableTuple1<int> scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) {
-      return new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
+    ], (SerializableTuple1<int> scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) =>
+      new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
         ..item1 = scrollPosition.item1
         ..item2 = selectedItems
-        ..item3 = openItems;
-    }, asBroadcastStream: true);
+        ..item3 = openItems, asBroadcastStream: true);
   }
 
   @override void ngAfterViewInit() {
@@ -434,7 +435,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   void toggleChildren(ListItem<T> listItem, int index) {
     final List<ListItem<T>> openItems = <ListItem<T>>[];
-    final Map<ListItem<T>, bool> clone = new LinkedHashMap<ListItem<T>, bool>(equals: (ListItem<T> itemA, ListItem<T> itemB) => itemA.compareTo(itemB) == 0);
+    final Map<ListItem<T>, bool> clone = <ListItem<T>, bool>{};
     ListItem<T> match;
 
     forceAnimateOnOpen = true;
@@ -445,16 +446,25 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       if (item.compareTo(listItem) == 0) match = item;
     });
 
-    if (match != listItem) clone.remove(match);
+    if (match != listItem) {
+      clone.keys
+        .where((ListItem<T> item) => item.compareTo(match) == 0)
+        .toList(growable: false)
+        .forEach(clone.remove);
+    }
 
-    if (!clone.containsKey(listItem)) clone[listItem] = match == null;
+    ListItem<T> listItemMatch = clone.keys.firstWhere((ListItem<T> item) => item.compareTo(listItem) == 0, orElse: () => null);
+
+    if (listItemMatch == null) clone[listItem] = (match == null);
     else clone[listItem] = !clone[listItem];
 
     clone.forEach((ListItem<T> listItem, bool isOpen) {
       if (isOpen) openItems.add(listItem);
     });
 
-    if (clone.containsKey(listItem) && clone[listItem]) {
+    listItemMatch = clone.keys.firstWhere((ListItem<T> item) => item.compareTo(listItem) == 0, orElse: () => null);
+
+    if (listItemMatch != null && clone[listItem]) {
       _isOpenMap = clone;
 
       _openListItems$Ctrl.add(openItems);
@@ -473,6 +483,16 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
           changeDetector.markForCheck();
         });
     }
+  }
+
+  void _cleanupOpenMap() {
+    final List<ListItem<T>> removeList = <ListItem<T>>[];
+
+    _isOpenMap.forEach((ListItem<T> item, bool isOpen) {
+      if (!isOpen) removeList.add(item);
+    });
+
+    removeList.forEach(_isOpenMap.remove);
   }
 
   List<ListItem<T>> resolveChildren(ListItem<T> listItem) {

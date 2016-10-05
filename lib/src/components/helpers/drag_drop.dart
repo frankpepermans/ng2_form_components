@@ -18,7 +18,7 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 )
 class DragDrop implements OnDestroy {
 
-  static const num _OFFSET = 9;
+  static const num _OFFSET = 11;
 
   @Input() set ngDragDropHandler(ListDragDropHandler handler) => _handler$ctrl.add(handler);
   @Input() set ngDragDrop(ListItem<Comparable<dynamic>> listItem) => _listItem$ctrl.add(listItem);
@@ -151,7 +151,7 @@ class DragDrop implements OnDestroy {
 
     element.setAttribute('draggable', 'true');
 
-    _sortHandlerSubscription = rx.observable(element.onDragOver)
+    _sortHandlerSubscription = new rx.Observable<MouseEvent>.merge(<Stream<MouseEvent>>[element.onDragOver, element.onDragLeave])
       .listen((MouseEvent event) {
         event.preventDefault();
 
@@ -172,7 +172,7 @@ class DragDrop implements OnDestroy {
 
     element.setAttribute('draggable', 'true');
 
-    _dropHandlerSubscription = rx.observable(element.onDragOver)
+    _dropHandlerSubscription = element.onDragOver
       .listen((MouseEvent event) {
         event.preventDefault();
 
