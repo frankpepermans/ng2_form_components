@@ -27,6 +27,8 @@ import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, Serial
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show ResolveChildrenHandler, ResolveRendererHandler;
 
+typedef bool ShouldOpenDiffer(ListItem<Comparable<dynamic>> itemA, ListItem<Comparable<dynamic>> itemB);
+
 @Component(
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
@@ -86,6 +88,10 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   @override @Input() set listRendererService(ListRendererService value) {
     super.listRendererService = value;
+
+    _listRendererService$ctrl.add(value);
+
+    value?.triggerEvent(new ItemRendererEvent<Hierarchy<Comparable<dynamic>>, T>('childRegistry', null, this));
   }
 
   int _level = 0;
@@ -130,6 +136,12 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     changeDetector.markForCheck();
   }
 
+  ShouldOpenDiffer _shouldOpenDiffer = (ListItem<Comparable<dynamic>> itemA, ListItem<Comparable<dynamic>> itemB) => itemA.compareTo(itemB) == 0;
+  ShouldOpenDiffer get shouldOpenDiffer => _shouldOpenDiffer;
+  @Input() set shouldOpenDiffer(ShouldOpenDiffer value) {
+    _shouldOpenDiffer = value;
+  }
+
   @override @Input() set resolveRendererHandler(ResolveRendererHandler value) {
     super.resolveRendererHandler = value;
   }
@@ -158,10 +170,12 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   final StreamController<List<ListItem<T>>> _openListItems$Ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<int> _beforeDestroyChild$ctrl = new StreamController<int>.broadcast();
   final StreamController<bool> _domModified$ctrl = new StreamController<bool>.broadcast();
+  final StreamController<ListRendererService> _listRendererService$ctrl = new StreamController<ListRendererService>();
 
   Map<ListItem<T>, bool> _isOpenMap = <ListItem<T>, bool>{};
 
   StreamSubscription<bool> _windowMutationListener;
+  StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _eventSubscription;
   StreamSubscription<Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler>> _clearChildHierarchiesSubscription;
   StreamSubscription<Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>> _registerChildHierarchySubscription;
   StreamSubscription<Map<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>> _selectionBuilderSubscription;
@@ -185,8 +199,6 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       super.resolveRendererHandler = (int level, [_]) => DefaultHierarchyListItemRenderer;
 
       _initStreams();
-
-      listRendererService.triggerEvent(new ItemRendererEvent<Hierarchy<Comparable<dynamic>>, T>('childRegistry', null, this));
     }
 
   //-----------------------------
@@ -280,6 +292,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     super.ngOnDestroy();
 
     _windowMutationListener?.cancel();
+    _eventSubscription?.cancel();
     _clearChildHierarchiesSubscription?.cancel();
     _registerChildHierarchySubscription?.cancel();
     _selectionBuilderSubscription?.cancel();
@@ -293,6 +306,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     _openListItems$Ctrl.close();
     _beforeDestroyChild$ctrl.close();
     _domModified$ctrl.close();
+    _listRendererService$ctrl.close();
   }
 
   //-----------------------------
@@ -302,6 +316,10 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   void _initStreams() {
     _windowMutationListener = domChange$
       .listen(_handleDomChange);
+
+    _eventSubscription = rx.observable(_listRendererService$ctrl.stream)
+      .flatMapLatest((ListRendererService service) => service.event$)
+      .listen(_handleItemRendererEvent);
 
     _clearChildHierarchiesSubscription = new rx.Observable<Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler>>.combineLatest(<Stream<dynamic>>[
       _childHierarchyList$ctrl.stream,
@@ -362,6 +380,23 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     _childHierarchyList$ctrl.add(const []);
     _selection$Ctrl.add(<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>{});
+    _listRendererService$ctrl.add(listRendererService);
+  }
+
+  void _handleItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
+    if (event?.type == 'openRecursively') {
+      final ItemRendererEvent<bool, Comparable<dynamic>> eventCast = event as ItemRendererEvent<bool, Comparable<dynamic>>;
+
+      if (eventCast.data != null) {
+        for (int i=0, len=dataProvider.length; i<len; i++) {
+          ListItem<T> entry = dataProvider.elementAt(i);
+
+          if (shouldOpenDiffer(eventCast.listItem, entry) && !isOpen(entry)) toggleChildren(entry, i);
+        }
+      }
+
+      changeDetector.markForCheck();
+    }
   }
 
   void _handleDomChange(bool _) {

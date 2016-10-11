@@ -229,13 +229,17 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         }
       });
 
+
+
     _range$ = new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
       element.onMouseDown,
-      element.onMouseUp,
+      rx.observable(element.onMouseDown)
+        .flatMapLatest((_) => document.onMouseUp.take(1)),
       element.onKeyDown,
-      element.onKeyUp,
+      rx.observable(element.onKeyDown)
+        .flatMapLatest((_) => document.onKeyUp.take(1)),
       rx.observable(_rangeTrigger$ctrl.stream),
-    ], asBroadcastStream: true)
+    ], asBroadcastStream: true).tap((_) => print(hashCode))
       .map((_) => window.getSelection())
       .map((Selection selection) {
         if (selection.rangeCount > 0) {

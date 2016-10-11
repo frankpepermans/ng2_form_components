@@ -40,7 +40,7 @@ export 'src/components/helpers/html_transform.dart'
     show HTMLTransform;
 
 export 'src/components/hierarchy.dart'
-    show Hierarchy;
+    show Hierarchy, ShouldOpenDiffer;
 
 export 'src/components/item_renderers/default_list_item_renderer.dart'
     show DefaultListItemRenderer;
