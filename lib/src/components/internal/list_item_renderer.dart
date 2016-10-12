@@ -10,7 +10,7 @@ import 'package:tuple/tuple.dart';
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
 
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
@@ -32,7 +32,7 @@ typedef String GetHierarchyOffsetHandler(ListItem<Comparable<dynamic>> listItem)
 @Component(
     selector: 'list-item-renderer',
     template: '''
-      <div [ngDragDrop]="listItem" [ngDragDropHandler]="dragDropHandler">
+      <div [ngDragDrop]="listItem" [ngDragDropHandler]="dragDropHandler" (onDrop)="handleDrop(\$event)">
         <div #renderType></div>
       </div>
     ''',
@@ -124,6 +124,10 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
 
       changeDetector.markForCheck();
     });
+  }
+
+  void handleDrop(DropResult dropResult) {
+    listRendererService.triggerEvent(new ItemRendererEvent<int, Comparable<dynamic>>('dropEffectRequest', dropResult.listItem, dropResult.type));
   }
 
 }

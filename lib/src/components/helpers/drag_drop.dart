@@ -23,6 +23,8 @@ class DragDrop implements OnDestroy {
   @Input() set ngDragDropHandler(ListDragDropHandler handler) => _handler$ctrl.add(handler);
   @Input() set ngDragDrop(ListItem<Comparable<dynamic>> listItem) => _listItem$ctrl.add(listItem);
 
+  @Output() Stream<DropResult> get onDrop => _onDrop$ctrl.stream;
+
   final Renderer renderer;
   final ElementRef elementRef;
   final ChangeDetectorRef changeDetector;
@@ -34,6 +36,7 @@ class DragDrop implements OnDestroy {
 
   final StreamController<ListItem<Comparable<dynamic>>> _listItem$ctrl = new StreamController<ListItem<Comparable<dynamic>>>();
   final StreamController<ListDragDropHandler> _handler$ctrl = new StreamController<ListDragDropHandler>();
+  final StreamController<DropResult> _onDrop$ctrl = new StreamController<DropResult>.broadcast();
 
   StreamSubscription<bool> _initSubscription;
   StreamSubscription<MouseEvent> _dropHandlerSubscription;
@@ -68,6 +71,7 @@ class DragDrop implements OnDestroy {
 
     _listItem$ctrl.close();
     _handler$ctrl.close();
+    _onDrop$ctrl.close();
   }
 
   void _initStreams() {
@@ -161,7 +165,11 @@ class DragDrop implements OnDestroy {
     _swapDropSubscription = element.onDrop
       .map(_dataTransferToListItem)
       .listen((ListItem<Comparable<dynamic>> droppedListItem) {
-        if (droppedListItem.compareTo(listItem) != 0) handler(droppedListItem, listItem, 0);
+        if (droppedListItem.compareTo(listItem) != 0) {
+          handler(droppedListItem, listItem, 0);
+
+          _onDrop$ctrl.add(new DropResult(0, listItem));
+        }
 
         _removeAllStyles(null);
       });
@@ -183,7 +191,11 @@ class DragDrop implements OnDestroy {
     _sortDropSubscription = element.onDrop
       .map((MouseEvent event) => new Tuple2<ListItem<Comparable<dynamic>>, int>(_dataTransferToListItem(event), _getSortOffset(event)))
       .listen((Tuple2<ListItem<Comparable<dynamic>>, int> tuple) {
-        if (tuple.item1.compareTo(listItem) != 0) handler(tuple.item1, listItem, tuple.item2);
+        if (tuple.item1.compareTo(listItem) != 0) {
+          handler(tuple.item1, listItem, tuple.item2);
+
+          _onDrop$ctrl.add(new DropResult(tuple.item2, tuple.item2 == 0 ? listItem : tuple.item1));
+        }
 
         _removeAllStyles(null);
       });
@@ -229,4 +241,13 @@ class DragDrop implements OnDestroy {
   bool _isSortAbove(num clientY) => _getActualOffsetY(elementRef.nativeElement, clientY) <= _OFFSET;
 
   bool _isSortBelow(num clientY) => _getActualOffsetY(elementRef.nativeElement, clientY) >= heightOnDragEnter - _OFFSET;
+}
+
+class DropResult {
+
+  final int type;
+  final ListItem<Comparable<dynamic>> listItem;
+
+  DropResult(this.type, this.listItem);
+
 }

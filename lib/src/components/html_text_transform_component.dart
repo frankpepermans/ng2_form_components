@@ -239,7 +239,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       rx.observable(element.onKeyDown)
         .flatMapLatest((_) => document.onKeyUp.take(1)),
       rx.observable(_rangeTrigger$ctrl.stream),
-    ], asBroadcastStream: true).tap((_) => print(hashCode))
+    ], asBroadcastStream: true)
       .map((_) => window.getSelection())
       .map((Selection selection) {
         if (selection.rangeCount > 0) {
@@ -391,9 +391,15 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     final StringBuffer buffer = new StringBuffer();
     final Range range = tuple.item1;
     final List<Node> allNodes = <Node>[];
+    Node root = range.commonAncestorContainer;
     bool isRangeModified = false;
 
-    _listAllNodes(range.commonAncestorContainer, allNodes: allNodes);
+    while (root != contentElement.nativeElement) {
+      if (root.parent.text.compareTo(root.text) == 0) root = root.parent;
+      else break;
+    }
+
+    _listAllNodes(root, allNodes: allNodes);
 
     allNodes.forEach((Node node) {
       if (node is Element) {
@@ -402,11 +408,15 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
             range.setStartBefore(node);
 
             isRangeModified = true;
-          } else if (node.contains(range.endContainer)) {
+          }
+
+          if (node.contains(range.endContainer)) {
             range.setEndAfter(node);
 
             isRangeModified = true;
-          } else if (node == range.commonAncestorContainer) {
+          }
+
+          if (node == root) {
             range.setStartBefore(node);
             range.setEndAfter(node);
 

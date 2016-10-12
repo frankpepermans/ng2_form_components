@@ -183,6 +183,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
   final StreamController<bool> _domChange$ctrl = new StreamController<bool>.broadcast();
   final StreamController<List<ListItem<T>>> _dataProvider$ctrl = new StreamController<List<ListItem<T>>>.broadcast();
+  final StreamController<ItemRendererEvent<int, Comparable<dynamic>>> _dropEffect$ctrl = new StreamController<ItemRendererEvent<int, Comparable<dynamic>>>.broadcast();
 
   StreamSubscription<Iterable<ListItem<T>>> _internalSelectedItemsSubscription;
   StreamSubscription<List<ListItem<T>>> _clearSelectionSubscription;
@@ -193,6 +194,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _rendererEventSubscription;
   StreamSubscription<bool> _domChangeSubscription;
   StreamSubscription<int> _scrollAfterDataProviderSubscription;
+  StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEventSubscription;
+  StreamSubscription<ItemRendererEvent<int, Comparable<dynamic>>> _dropEffectSubscription;
 
   MutationObserver observer;
   int _pendingScrollTop = 0;
@@ -275,6 +278,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _clearSelectionSubscription?.cancel();
     _domChangeSubscription?.cancel();
     _scrollAfterDataProviderSubscription.cancel();
+    _itemRendererEventSubscription?.cancel();
+    _dropEffectSubscription?.cancel();
 
     listRendererService.removeRenderer(this);
 
@@ -287,6 +292,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _clearSelection$ctrl.close();
     _domChange$ctrl.close();
     _dataProvider$ctrl.close();
+    _dropEffect$ctrl.close();
   }
 
   @override void ngAfterViewInit() {
@@ -419,8 +425,22 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
         }
     });
 
+    _itemRendererEventSubscription = _itemRendererEvent$ctrl.stream
+      .listen(_handleItemRendererEvent);
+
+    _dropEffectSubscription = new rx.Observable<ItemRendererEvent<int, Comparable<dynamic>>>.combineLatest(<Stream<dynamic>>[
+      _dataProvider$ctrl.stream,
+      _dropEffect$ctrl.stream,
+      _domChange$ctrl.stream
+    ], (_, ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent, __) => dropEffectEvent)
+      .listen((listRendererService.triggerEvent));
+
     observer = new MutationObserver(notifyDomChanged)
       ..observe(element.nativeElement, subtree: true, childList: true);
+  }
+
+  void _handleItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
+    if (event.type == 'dropEffectRequest') _dropEffect$ctrl.add(new ItemRendererEvent<int, Comparable<dynamic>>('dropEffect', event.listItem, event.data));
   }
 
   void notifyDomChanged(List<MutationRecord> records, _) {
