@@ -448,7 +448,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   }
 
   void _attemptRequiredScrollPosition(bool _) {
-    final num targetPosition = math.min(scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight, _pendingScrollTop);
+    final Element scrollPaneElement = scrollPane.nativeElement;
+    final num targetPosition = math.min(scrollPaneElement.scrollHeight - scrollPaneElement.clientHeight, _pendingScrollTop);
 
     scrollPane.nativeElement.scrollTop = targetPosition;
 
