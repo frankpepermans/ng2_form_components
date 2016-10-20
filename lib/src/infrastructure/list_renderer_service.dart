@@ -43,6 +43,12 @@ class ListRendererService {
 
     return false;
   }
+
+  void close() {
+    /*_rendererSelection$ctrl.close();
+    _event$ctrl.close();
+    _responder$ctrl.close();*/
+  }
 }
 
 class ListRendererEvent<T, U extends Comparable<dynamic>> {

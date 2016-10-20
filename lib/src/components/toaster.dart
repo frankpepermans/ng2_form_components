@@ -56,6 +56,7 @@ class Toaster implements OnDestroy {
       .tap((_) => changeDetector.markForCheck())
       .flatMap((_ToastMessage message) => message.disappear)
       .tap(messageQueue.remove)
+      .tap((_ToastMessage message) => message.close())
       .listen((_) => changeDetector.markForCheck());
   }
 
@@ -90,6 +91,11 @@ class _ToastMessage {
     _appear$ctrl.add(this);
 
     new Timer(duration, () => _disappear$ctrl.add(this));
+  }
+
+  void close() {
+    _appear$ctrl.close();
+    _disappear$ctrl.close();
   }
 
 }

@@ -148,6 +148,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   ListRendererService _listRendererService = new ListRendererService();
   ListRendererService get listRendererService => _listRendererService;
   @Input() set listRendererService(ListRendererService value) {
+    if (_listRendererService != null) _listRendererService.close();
+
     _listRendererService = value;
   }
 
@@ -269,6 +271,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     super.ngOnDestroy();
 
     observer.disconnect();
+
+    _listRendererService.close();
 
     _internalSelectedItemsSubscription?.cancel();
     _rendererSelectionSubscription?.cancel();

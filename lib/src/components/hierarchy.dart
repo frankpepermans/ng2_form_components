@@ -1,7 +1,6 @@
 library ng2_form_components.components.hierarchy;
 
 import 'dart:async';
-import 'dart:collection';
 import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
