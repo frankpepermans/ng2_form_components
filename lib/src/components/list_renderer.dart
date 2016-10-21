@@ -188,9 +188,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   final StreamController<ItemRendererEvent<int, Comparable<dynamic>>> _dropEffect$ctrl = new StreamController<ItemRendererEvent<int, Comparable<dynamic>>>.broadcast();
 
   StreamSubscription<Iterable<ListItem<T>>> _internalSelectedItemsSubscription;
-  StreamSubscription<List<ListItem<T>>> _clearSelectionSubscription;
+  StreamSubscription<Iterable<ListItem<T>>> _clearSelectionSubscription;
   StreamSubscription<ListItem<Comparable<dynamic>>> _rendererSelectionSubscription;
-  StreamSubscription<List<ListItem<T>>> _selectionStateSubscription;
+  StreamSubscription<Iterable<ListItem<T>>> _selectionStateSubscription;
   StreamSubscription<MouseEvent> _domClickSubscription;
   StreamSubscription<bool> _scrollPositionSubscription;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _rendererEventSubscription;
@@ -407,7 +407,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       _selectedItems$.startWith(const [const []])
     ], (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
       .where((Iterable<ListItem<T>> items) => items.isNotEmpty)
-      .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add)) as StreamSubscription<List<ListItem<T>>>;
+      .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add));
 
     _rendererSelectionSubscription = listRendererService.rendererSelection$
       .listen((ListItem<Comparable<dynamic>> listItem) => handleSelection(listItem as ListItem<T>));

@@ -89,7 +89,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
 
   Stream<String> _inputChanged$;
 
-  StreamSubscription<List<ListItem<T>>> _mergedDataProviderChangedSubscription;
+  StreamSubscription<Tuple2<bool, List<ListItem<T>>>> _mergedDataProviderChangedSubscription;
   StreamSubscription<String> _inputChangedSubscription;
   StreamSubscription<String> _currentHeaderLabelSubscription;
 
@@ -296,7 +296,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
         changeDetector.markForCheck();
       })
       .debounce(const Duration(milliseconds: 30))
-      .listen((_) => changeDetector.markForCheck()) as StreamSubscription<List<ListItem<T>>>;
+      .listen((_) => changeDetector.markForCheck());
 
     _inputChangedSubscription = _inputChanged$.listen((_) {
       showLoading = true;
