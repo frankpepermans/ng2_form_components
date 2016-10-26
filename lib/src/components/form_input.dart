@@ -17,7 +17,8 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     templateUrl: 'form_input.html',
     directives: const <Type>[],
     providers: const <Type>[],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy {
 

@@ -26,7 +26,8 @@ typedef String ContentInterceptor(String value);
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
   providers: const <Type>[StateService],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  preserveWhitespace: false
 )
 class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, AfterViewInit {
 

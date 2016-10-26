@@ -37,7 +37,8 @@ typedef String GetHierarchyOffsetHandler(ListItem<Comparable<dynamic>> listItem)
       </div>
     ''',
     directives: const <Type>[DragDrop],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnInit {
 

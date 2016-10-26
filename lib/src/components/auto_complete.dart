@@ -22,7 +22,8 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableT
     templateUrl: 'auto_complete.html',
     directives: const <Type>[ListRenderer, Tween, NgClass, NgIf],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements OnChanges, OnDestroy, AfterViewInit {
 

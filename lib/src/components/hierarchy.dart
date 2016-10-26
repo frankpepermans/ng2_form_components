@@ -33,7 +33,8 @@ typedef bool ShouldOpenDiffer(ListItem<Comparable<dynamic>> itemA, ListItem<Comp
     templateUrl: 'hierarchy.html',
     directives: const <Type>[State, Hierarchy, HierarchyAnimation, ListItemRenderer],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
 

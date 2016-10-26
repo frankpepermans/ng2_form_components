@@ -20,7 +20,8 @@ enum ToastMessageType {
     selector: 'toaster',
     templateUrl: 'toaster.html',
     directives: const <Type>[Tween],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class Toaster implements OnDestroy {
 

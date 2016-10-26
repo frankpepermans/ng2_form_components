@@ -19,7 +19,8 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     templateUrl: 'side_panel.html',
     directives: const <Type>[SidePanelAnimation],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, BeforeDestroyChild {
 

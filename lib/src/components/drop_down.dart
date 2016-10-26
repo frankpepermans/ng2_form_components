@@ -24,7 +24,8 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, S
     templateUrl: 'drop_down.html',
     directives: const <Type>[ListRenderer, Tween],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
 

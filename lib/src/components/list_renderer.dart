@@ -55,7 +55,8 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransfor
     directives: const <Type>[ListItemRenderer],
     providers: const <Type>[StateService],
     pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    preserveWhitespace: false
 )
 class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
 
