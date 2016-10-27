@@ -15,7 +15,9 @@ class ListRendererService {
   Stream<ListItem<Comparable<dynamic>>> get rendererSelection$ => _rendererSelection$ctrl.stream;
   Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get event$ => _event$ctrl.stream;
   Stream<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> get responders$ => _responder$ctrl.stream;
+  Stream<bool> get isOpenChange$ => _isOpenChange$ctrl.stream;
 
+  final StreamController<bool> _isOpenChange$ctrl = new StreamController<bool>.broadcast();
   final StreamController<ListItem<Comparable<dynamic>>> _rendererSelection$ctrl = new StreamController<ListItem<Comparable<dynamic>>>.broadcast();
   final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _event$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
   final StreamController<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _responder$ctrl = new StreamController<List<ListRendererEvent<dynamic, Comparable<dynamic>>>>.broadcast();
@@ -49,6 +51,8 @@ class ListRendererService {
     _event$ctrl.close();
     _responder$ctrl.close();*/
   }
+
+  void notifyIsOpenChange() => _isOpenChange$ctrl.add(true);
 }
 
 class ListRendererEvent<T, U extends Comparable<dynamic>> {

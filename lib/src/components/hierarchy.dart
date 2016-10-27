@@ -128,12 +128,14 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     _resolveChildrenHandler = value;
   }
 
-  bool _allowToggle = true;
+  bool _allowToggle = false;
   bool get allowToggle => _allowToggle;
   @Input() set allowToggle(bool value) {
-    _allowToggle = value;
+    if (_allowToggle != value) {
+      _allowToggle = value;
 
-    changeDetector.markForCheck();
+      changeDetector.markForCheck();
+    }
   }
 
   ShouldOpenDiffer _shouldOpenDiffer = (ListItem<Comparable<dynamic>> itemA, ListItem<Comparable<dynamic>> itemB) => itemA.compareTo(itemB) == 0;
@@ -248,7 +250,9 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     _openListItems$Ctrl.add(listCast2);
 
-    changeDetector.markForCheck();
+    listRendererService.notifyIsOpenChange();
+
+    if (tuple.item3.isNotEmpty) changeDetector.markForCheck();
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
@@ -514,10 +518,12 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
           _isOpenMap = clone;
 
           _openListItems$Ctrl.add(openItems);
-
+          
           changeDetector.markForCheck();
         });
     }
+
+    listRendererService.notifyIsOpenChange();
   }
 
   void _cleanupOpenMap() {
@@ -528,6 +534,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     });
 
     removeList.forEach(_isOpenMap.remove);
+
+    listRendererService.notifyIsOpenChange();
   }
 
   List<ListItem<T>> resolveChildren(ListItem<T> listItem) {

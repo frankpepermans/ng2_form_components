@@ -330,7 +330,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     if (_interceptor != null) newContent = _interceptor(newContent);
 
-    element.setInnerHtml(newContent, treeSanitizer: NodeTreeSanitizer.trusted);
+    if (newContent != element.innerHtml) element.setInnerHtml(newContent, treeSanitizer: NodeTreeSanitizer.trusted);
   }
 
   bool _hasValidRange(Range range) {
@@ -496,9 +496,9 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     _rangeTrigger$ctrl.add(true);
 
-    _modelTransformation$ctrl.stream
+    /*_modelTransformation$ctrl.stream
       .take(1)
-      .listen((_) => window.getSelection().removeAllRanges());
+      .listen((_) => window.getSelection().removeAllRanges());*/
   }
 
   String _writeOpeningTag(HTMLTextTransformation transformation) {
