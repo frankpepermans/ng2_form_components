@@ -40,7 +40,7 @@ typedef String GetHierarchyOffsetHandler(ListItem<Comparable<dynamic>> listItem)
     changeDetection: ChangeDetectionStrategy.OnPush,
     preserveWhitespace: false
 )
-class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnInit {
+class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit {
 
   @ViewChild('renderType', read: ViewContainerRef) ViewContainerRef renderTypeTarget;
 
@@ -68,11 +68,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
   final Renderer renderer;
   final DragDropService dragDropService;
 
-  StreamSubscription<Tuple2<Element, List<bool>>> _shiftSubscription;
-  StreamSubscription<MouseEvent> _showHooksSubscription;
-
-  bool _isChildComponentInjected = false;
-
   //-----------------------------
   // constructor
   //-----------------------------
@@ -89,18 +84,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnDestroy, OnIn
   // ng2 life cycle
   //-----------------------------
 
-  @override void ngOnDestroy() {
-    _shiftSubscription?.cancel();
-    _showHooksSubscription?.cancel();
-  }
-
-  @override void ngOnInit() => _injectChildComponent();
-
-  void _injectChildComponent() {
-    if (_isChildComponentInjected || resolveRendererHandler == null || renderTypeTarget == null) return;
-
-    _isChildComponentInjected = true;
-
+  @override void ngOnInit() {
     final Type resolvedRendererType = resolveRendererHandler(0, listItem);
 
     if (resolvedRendererType == null) throw new ArgumentError('Unable to resolve renderer for list item: ${listItem.runtimeType}');

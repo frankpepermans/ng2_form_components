@@ -438,7 +438,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       _dropEffect$ctrl.stream,
       _domChange$ctrl.stream
     ], (_, ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent, __) => dropEffectEvent)
-      .listen((listRendererService.triggerEvent));
+      .listen(listRendererService.triggerEvent);
 
     observer = new MutationObserver(notifyDomChanged)
       ..observe(element.nativeElement, subtree: true, childList: true);

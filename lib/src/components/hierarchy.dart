@@ -518,7 +518,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
           _isOpenMap = clone;
 
           _openListItems$Ctrl.add(openItems);
-          
+
           changeDetector.markForCheck();
         });
     }
