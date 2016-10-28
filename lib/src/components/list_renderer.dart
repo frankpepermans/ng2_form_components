@@ -11,6 +11,7 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
+import 'package:ng2_form_components/src/components/internal/drag_drop_list_item_renderer.dart' show DragDropListItemRenderer;
 import 'package:ng2_form_components/src/components/list_item.dart';
 
 import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.dart' show DefaultListItemRenderer;
@@ -52,7 +53,7 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransfor
 @Component(
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
-    directives: const <Type>[ListItemRenderer],
+    directives: const <Type>[ListItemRenderer, DragDropListItemRenderer],
     providers: const <Type>[StateService],
     pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.OnPush,

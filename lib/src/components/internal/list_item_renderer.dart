@@ -1,20 +1,15 @@
 library ng2_form_components.components.list_item_renderer;
 
 import 'dart:async';
-import 'dart:html';
 
 import 'package:angular2/angular2.dart';
-
-import 'package:tuple/tuple.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
 
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
-
-import 'package:ng2_form_components/src/components/helpers/drag_drop.dart';
 
 import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
@@ -32,37 +27,72 @@ typedef String GetHierarchyOffsetHandler(ListItem<Comparable<dynamic>> listItem)
 @Component(
     selector: 'list-item-renderer',
     template: '''
-      <div [ngDragDrop]="listItem" [ngDragDropHandler]="dragDropHandler" (onDrop)="handleDrop(\$event)">
-        <div #renderType></div>
-      </div>
+      <div><div #renderType></div></div>
     ''',
-    directives: const <Type>[DragDrop],
     changeDetection: ChangeDetectionStrategy.OnPush,
     preserveWhitespace: false
 )
-class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit {
+class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit, OnDestroy {
 
-  @ViewChild('renderType', read: ViewContainerRef) ViewContainerRef renderTypeTarget;
+  StreamSubscription<bool> _requestChangeDetectionSubscription;
+
+  ViewContainerRef _renderTypeTarget;
+  ViewContainerRef get renderTypeTarget => _renderTypeTarget;
+  @ViewChild('renderType', read: ViewContainerRef) set renderTypeTarget(ViewContainerRef value) {
+    _renderTypeTarget = value;
+  }
 
   //-----------------------------
   // input
   //-----------------------------
 
-  @Input() ListRendererService listRendererService;
-  @Input() int index;
-  @Input() LabelHandler labelHandler;
-  @Input() ListItem<T> listItem;
-  @Input() IsSelectedHandler isSelected;
-  @Input() GetHierarchyOffsetHandler getHierarchyOffset;
-  @Input() ResolveRendererHandler resolveRendererHandler;
-  @Input() ListDragDropHandler dragDropHandler;
+  ListRendererService _listRendererService;
+  ListRendererService get listRendererService => _listRendererService;
+  @Input() set listRendererService(ListRendererService value) {
+    _listRendererService = value;
+  }
+
+  int _index;
+  int get index => _index;
+  @Input() set index(int value) {
+    _index = value;
+  }
+
+  LabelHandler _labelHandler;
+  LabelHandler get labelHandler => _labelHandler;
+  @Input() set labelHandler(LabelHandler value) {
+    _labelHandler = value;
+  }
+
+  ListItem<T> _listItem;
+  ListItem<T> get listItem => _listItem;
+  @Input() set listItem(ListItem<T> value) {
+    _listItem = value;
+  }
+
+  IsSelectedHandler _isSelected;
+  IsSelectedHandler get isSelected => _isSelected;
+  @Input() set isSelected(IsSelectedHandler value) {
+    _isSelected = value;
+  }
+
+  GetHierarchyOffsetHandler _getHierarchyOffset;
+  GetHierarchyOffsetHandler get getHierarchyOffset => _getHierarchyOffset;
+  @Input() set getHierarchyOffset(GetHierarchyOffsetHandler value) {
+    _getHierarchyOffset = value;
+  }
+
+  ResolveRendererHandler _resolveRendererHandler;
+  ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
+  @Input() set resolveRendererHandler(ResolveRendererHandler value) {
+    _resolveRendererHandler = value;
+  }
 
   //-----------------------------
   // public properties
   //-----------------------------
 
   final DynamicComponentLoader dynamicComponentLoader;
-  final ElementRef elementRef;
   final ChangeDetectorRef changeDetector;
   final Injector injector;
   final Renderer renderer;
@@ -75,7 +105,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit {
   ListItemRenderer(
     @Inject(Injector) this.injector,
     @Inject(DynamicComponentLoader) this.dynamicComponentLoader,
-    @Inject(ElementRef) this.elementRef,
     @Inject(Renderer) this.renderer,
     @Inject(ChangeDetectorRef) this.changeDetector,
     @Inject(DragDropService) this.dragDropService);
@@ -83,6 +112,10 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit {
   //-----------------------------
   // ng2 life cycle
   //-----------------------------
+
+  @override void ngOnDestroy() {
+    _requestChangeDetectionSubscription?.cancel();
+  }
 
   @override void ngOnInit() {
     final Type resolvedRendererType = resolveRendererHandler(0, listItem);
@@ -96,23 +129,9 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit {
       new Provider(GetHierarchyOffsetHandler, useValue: getHierarchyOffset),
       new Provider(LabelHandler, useValue: labelHandler),
       new Provider('list-item-index', useValue: index)
-    ]), injector)).then((ComponentRef ref) {
-      if (dragDropHandler != null) {
-        final ListDragDropHandlerType dragDropType = dragDropService.typeHandler(listItem);
-
-        if (dragDropType != ListDragDropHandlerType.NONE) {
-          renderer.setElementClass(ref.location.nativeElement, 'ngDragDrop--target', true);
-
-          (ref.location.nativeElement as Element).style.order = '1';
-        }
-      }
-
-      changeDetector.markForCheck();
-    });
+    ]), injector)).then(ngOnComponentLoaded);
   }
 
-  void handleDrop(DropResult dropResult) {
-    listRendererService.triggerEvent(new ItemRendererEvent<int, Comparable<dynamic>>('dropEffectRequest', dropResult.listItem, dropResult.type));
-  }
+  void ngOnComponentLoaded(ComponentRef ref) => changeDetector.markForCheck();
 
 }

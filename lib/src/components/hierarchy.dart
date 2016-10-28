@@ -12,6 +12,7 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart' show ListItemRenderer, ListDragDropHandler;
+import 'package:ng2_form_components/src/components/internal/drag_drop_list_item_renderer.dart' show DragDropListItemRenderer;
 
 import 'package:ng2_form_components/src/components/list_renderer.dart' show ListRenderer, ClearSelectionWhereHandler, NgForTracker;
 import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
@@ -31,7 +32,7 @@ typedef bool ShouldOpenDiffer(ListItem<Comparable<dynamic>> itemA, ListItem<Comp
 @Component(
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
-    directives: const <Type>[State, Hierarchy, HierarchyAnimation, ListItemRenderer],
+    directives: const <Type>[State, Hierarchy, HierarchyAnimation, ListItemRenderer, DragDropListItemRenderer],
     providers: const <Type>[StateService],
     changeDetection: ChangeDetectionStrategy.OnPush,
     preserveWhitespace: false
