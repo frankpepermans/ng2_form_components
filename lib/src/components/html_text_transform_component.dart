@@ -29,7 +29,7 @@ typedef String ContentInterceptor(String value);
   changeDetection: ChangeDetectionStrategy.OnPush,
   preserveWhitespace: false
 )
-class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, AfterViewInit {
+class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, OnInit {
 
   final ElementRef element;
   final HTMLTransform transformer = new HTMLTransform();
@@ -145,7 +145,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _updateInnerHtmlTrusted(incoming, false);
   }
 
-  @override void ngAfterViewInit() {
+  @override void ngOnInit() {
     _updateInnerHtmlTrusted(model, false);
 
     _initStreams();
