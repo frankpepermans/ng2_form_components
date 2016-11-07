@@ -507,7 +507,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     if (listItemMatch != null && clone[listItem]) {
       _isOpenMap = clone;
 
-      _openListItems$Ctrl.add(openItems);
+      if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
     } else {
       _beforeDestroyChildSubscription?.cancel();
 
@@ -518,7 +518,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
         .listen((Map<ListItem<T>, bool> clone) {
           _isOpenMap = clone;
 
-          _openListItems$Ctrl.add(openItems);
+          if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
 
           changeDetector.markForCheck();
         });
