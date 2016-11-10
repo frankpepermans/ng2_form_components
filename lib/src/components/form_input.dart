@@ -38,18 +38,33 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // output
   //-----------------------------
 
-  @Output() Stream<String> get inputValue => _inputValue$ctrl.stream;
+  @Output() Stream<String> get inputValue => _inputValue$ctrl.stream.distinct();
   @Output() Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
+  @Output() Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
+  @Output() Stream<bool> get hasValue => new rx.Observable<bool>.combineLatest(<Stream<String>>[
+      rx.observable(_value$ctrl.stream)
+        .startWith(const <String>['']),
+      rx.observable(inputValue)
+        .startWith(const <String>[null])
+    ], (String a, String b) {
+      if (b == null) return a.trim().isNotEmpty;
+
+      return b.trim().isNotEmpty;
+    })
+    .distinct();
 
   //-----------------------------
   // private properties
   //-----------------------------
 
+  StreamController<String> _value$ctrl = new StreamController<String>.broadcast();
   StreamController<String> _inputValue$ctrl = new StreamController<String>.broadcast();
   StreamController<String> _inputType$ctrl = new StreamController<String>.broadcast();
   StreamController<FocusEvent> _focusEvent$ctrl = new StreamController<FocusEvent>.broadcast();
+  StreamController<FocusEvent> _blurEvent$ctrl = new StreamController<FocusEvent>.broadcast();
 
   StreamSubscription<String> _inputTypeSubscription;
+  StreamSubscription<String> _valueSubscription;
 
   //-----------------------------
   // public properties
@@ -78,7 +93,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => _inputValue$ctrl.stream
+  @override Stream<Entity> provideState() => _inputValue$ctrl.stream.distinct()
     .map((String inputValue) => new SerializableTuple1<String>()..item1 = inputValue);
 
   @override void receiveState(Entity entity, StatePhase phase) {
@@ -90,11 +105,11 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       .where((String inputType) => inputType != null)
       .take(1)
       .listen((String inputType) {
-        if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') startValue = tuple.item1;
+        if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') _value$ctrl.add(tuple.item1);
         else if (inputType == 'date') {
           final List<String> parts = tuple.item1.split('/');
 
-          if (parts.length == 3) startValue = '${parts[2]}-${parts[1]}-${parts[0]}';
+          if (parts.length == 3) _value$ctrl.add('${parts[2]}-${parts[1]}-${parts[0]}');
         }
 
         changeDetector.markForCheck();
@@ -107,9 +122,19 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     super.ngOnDestroy();
 
     _inputTypeSubscription?.cancel();
+    _valueSubscription?.cancel();
 
+    _value$ctrl.close();
     _inputValue$ctrl.close();
     _inputType$ctrl.close();
+    _focusEvent$ctrl.close();
+    _blurEvent$ctrl.close();
+  }
+
+  void setFocus() {
+    final Element element = elementRef.nativeElement;
+
+    element.children.first.focus();
   }
 
   //-----------------------------
@@ -117,6 +142,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   void _initStreams() {
+    _valueSubscription = _value$ctrl.stream
+      .listen((String value) {
+        startValue = value;
+
+        changeDetector.markForCheck();
+      });
   }
 
   //-----------------------------
@@ -139,5 +170,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   }
 
   void handleFocus(FocusEvent event) => _focusEvent$ctrl.add(event);
+
+  void handleClick(MouseEvent event) {
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+  }
+
+  void handleBlur(FocusEvent event) => _blurEvent$ctrl.add(event);
 
 }
