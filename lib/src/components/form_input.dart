@@ -20,7 +20,9 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     changeDetection: ChangeDetectionStrategy.OnPush,
     preserveWhitespace: false
 )
-class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy {
+class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, AfterViewInit {
+
+  @ViewChild('textarea') ElementRef textarea;
 
   //-----------------------------
   // input
@@ -33,6 +35,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
     _inputType$ctrl.add(value);
   }
+
+  @Input() int heightCalcAdjustment = 0;
 
   //-----------------------------
   // output
@@ -71,6 +75,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   String startValue = '';
+  String textareaHeight = '0';
 
   //-----------------------------
   // constructor
@@ -120,6 +125,18 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _inputValue$ctrl.add(tuple.item1);
   }
 
+  @override void ngAfterViewInit() {
+    if (inputType == 'text') {
+      final TextAreaElement target = textarea.nativeElement;
+
+      window.animationFrame.whenComplete(() {
+        textareaHeight = '${target.scrollHeight - heightCalcAdjustment}px';
+
+        changeDetector.markForCheck();
+      });
+    }
+  }
+
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
@@ -157,11 +174,22 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   void handleInput(Event event) {
-    final InputElement target = event.target;
     String valueToSet;
 
-    if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') valueToSet = target.value;
-    else if (inputType == 'date') {
+    if (inputType == 'text') {
+      final TextAreaElement target = event.target;
+
+      valueToSet = target.value;
+
+      textareaHeight = '${target.scrollHeight - heightCalcAdjustment}px';
+
+      changeDetector.markForCheck();
+    } else if (inputType == 'amount' || inputType == 'numeric') {
+      final InputElement target = event.target;
+
+      valueToSet = target.value;
+    } else if (inputType == 'date') {
+      final InputElement target = event.target;
       final List<String> parts = target.value.split('-');
 
       if (parts.length == 3) valueToSet = '${parts[2]}/${parts[1]}/${parts[0]}';
