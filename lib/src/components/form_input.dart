@@ -107,9 +107,11 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       .listen((String inputType) {
         if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') _value$ctrl.add(tuple.item1);
         else if (inputType == 'date') {
-          final List<String> parts = tuple.item1.split('/');
+          if (tuple.item1 != null) {
+            final List<String> parts = tuple.item1.split('/');
 
-          if (parts.length == 3) _value$ctrl.add('${parts[2]}-${parts[1]}-${parts[0]}');
+            if (parts.length == 3) _value$ctrl.add('${parts[2]}-${parts[1]}-${parts[0]}');
+          }
         }
 
         changeDetector.markForCheck();
