@@ -36,6 +36,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _inputType$ctrl.add(value);
   }
 
+  @Input() set initialValue(String value) {
+    if (value == null) return;
+
+    _inputValue$ctrl.add(value);
+  }
+
   @Input() int heightCalcAdjustment = 0;
 
   //-----------------------------
@@ -104,24 +110,6 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple1<String> tuple = entity as SerializableTuple1<String>;
 
-    _inputTypeSubscription?.cancel();
-
-    _inputTypeSubscription = rx.observable(_inputType$ctrl.stream)
-      .where((String inputType) => inputType != null)
-      .take(1)
-      .listen((String inputType) {
-        if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') _value$ctrl.add(tuple.item1);
-        else if (inputType == 'date') {
-          if (tuple.item1 != null) {
-            final List<String> parts = tuple.item1.split('/');
-
-            if (parts.length == 3) _value$ctrl.add('${parts[2]}-${parts[1]}-${parts[0]}');
-          }
-        }
-
-        changeDetector.markForCheck();
-      });
-
     _inputValue$ctrl.add(tuple.item1);
   }
 
@@ -167,7 +155,26 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
         changeDetector.markForCheck();
       });
-  }
+
+    _inputTypeSubscription = new rx.Observable<String>.combineLatest([
+      _inputType$ctrl.stream,
+      _inputValue$ctrl.stream
+      ], (String inputType, String inputValue) {print('here');
+        if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') return inputValue;
+        else if (inputType == 'date') {
+          if (inputValue != null) {
+            final List<String> parts = inputValue.split('/');
+
+            if (parts.length == 3) return '${parts[2]}-${parts[1]}-${parts[0]}';
+          }
+        }
+      })
+        .listen((String value) {
+          _value$ctrl.add(value);
+
+          changeDetector.markForCheck();
+        });
+    }
 
   //-----------------------------
   // template methods
