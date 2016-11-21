@@ -34,7 +34,7 @@ typedef bool ShouldOpenDiffer(ListItem<Comparable<dynamic>> itemA, ListItem<Comp
     templateUrl: 'hierarchy.html',
     directives: const <Type>[State, Hierarchy, HierarchyAnimation, ListItemRenderer, DragDropListItemRenderer],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
@@ -132,11 +132,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   bool _allowToggle = false;
   bool get allowToggle => _allowToggle;
   @Input() set allowToggle(bool value) {
-    if (_allowToggle != value) {
-      _allowToggle = value;
-
-      changeDetector.markForCheck();
-    }
+    if (_allowToggle != value) setState(() => _allowToggle = value);
   }
 
   ShouldOpenDiffer _shouldOpenDiffer = (ListItem<Comparable<dynamic>> itemA, ListItem<Comparable<dynamic>> itemB) => itemA.compareTo(itemB) == 0;
@@ -197,8 +193,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   Hierarchy(
     @Inject(ElementRef) ElementRef element,
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
-    @Inject(StateService) StateService stateService) : super(element, changeDetector, stateService) {
+    @Inject(StateService) StateService stateService) : super(element, stateService) {
       super.resolveRendererHandler = (int level, [_]) => DefaultHierarchyListItemRenderer;
 
       _initStreams();
@@ -253,7 +248,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     listRendererService.notifyIsOpenChange();
 
-    if (tuple.item3.isNotEmpty) changeDetector.markForCheck();
+    if (tuple.item3.isNotEmpty) deliverStateChanges();
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
@@ -400,7 +395,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
         }
       }
 
-      changeDetector.markForCheck();
+      deliverStateChanges();
     }
   }
 
@@ -520,7 +515,9 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
           if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
 
-          changeDetector.markForCheck();
+          listRendererService.notifyIsOpenChange();
+
+          deliverStateChanges();
         });
     }
 

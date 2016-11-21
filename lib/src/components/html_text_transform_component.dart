@@ -26,7 +26,7 @@ typedef String ContentInterceptor(String value);
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
   providers: const <Type>[StateService],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.Stateful,
   preserveWhitespace: false
 )
 class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, OnInit {
@@ -118,10 +118,9 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
   HTMLTextTransformComponent(
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(StateService) StateService stateService) :
       this.element = elementRef,
-      super(changeDetector, elementRef, stateService) {
+      super(elementRef, stateService) {
     if (!_HAS_MODIFIED_INSERT_LINE_RULE) {
       _HAS_MODIFIED_INSERT_LINE_RULE = true;
 
@@ -559,7 +558,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         }
       });
 
-      if (isChanged) changeDetector.markForCheck();
+      if (isChanged) deliverStateChanges();
     }
 
     return forRange;
@@ -597,7 +596,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         }
       });
 
-      changeDetector.markForCheck();
+      deliverStateChanges();
 
       menu.changeDetector.markForCheck();
     }

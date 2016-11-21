@@ -13,9 +13,8 @@ typedef String LabelHandler(dynamic data);
 typedef List<ListItem<Comparable<dynamic>>> ResolveChildrenHandler(int level, ListItem<Comparable<dynamic>> listItem);
 typedef Type ResolveRendererHandler(int level, [ListItem<Comparable<dynamic>> listItem]);
 
-abstract class FormComponent<T extends Comparable<dynamic>> implements StatefulComponent, OnDestroy {
+abstract class FormComponent<T extends Comparable<dynamic>> extends ComponentState implements StatefulComponent, OnDestroy {
 
-  @override final ChangeDetectorRef changeDetector;
   final ElementRef elementRef;
   final StateService stateService;
   final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
@@ -28,7 +27,7 @@ abstract class FormComponent<T extends Comparable<dynamic>> implements StatefulC
   // constructor
   //-----------------------------
 
-  FormComponent(this.changeDetector, this.elementRef, this.stateService) {
+  FormComponent(this.elementRef, this.stateService) {
     registerElement();
   }
 

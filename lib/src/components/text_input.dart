@@ -69,9 +69,8 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   TextInput(
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
+    @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
       _initStreams();
     }
 
@@ -100,7 +99,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       }
     }
 
-    changeDetector.markForCheck();
+    deliverStateChanges();
   }
 
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
@@ -126,9 +125,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
     if (action != null) action('');
 
-    inputValue = '';
-
-    changeDetector.markForCheck();
+    if (inputValue != '') setState(() => inputValue = '');
   }
 
   //-----------------------------

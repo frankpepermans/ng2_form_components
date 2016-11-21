@@ -29,12 +29,10 @@ typedef String GetHierarchyOffsetHandler(ListItem<Comparable<dynamic>> listItem)
     template: '''
       <div><div #renderType></div></div>
     ''',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
-class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit, OnDestroy {
-
-  StreamSubscription<bool> _requestChangeDetectionSubscription;
+class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState implements OnInit {
 
   ViewContainerRef _renderTypeTarget;
   ViewContainerRef get renderTypeTarget => _renderTypeTarget;
@@ -93,7 +91,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit, OnDestr
   //-----------------------------
 
   final DynamicComponentLoader dynamicComponentLoader;
-  final ChangeDetectorRef changeDetector;
   final Injector injector;
   final Renderer renderer;
   final DragDropService dragDropService;
@@ -106,16 +103,11 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit, OnDestr
     @Inject(Injector) this.injector,
     @Inject(DynamicComponentLoader) this.dynamicComponentLoader,
     @Inject(Renderer) this.renderer,
-    @Inject(ChangeDetectorRef) this.changeDetector,
     @Inject(DragDropService) this.dragDropService);
 
   //-----------------------------
   // ng2 life cycle
   //-----------------------------
-
-  @override void ngOnDestroy() {
-    _requestChangeDetectionSubscription?.cancel();
-  }
 
   @override void ngOnInit() {
     final Type resolvedRendererType = resolveRendererHandler(0, listItem);
@@ -132,6 +124,8 @@ class ListItemRenderer<T extends Comparable<dynamic>> implements OnInit, OnDestr
     ]), injector)).then(ngOnComponentLoaded);
   }
 
-  void ngOnComponentLoaded(ComponentRef ref) => changeDetector.markForCheck();
+  void ngOnComponentLoaded(ComponentRef ref) {
+    deliverStateChanges();
+  }
 
 }

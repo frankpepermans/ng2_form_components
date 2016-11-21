@@ -22,7 +22,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableT
     templateUrl: 'auto_complete.html',
     directives: const <Type>[ListRenderer, Tween, NgClass, NgIf],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements OnChanges, OnDestroy, AfterViewInit {
@@ -114,9 +114,8 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   //-----------------------------
 
   AutoComplete(
-      @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
       @Inject(ElementRef) ElementRef elementRef,
-      @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
+      @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
     super.className = 'ng2-form-components-auto-complete';
 
     _initStreams();
@@ -186,13 +185,11 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   void setInputValue(String value) {
     if (searchInput != null) (searchInput.nativeElement as InputElement).value = value;
 
-    inputValue = value;
-
     _inputCriteriaMet$ctrl.add(value.length >= minCharsRequired);
 
     _input$ctrl.add(value);
 
-    changeDetector.markForCheck();
+    setState(() => inputValue = value);
   }
 
   @override void clear() {
@@ -245,9 +242,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
 
         return '';
       }).listen((String headerLabel) {
-        currentHeaderLabel = headerLabel;
-
-        changeDetector.markForCheck();
+        setState(() => currentHeaderLabel = headerLabel);
       });
 
     _inputChanged$ = rx.observable(_input$ctrl.stream)
@@ -294,15 +289,13 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
 
         if (tuple.item1) open();
 
-        changeDetector.markForCheck();
+        setState(() => showLoading = false);
       })
       .debounce(const Duration(milliseconds: 30))
-      .listen((_) => changeDetector.markForCheck());
+      .listen((_) => deliverStateChanges());
 
     _inputChangedSubscription = _inputChanged$.listen((_) {
-      showLoading = true;
-
-      changeDetector.markForCheck();
+      if (!showLoading) setState(() => showLoading = true);
     });
   }
 

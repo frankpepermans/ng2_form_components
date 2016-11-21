@@ -19,7 +19,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     templateUrl: 'side_panel.html',
     directives: const <Type>[SidePanelAnimation],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, BeforeDestroyChild {
@@ -54,10 +54,9 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   SidePanel(
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(ElementRef) ElementRef elementRef,
     @Inject(StateService) StateService stateService) :
-      super(changeDetector, elementRef, stateService) {
+      super(elementRef, stateService) {
         _initStreams();
       }
 
@@ -73,9 +72,7 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
     _isOpen$ctrl.add(tuple.item1);
 
-    isOpen = tuple.item1;
-
-    changeDetector.markForCheck();
+    if (isOpen != tuple.item1) setState(() => isOpen = tuple.item1);
   }
 
   @override void ngOnDestroy() {
@@ -123,9 +120,7 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     if (!newIsOpenState) {
       _isOpen$ctrl.add(true);
 
-      this.isOpen = true;
-
-      changeDetector.markForCheck();
+      if (!isOpen) setState(() => this.isOpen = true);
     } else {
       _beforeDestroyChildSubscription?.cancel();
 
@@ -134,9 +129,7 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
           .listen((_) {
         _isOpen$ctrl.add(false);
 
-        this.isOpen = false;
-
-        changeDetector.markForCheck();
+        if (isOpen) setState(() => this.isOpen = false);
       });
     }
   }

@@ -17,7 +17,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     templateUrl: 'form_input.html',
     directives: const <Type>[],
     providers: const <Type>[],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, AfterViewInit {
@@ -88,9 +88,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   FormInput(
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
+    @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
       final Element element = elementRef.nativeElement;
 
       element.style.display = 'flex';
@@ -118,9 +117,9 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       final TextAreaElement target = textarea.nativeElement;
 
       window.animationFrame.whenComplete(() {
-        textareaHeight = '${target.scrollHeight - heightCalcAdjustment}px';
+        final String newValue = '${target.scrollHeight - heightCalcAdjustment}px';
 
-        changeDetector.markForCheck();
+        if (textareaHeight != newValue) setState(() => textareaHeight = newValue);
       });
     }
   }
@@ -150,13 +149,9 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   void _initStreams() {
     _valueSubscription = _value$ctrl.stream
-      .listen((String value) {
-        startValue = value;
+      .listen((String value) => setState(() => startValue = value));
 
-        changeDetector.markForCheck();
-      });
-
-    _inputTypeSubscription = new rx.Observable<String>.combineLatest([
+    _inputTypeSubscription = new rx.Observable<String>.combineLatest(<Stream<String>>[
       _inputType$ctrl.stream,
       _inputValue$ctrl.stream
       ], (String inputType, String inputValue) {print('here');
@@ -172,7 +167,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
         .listen((String value) {
           _value$ctrl.add(value);
 
-          changeDetector.markForCheck();
+          deliverStateChanges();
         });
     }
 
@@ -188,9 +183,9 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
       valueToSet = target.value;
 
-      textareaHeight = '${target.scrollHeight - heightCalcAdjustment}px';
+      final String newValue = '${target.scrollHeight - heightCalcAdjustment}px';
 
-      changeDetector.markForCheck();
+      if (textareaHeight != newValue) setState(() => textareaHeight = newValue);
     } else if (inputType == 'amount' || inputType == 'numeric') {
       final InputElement target = event.target;
 

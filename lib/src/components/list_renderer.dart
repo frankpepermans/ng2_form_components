@@ -56,7 +56,7 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransfor
     directives: const <Type>[ListItemRenderer, DragDropListItemRenderer],
     providers: const <Type>[StateService],
     pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
@@ -98,8 +98,6 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   List<ListItem<T>> _dataProvider = <ListItem<T>>[];
   List<ListItem<T>> get dataProvider => _dataProvider;
   @Input() set dataProvider(List<ListItem<T>> value) {
-    _dataProvider = value;
-
     _dataProvider$ctrl.add(value);
   }
 
@@ -189,6 +187,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   final StreamController<List<ListItem<T>>> _dataProvider$ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<ItemRendererEvent<int, Comparable<dynamic>>> _dropEffect$ctrl = new StreamController<ItemRendererEvent<int, Comparable<dynamic>>>.broadcast();
 
+  StreamSubscription<List<ListItem<T>>> _dataProviderSubscription;
   StreamSubscription<Iterable<ListItem<T>>> _internalSelectedItemsSubscription;
   StreamSubscription<Iterable<ListItem<T>>> _clearSelectionSubscription;
   StreamSubscription<ListItem<Comparable<dynamic>>> _rendererSelectionSubscription;
@@ -210,10 +209,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
   ListRenderer(
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(StateService) StateService stateService) :
       this.element = elementRef,
-        super(changeDetector, elementRef, stateService) {
+        super(elementRef, stateService) {
           _initStreams();
         }
 
@@ -276,6 +274,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     _listRendererService.close();
 
+    _dataProviderSubscription?.cancel();
     _internalSelectedItemsSubscription?.cancel();
     _rendererSelectionSubscription?.cancel();
     _selectionStateSubscription?.cancel();
@@ -374,12 +373,13 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   }
 
   void _initStreams() {
-    _internalSelectedItemsSubscription = _selectedItems$ctrl.stream.listen((Iterable<ListItem<T>> items) {
-      internalSelectedItems = items;
+    _dataProviderSubscription = _dataProvider$ctrl.stream
+      .listen((List<ListItem<T>> dataProvider) => setState(() => _dataProvider = dataProvider));
 
+    _internalSelectedItemsSubscription = _selectedItems$ctrl.stream.listen((Iterable<ListItem<T>> items) {
       listRendererService.respondEvents(<ListRendererEvent<Iterable<ListItem<T>>, Comparable<dynamic>>>[new ListRendererEvent<Iterable<ListItem<T>>, Comparable<dynamic>>('selectionChanged', null, items)]);
 
-      changeDetector.markForCheck();
+      setState(() => internalSelectedItems = items);
     });
 
     _selectedItems$ = new rx.Observable<List<ListItem<T>>>.zip(<Stream<dynamic>>[

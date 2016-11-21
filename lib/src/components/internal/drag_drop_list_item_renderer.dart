@@ -25,10 +25,10 @@ import 'package:ng2_form_components/src/components/internal/list_item_renderer.d
       </div>
     ''',
     directives: const <Type>[DragDrop],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
-class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRenderer<T> implements OnInit, OnDestroy {
+class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRenderer<T> implements OnInit {
 
   @ViewChild('renderType', read: ViewContainerRef) set renderTypeTarget(ViewContainerRef value) {
     super.renderTypeTarget = value;
@@ -80,8 +80,7 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRe
       @Inject(Injector) Injector injector,
       @Inject(DynamicComponentLoader) DynamicComponentLoader dynamicComponentLoader,
       @Inject(Renderer) Renderer renderer,
-      @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
-      @Inject(DragDropService) DragDropService dragDropService) : super(injector, dynamicComponentLoader, renderer, changeDetector, dragDropService);
+      @Inject(DragDropService) DragDropService dragDropService) : super(injector, dynamicComponentLoader, renderer, dragDropService);
 
   //-----------------------------
   // ng2 life cycle

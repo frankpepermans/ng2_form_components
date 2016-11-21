@@ -8,12 +8,10 @@ import 'package:ng2_form_components/src/components/helpers/html_text_transformat
 @Component(
     selector: 'html-text-transform-menu',
     templateUrl: 'html_text_transform_menu.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
-class HTMLTextTransformMenu implements OnDestroy {
-
-  final ChangeDetectorRef changeDetector;
+class HTMLTextTransformMenu extends ComponentState implements OnDestroy {
 
   //-----------------------------
   // input
@@ -37,7 +35,7 @@ class HTMLTextTransformMenu implements OnDestroy {
   // Constructor
   //-----------------------------
 
-  HTMLTextTransformMenu(@Inject(ChangeDetectorRef) this.changeDetector);
+  HTMLTextTransformMenu();
 
   //-----------------------------
   // ng2 life cycle

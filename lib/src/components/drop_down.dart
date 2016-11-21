@@ -24,7 +24,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, S
     templateUrl: 'drop_down.html',
     directives: const <Type>[ListRenderer, Tween],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
@@ -139,9 +139,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   //-----------------------------
 
   DropDown(
-    @Inject(ChangeDetectorRef) ChangeDetectorRef changeDetector,
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) : super(changeDetector, elementRef, stateService) {
+    @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
     _initStreams();
   }
 
@@ -232,16 +231,10 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // private methods
   //-----------------------------
 
-  void setSelectedItems(Iterable<ListItem<T>> value) {
-    selectedItems = value;
-
-    changeDetector.markForCheck();
-  }
+  void setSelectedItems(Iterable<ListItem<T>> value) => setState(() => selectedItems = value);
 
   void setOpenOrClosed(bool value) {
-    isOpen = value;
-
-    changeDetector.markForCheck();
+    if (isOpen != value) setState(() => isOpen = value);
   }
 
   void _initStreams() {
@@ -257,9 +250,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
 
       return label;
     }).listen((String headerLabel) {
-      currentHeaderLabel = headerLabel;
-
-      changeDetector.markForCheck();
+      if (currentHeaderLabel != headerLabel) setState(() => currentHeaderLabel = headerLabel);
     });
 
     _openCloseSubscription = rx.observable(_openClose$ctrl.stream)
@@ -296,7 +287,11 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
     if (isOpen) {
       final StreamController<bool> ctrl = new StreamController<bool>();
 
-      ctrl.onListen = () => ctrl.add(true);
+      ctrl.onListen = () {
+        ctrl.add(true);
+
+        ctrl.close();
+      };
 
       return ctrl.stream;
     }
