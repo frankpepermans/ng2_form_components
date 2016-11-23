@@ -16,7 +16,7 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
     selector: 'default-list-item-renderer',
     template: '''
       <div class="instance" (click)="triggerSelection()" style="padding:5px">
-        <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelHandler(listItem.data)}}</label>
+        <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelStream | async}}</label>
         <i *ngIf="isSelected(listItem)" class="fa fa-check" style="float:right"></i>
       </div>
     ''',
@@ -37,6 +37,8 @@ class DefaultListItemRenderer<T extends Comparable<dynamic>> implements DynamicL
 
   StreamSubscription<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _eventSubscription;
 
+  final Stream<String> labelStream;
+
   //-----------------------------
   // constructor
   //-----------------------------
@@ -44,11 +46,15 @@ class DefaultListItemRenderer<T extends Comparable<dynamic>> implements DynamicL
   DefaultListItemRenderer(
     @Inject(ListRendererService) this.listRendererService,
     @Inject(ChangeDetectorRef) this.changeDetector,
-    @Inject(ListItem) this.listItem,
+    @Inject(ListItem) ListItem<T> listItem,
     @Inject(IsSelectedHandler) this.isSelected,
     @Inject(GetHierarchyOffsetHandler) this.getHierarchyOffset,
-    @Inject(LabelHandler) this.labelHandler,
-    @Inject(ElementRef) ElementRef elementRef) {
+    @Inject(LabelHandler) LabelHandler labelHandler,
+    @Inject(ElementRef) ElementRef elementRef) :
+      this.listItem = listItem,
+      this.labelHandler = labelHandler,
+      this.labelStream = (_resolveLabel(labelHandler(listItem.data)))
+  {
     _initStreams();
   }
 
@@ -60,6 +66,12 @@ class DefaultListItemRenderer<T extends Comparable<dynamic>> implements DynamicL
     _eventSubscription = listRendererService.responders$
       .where((List<ListRendererEvent<dynamic, Comparable<dynamic>>> events) => events.firstWhere((ListRendererEvent<dynamic, Comparable<dynamic>> event) => event.type == 'selectionChanged', orElse: () => null) != null)
       .listen((_) => changeDetector.markForCheck());
+  }
+
+  static Stream<String> _resolveLabel(dynamic label) {
+    if (label is String) return new Stream<String>.fromIterable(<String>[label]);
+
+    return label as Stream<String>;
   }
 
   void triggerSelection() => listRendererService.triggerSelection(listItem);

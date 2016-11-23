@@ -5,6 +5,7 @@ import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
+import 'package:tuple/tuple.dart';
 
 import 'package:angular2/angular2.dart';
 
@@ -164,7 +165,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
 
     if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
 
-    tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    if (tuple.item2 != null) tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     scheduleMicrotask(() {
       _selectedItems$ctrl.add(listCast);
@@ -176,7 +177,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   @override void ngOnChanges(Map<String, SimpleChange> changes) {
     if (changes.containsKey('headerLabel')) {
       _headerLabel$ctrl.add(headerLabel);
-      _selectedItems$ctrl.add(const []);
+      _selectedItems$ctrl.add(selectedItems);
     }
 
     if (changes.containsKey('selectedItems')) _selectedItems$ctrl.add(selectedItems);
@@ -238,18 +239,33 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = new rx.Observable<String>.combineLatest(<Stream<dynamic>>[
+    _currentHeaderLabelSubscription = new rx.Observable<Tuple2<String, Iterable<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
       rx.observable(_headerLabel$ctrl.stream).startWith(const <String>['']),
       rx.observable(_selectedItems$ctrl.stream).startWith(const [const []])
-    ], (String label, Iterable<ListItem<T>> selectedItems) {
-      if (updateHeaderLabelWithSelection && selectedItems != null && selectedItems.isNotEmpty) {
-        return (selectedItems.length == 1) ?
-          labelHandler(selectedItems.first.data) :
-          selectedItems.map((ListItem<T> listItem) => labelHandler(listItem.data)).join(', ');
+    ], (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
+    .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
+      if (updateHeaderLabelWithSelection && tuple.item2 != null && tuple.item2.isNotEmpty) {
+        if (tuple.item2.length == 1) {
+          final dynamic resolvedLabel = labelHandler(tuple.item2.first.data);
+
+          if (resolvedLabel is String) return new Stream<String>.fromIterable(<String>[resolvedLabel]);
+          else return resolvedLabel as Stream<String>;
+        } else {
+          return rx.observable(new Stream<ListItem<T>>.fromIterable(tuple.item2))
+            .flatMap((ListItem<T> listItem) {
+              final dynamic resolvedLabel = labelHandler(listItem.data);
+
+              if (resolvedLabel is String) return new Stream<String>.fromIterable(<String>[resolvedLabel]);
+              else return resolvedLabel as Stream<String>;
+            })
+            .bufferWithCount(tuple.item2.length)
+            .map((Iterable<String> list) => list.join(', '));
+        }
       }
 
-      return label;
-    }).listen((String headerLabel) {
+      return new Stream<String>.fromIterable(<String>[tuple.item1]);
+    })
+    .listen((String headerLabel) {
       if (currentHeaderLabel != headerLabel) setState(() => currentHeaderLabel = headerLabel);
     });
 

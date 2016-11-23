@@ -236,8 +236,8 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       .map((Iterable<ListItem<T>> selectedItems) {
         if (selectedItems != null && selectedItems.isNotEmpty) {
           return (selectedItems.length == 1) ?
-            labelHandler(selectedItems.first.data) :
-            selectedItems.map((ListItem<T> listItem) => labelHandler(listItem.data)).join(', ');
+            labelHandler(selectedItems.first.data) as String :
+            selectedItems.map((ListItem<T> listItem) => labelHandler(listItem.data) as String).join(', ');
         }
 
         return '';

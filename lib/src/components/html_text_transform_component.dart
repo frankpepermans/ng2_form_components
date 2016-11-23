@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
 
 import 'package:angular2/angular2.dart';
+import 'package:angular2/platform/browser.dart' show DOCUMENT;
 import 'package:dorm/dorm.dart' show Entity;
 
 import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, StatePhase, StateService;
@@ -25,13 +26,14 @@ typedef String ContentInterceptor(String value);
 @Component(
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
-  providers: const <Type>[StateService],
+  providers: const <dynamic>[StateService, DOCUMENT],
   changeDetection: ChangeDetectionStrategy.Stateful,
   preserveWhitespace: false
 )
 class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, OnInit {
 
   final ElementRef element;
+  final HtmlDocument documentReference;
   final HTMLTransform transformer = new HTMLTransform();
   final WindowListeners windowListeners = new WindowListeners();
 
@@ -118,13 +120,14 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
   HTMLTextTransformComponent(
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) :
+    @Inject(StateService) StateService stateService,
+    @Inject(DOCUMENT) this.documentReference) :
       this.element = elementRef,
       super(elementRef, stateService) {
     if (!_HAS_MODIFIED_INSERT_LINE_RULE) {
       _HAS_MODIFIED_INSERT_LINE_RULE = true;
 
-      document.execCommand('insertBrOnReturn');
+      documentReference.execCommand('insertBrOnReturn');
     }
   }
 
@@ -193,7 +196,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     if (event.keyCode == 10 || event.keyCode == 13) {
       event.preventDefault();
 
-      document.execCommand('insertHTML', false, '<br><br>');
+      documentReference.execCommand('insertHTML', false, '<br><br>');
     }
   }
 
@@ -248,10 +251,10 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _range$ = new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
       element.onMouseDown,
       rx.observable(element.onMouseDown)
-        .flatMapLatest((_) => document.onMouseUp.take(1)),
+        .flatMapLatest((_) => documentReference.onMouseUp.take(1)),
       element.onKeyDown,
       rx.observable(element.onKeyDown)
-        .flatMapLatest((_) => document.onKeyUp.take(1)),
+        .flatMapLatest((_) => documentReference.onKeyUp.take(1)),
       rx.observable(_rangeTrigger$ctrl.stream),
     ], asBroadcastStream: true)
       .map((_) => window.getSelection())
@@ -319,7 +322,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
           return event;
         })
-        .takeUntil(document.onMouseUp)
+        .takeUntil(documentReference.onMouseUp)
       )
       .listen((_) {});
   }
@@ -396,7 +399,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   }
 
   void _execDocumentCommand(String command, [bool showUI = null, String value = null]) {
-    document.execCommand(command, showUI, value);
+    documentReference.execCommand(command, showUI, value);
 
     _rangeTrigger$ctrl.add(true);
   }
@@ -598,7 +601,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
       deliverStateChanges();
 
-      menu.changeDetector.markForCheck();
+      menu.deliverStateChanges();
     }
 
     return range;

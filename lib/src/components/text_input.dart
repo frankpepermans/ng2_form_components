@@ -19,7 +19,7 @@ typedef void TextInputAction(String inputValue);
     templateUrl: 'text_input.html',
     directives: const <Type>[NgClass, NgIf],
     providers: const <Type>[StateService],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
 class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy {
