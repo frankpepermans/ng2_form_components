@@ -17,6 +17,8 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
 
+import 'package:ng2_form_components/src/utils/html_helpers.dart';
+
 @Component(
     selector: 'drag-drop-list-item-renderer',
     template: '''
@@ -25,6 +27,7 @@ import 'package:ng2_form_components/src/components/internal/list_item_renderer.d
       </div>
     ''',
     directives: const <Type>[DragDrop],
+    providers: const <Type>[HtmlHelpers],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -33,6 +36,8 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRe
   @ViewChild('renderType', read: ViewContainerRef) set renderTypeTarget(ViewContainerRef value) {
     super.renderTypeTarget = value;
   }
+
+  final HtmlHelpers helpers;
 
   //-----------------------------
   // input
@@ -77,10 +82,10 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRe
   //-----------------------------
 
   DragDropListItemRenderer(
-      @Inject(Injector) Injector injector,
-      @Inject(DynamicComponentLoader) DynamicComponentLoader dynamicComponentLoader,
-      @Inject(Renderer) Renderer renderer,
-      @Inject(DragDropService) DragDropService dragDropService) : super(injector, dynamicComponentLoader, renderer, dragDropService);
+    @Inject(Injector) Injector injector,
+    @Inject(HtmlHelpers) this.helpers,
+    @Inject(DynamicComponentLoader) DynamicComponentLoader dynamicComponentLoader,
+    @Inject(DragDropService) DragDropService dragDropService) : super(injector, dynamicComponentLoader, dragDropService);
 
   //-----------------------------
   // ng2 life cycle
@@ -95,7 +100,7 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRe
       final ListDragDropHandlerType dragDropType = dragDropService.typeHandler(listItem);
 
       if (dragDropType != ListDragDropHandlerType.NONE) {
-        renderer.setElementClass(ref.location.nativeElement, 'ngDragDrop--target', true);
+        helpers.updateElementClasses(ref.location.nativeElement, 'ngDragDrop--target', true);
 
         (ref.location.nativeElement as Element).style.order = '1';
       }

@@ -13,8 +13,11 @@ import 'package:ng2_form_components/src/components/internal/list_item_renderer.d
 
 import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
+import 'package:ng2_form_components/src/utils/html_helpers.dart';
+
 @Directive(
-  selector: '[ngDragDrop]'
+  selector: '[ngDragDrop]',
+  providers: const <Type>[HtmlHelpers]
 )
 class DragDrop implements OnDestroy {
 
@@ -25,10 +28,10 @@ class DragDrop implements OnDestroy {
 
   @Output() Stream<DropResult> get onDrop => _onDrop$ctrl.stream;
 
-  final Renderer renderer;
   final ElementRef elementRef;
   final ChangeDetectorRef changeDetector;
   final DragDropService dragDropService;
+  final HtmlHelpers helpers;
 
   rx.Observable<bool> dragDetection$;
   rx.Observable<bool> dragOver$;
@@ -52,10 +55,10 @@ class DragDrop implements OnDestroy {
   num heightOnDragEnter = 0;
 
   DragDrop(
-    @Inject(Renderer) this.renderer,
     @Inject(ElementRef) this.elementRef,
     @Inject(ChangeDetectorRef) this.changeDetector,
-    @Inject(DragDropService) this.dragDropService) {
+    @Inject(DragDropService) this.dragDropService,
+    @Inject(HtmlHelpers) this.helpers) {
       _initStreams();
     }
 
@@ -138,12 +141,12 @@ class DragDrop implements OnDestroy {
         event.dataTransfer.effectAllowed = 'move';
         event.dataTransfer.setData('text/plain', serializer.outgoing(<Entity>[listItem]));
 
-        renderer.setElementClass(element, 'ngDragDrop--active', true);
+        helpers.updateElementClasses(element, 'ngDragDrop--active', true);
       });
 
     _dragEndSubscription = element.onDragEnd
       .listen((MouseEvent event) {
-        renderer.setElementClass(element, 'ngDragDrop--active', false);
+        helpers.updateElementClasses(element, 'ngDragDrop--active', false);
       });
 
     _dragOutSubscription = dragOut$
@@ -159,7 +162,7 @@ class DragDrop implements OnDestroy {
       .listen((MouseEvent event) {
         event.preventDefault();
 
-        renderer.setElementClass(element, dragDropService.resolveDropClassName(listItem), _isWithinDropBounds(event.client.y));
+        helpers.updateElementClasses(element, dragDropService.resolveDropClassName(listItem), _isWithinDropBounds(event.client.y));
       });
 
     _swapDropSubscription = element.onDrop
@@ -184,8 +187,8 @@ class DragDrop implements OnDestroy {
       .listen((MouseEvent event) {
         event.preventDefault();
 
-        renderer.setElementClass(element, 'ngDragDrop--sort-handler--above', _isSortAbove(event.client.y));
-        renderer.setElementClass(element, 'ngDragDrop--sort-handler--below', _isSortBelow(event.client.y));
+        helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--above', _isSortAbove(event.client.y));
+        helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--below', _isSortBelow(event.client.y));
       });
 
     _sortDropSubscription = element.onDrop
@@ -223,9 +226,9 @@ class DragDrop implements OnDestroy {
   void _removeAllStyles(dynamic _) {
     final Element element = elementRef.nativeElement;
 
-    renderer.setElementClass(element, 'ngDragDrop--drop-inside', false);
-    renderer.setElementClass(element, 'ngDragDrop--sort-handler--above', false);
-    renderer.setElementClass(element, 'ngDragDrop--sort-handler--below', false);
+    helpers.updateElementClasses(element, 'ngDragDrop--drop-inside', false);
+    helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--above', false);
+    helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--below', false);
   }
 
   num _getActualOffsetY(Element element, num clientY) {

@@ -92,7 +92,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState imp
 
   final DynamicComponentLoader dynamicComponentLoader;
   final Injector injector;
-  final Renderer renderer;
   final DragDropService dragDropService;
 
   //-----------------------------
@@ -102,7 +101,6 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState imp
   ListItemRenderer(
     @Inject(Injector) this.injector,
     @Inject(DynamicComponentLoader) this.dynamicComponentLoader,
-    @Inject(Renderer) this.renderer,
     @Inject(DragDropService) this.dragDropService);
 
   //-----------------------------
