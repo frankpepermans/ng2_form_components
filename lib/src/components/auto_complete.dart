@@ -15,13 +15,13 @@ import 'package:ng2_form_components/src/components/list_renderer.dart';
 import 'package:ng2_form_components/src/components/list_item.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple3, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple3, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'auto-complete',
     templateUrl: 'auto_complete.html',
     directives: const <Type>[ListRenderer, Tween, NgClass, NgIf],
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: AutoComplete)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -114,8 +114,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   //-----------------------------
 
   AutoComplete(
-      @Inject(ElementRef) ElementRef elementRef,
-      @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
+      @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
     super.className = 'ng2-form-components-auto-complete';
 
     _initStreams();

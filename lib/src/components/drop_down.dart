@@ -18,13 +18,13 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
     directives: const <Type>[ListRenderer, Tween],
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: DropDown)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -140,8 +140,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   //-----------------------------
 
   DropDown(
-    @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
+    @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
     _initStreams();
   }
 

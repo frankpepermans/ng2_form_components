@@ -23,7 +23,7 @@ import 'package:ng2_form_components/src/components/item_renderers/default_hierar
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ItemRendererEvent, ListRendererEvent, ListRendererService;
 
-import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase, StateService, StatefulComponent;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show ResolveChildrenHandler, ResolveRendererHandler;
 
@@ -33,7 +33,7 @@ typedef bool ShouldOpenDiffer(ListItem<Comparable<dynamic>> itemA, ListItem<Comp
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
     directives: const <Type>[State, Hierarchy, HierarchyAnimation, ListItemRenderer, DragDropListItemRenderer],
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: Hierarchy)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -192,8 +192,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   //-----------------------------
 
   Hierarchy(
-    @Inject(ElementRef) ElementRef element,
-    @Inject(StateService) StateService stateService) : super(element, stateService) {
+    @Inject(ElementRef) ElementRef element) : super(element) {
       super.resolveRendererHandler = (int level, [_]) => DefaultHierarchyListItemRenderer;
 
       _initStreams();

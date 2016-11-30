@@ -18,7 +18,7 @@ import 'package:ng2_form_components/src/components/item_renderers/default_list_i
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent, ListRendererEvent;
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService, StatefulComponent;
 
 typedef bool IsSelectedHandler(ListItem<Comparable<dynamic>> listItem);
 typedef bool ClearSelectionWhereHandler(ListItem<Comparable<dynamic>> listItem);
@@ -54,7 +54,7 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransfor
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
     directives: const <Type>[ListItemRenderer, DragDropListItemRenderer],
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: ListRenderer)],
     pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
@@ -208,10 +208,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   //-----------------------------
 
   ListRenderer(
-    @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) :
+    @Inject(ElementRef) ElementRef elementRef) :
       this.element = elementRef,
-        super(elementRef, stateService) {
+        super(elementRef) {
           _initStreams();
         }
 

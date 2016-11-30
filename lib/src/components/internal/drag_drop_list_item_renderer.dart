@@ -33,7 +33,7 @@ import 'package:ng2_form_components/src/utils/html_helpers.dart';
 )
 class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRenderer<T> implements OnInit {
 
-  @ViewChild('renderType', read: ViewContainerRef) set renderTypeTarget(ViewContainerRef value) {
+  @override @ViewChild('renderType', read: ViewContainerRef) set renderTypeTarget(ViewContainerRef value) {
     super.renderTypeTarget = value;
   }
 

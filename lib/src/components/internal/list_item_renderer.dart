@@ -1,7 +1,5 @@
 library ng2_form_components.components.list_item_renderer;
 
-import 'dart:async';
-
 import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;

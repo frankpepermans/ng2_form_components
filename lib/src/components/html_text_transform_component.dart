@@ -26,7 +26,7 @@ typedef String ContentInterceptor(String value);
 @Component(
   selector: 'html-text-transform-component',
   templateUrl: 'html_text_transform_component.html',
-  providers: const <dynamic>[StateService, DOCUMENT],
+  providers: const <dynamic>[StateService, DOCUMENT, const Provider(StatefulComponent, useExisting: HTMLTextTransformComponent)],
   changeDetection: ChangeDetectionStrategy.Stateful,
   preserveWhitespace: false
 )
@@ -120,10 +120,9 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
   HTMLTextTransformComponent(
     @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService,
     @Inject(DOCUMENT) this.documentReference) :
       this.element = elementRef,
-      super(elementRef, stateService) {
+      super(elementRef) {
     if (!_HAS_MODIFIED_INSERT_LINE_RULE) {
       _HAS_MODIFIED_INSERT_LINE_RULE = true;
 

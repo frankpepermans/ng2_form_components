@@ -10,7 +10,7 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService, StatefulComponent;
 
 typedef void TextInputAction(String inputValue);
 
@@ -18,7 +18,7 @@ typedef void TextInputAction(String inputValue);
     selector: 'text-input',
     templateUrl: 'text_input.html',
     directives: const <Type>[NgClass, NgIf],
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: TextInput)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -69,8 +69,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   TextInput(
-    @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
+    @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
       _initStreams();
     }
 

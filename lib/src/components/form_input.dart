@@ -10,13 +10,13 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StatefulComponent;
 
 @Component(
     selector: 'form-input',
     templateUrl: 'form_input.html',
     directives: const <Type>[],
-    providers: const <Type>[],
+    providers: const <dynamic>[const Provider(StatefulComponent, useExisting: FormInput)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -88,8 +88,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   FormInput(
-    @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) : super(elementRef, stateService) {
+    @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
       final Element element = elementRef.nativeElement;
 
       element.style.display = 'flex';

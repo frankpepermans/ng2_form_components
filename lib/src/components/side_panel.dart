@@ -12,13 +12,13 @@ import 'package:ng2_form_components/src/components/animation/side_panel_animatio
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'side-panel',
     templateUrl: 'side_panel.html',
     directives: const <Type>[SidePanelAnimation],
-    providers: const <Type>[StateService],
+    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: SidePanel)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
@@ -54,9 +54,8 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   SidePanel(
-    @Inject(ElementRef) ElementRef elementRef,
-    @Inject(StateService) StateService stateService) :
-      super(elementRef, stateService) {
+    @Inject(ElementRef) ElementRef elementRef) :
+      super(elementRef) {
         _initStreams();
       }
 

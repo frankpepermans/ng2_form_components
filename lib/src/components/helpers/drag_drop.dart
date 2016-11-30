@@ -128,7 +128,6 @@ class DragDrop implements OnDestroy {
       .map((_) => true);
 
     serializer = new SerializerJson<String, Map<String, dynamic>>()
-      ..asDetached = true
       ..outgoing(const [])
       ..addRule(
           DateTime,
