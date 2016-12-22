@@ -17,7 +17,11 @@ class HTMLTextTransformMenu extends ComponentState implements OnDestroy {
   // input
   //-----------------------------
 
-  @Input() List<List<HTMLTextTransformation>> buttons;
+  List<List<HTMLTextTransformation>> _buttons;
+  List<List<HTMLTextTransformation>> get buttons => _buttons;
+  @Input() set buttons(List<List<HTMLTextTransformation>> value) {
+    setState(() => _buttons = value);
+  }
 
   //-----------------------------
   // output
