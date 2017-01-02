@@ -1,12 +1,12 @@
 library ng2_form_components.components.helpers.drag_drop;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:html';
 
 import 'package:angular2/angular2.dart';
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
-import 'package:dorm/dorm.dart';
 
 import 'package:ng2_form_components/src/components/list_item.dart';
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
@@ -50,7 +50,6 @@ class DragDrop implements OnDestroy {
   StreamSubscription<ListItem<Comparable<dynamic>>> _swapDropSubscription;
   StreamSubscription<Tuple2<ListItem<Comparable<dynamic>>, int>> _sortDropSubscription;
 
-  SerializerJson<String, Map<String, dynamic>> serializer;
   bool _areStreamsSet = false;
   num heightOnDragEnter = 0;
 
@@ -127,18 +126,14 @@ class DragDrop implements OnDestroy {
       .where((bool value) => !value)
       .map((_) => true);
 
-    serializer = new SerializerJson<String, Map<String, dynamic>>()
-      ..outgoing(const [])
-      ..addRule(
-          DateTime,
-          (int value) => (value != null) ? new DateTime.fromMillisecondsSinceEpoch(value, isUtc:true) : null,
-          (DateTime value) => value?.millisecondsSinceEpoch
-      );
-
     _dragStartSubscription = element.onDragStart
       .listen((MouseEvent event) {
         event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setData('text/plain', serializer.outgoing(<Entity>[listItem]));
+        event.dataTransfer.setData('text/plain', JSON.encode(<Comparable<dynamic>>[listItem], toEncodable: (_) {
+          if (_ is DateTime) return '|T|${_.millisecondsSinceEpoch}';
+
+          return _;
+        }));
 
         helpers.updateElementClasses(element, 'ngDragDrop--active', true);
       });
@@ -215,9 +210,11 @@ class DragDrop implements OnDestroy {
 
     if (transferDataEncoded.isEmpty) return null;
 
-    final EntityFactory<Entity> factory = new EntityFactory<Entity>();
-    final List<dynamic> result = factory.spawn(serializer.incoming(transferDataEncoded), serializer,
-        (Entity serverEntity, Entity clientEntity) => ConflictManager.AcceptClient);
+    final List<dynamic> result = JSON.decode(transferDataEncoded, reviver: (K, V) {
+      if (V is String && V.length > 3 && V.substring(0, 3).compareTo('|T|') == 0) return new DateTime.fromMicrosecondsSinceEpoch(int.parse(V.split('|').last));
+
+      return V;
+    });
 
     return result.first as ListItem<Comparable<dynamic>>;
   }

@@ -5,7 +5,6 @@ import 'dart:html';
 import 'dart:math' as math;
 
 import 'package:rxdart/rxdart.dart' as rx;
-import 'package:dorm/dorm.dart';
 import 'package:tuple/tuple.dart';
 import 'package:angular2/angular2.dart';
 
@@ -18,7 +17,7 @@ import 'package:ng2_form_components/src/components/item_renderers/default_list_i
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent, ListRendererEvent;
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, SerializableTuple1Immutable, StatePhase, StateService, StatefulComponent;
 
 typedef bool IsSelectedHandler(ListItem<Comparable<dynamic>> listItem);
 typedef bool ClearSelectionWhereHandler(ListItem<Comparable<dynamic>> listItem);
@@ -218,10 +217,10 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => _scroll$ctrl.stream
-    .map((int scrollTop) => new SerializableTuple1<int>()..item1 = scrollTop);
+  @override Stream<Comparable<dynamic>> provideState() => _scroll$ctrl.stream
+    .map((int scrollTop) => new SerializableTuple1Immutable<int>(item1: scrollTop));
 
-  @override void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
     final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
 
     if (scrollPane != null) {

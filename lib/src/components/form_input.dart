@@ -3,14 +3,13 @@ library ng2_form_components.components.form_input;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:dorm/dorm.dart';
 import 'package:rxdart/rxdart.dart' as rx;
 
 import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, SerializableTuple1Immutable, StatePhase, StatefulComponent;
 
 @Component(
     selector: 'form-input',
@@ -102,10 +101,10 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => _inputValue$ctrl.stream.distinct()
-    .map((String inputValue) => new SerializableTuple1<String>()..item1 = inputValue);
+  @override Stream<Comparable<dynamic>> provideState() => _inputValue$ctrl.stream.distinct()
+    .map((String inputValue) => new SerializableTuple1Immutable<String>(item1: inputValue));
 
-  @override void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
     final SerializableTuple1<String> tuple = entity as SerializableTuple1<String>;
 
     _inputValue$ctrl.add(tuple.item1);

@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
-import 'package:dorm/dorm.dart';
 import 'package:tuple/tuple.dart';
 
 import 'package:angular2/angular2.dart';
@@ -18,7 +17,7 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple2Immutable, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'drop-down',
@@ -148,23 +147,24 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
+  @override Stream<Comparable<dynamic>> provideState() => new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(<Iterable<ListItem<T>>>[selectedItems]),
       rx.observable(_openClose$ctrl.stream)
         .startWith(<bool>[isOpen])
         .distinct((bool vA, bool vB) => vA == vB)
-    ], (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
-      ..item1 = isOpen
-      ..item2 = items);
+    ], (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2Immutable<bool, Iterable<ListItem<T>>>(
+        item1: isOpen,
+        item2: items
+    ));
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple2<bool, Iterable<Entity>> tuple = entity as SerializableTuple2<bool, Iterable<Entity>>;
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
+    final SerializableTuple2<bool, Iterable<Comparable<dynamic>>> tuple = entity as SerializableTuple2<bool, Iterable<Comparable<dynamic>>>;
     final List<ListItem<T>> listCast = <ListItem<T>>[];
 
     if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
 
-    if (tuple.item2 != null) tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    if (tuple.item2 != null) tuple.item2.forEach((Comparable<dynamic> entity) => listCast.add(entity as ListItem<T>));
 
     scheduleMicrotask(() {
       _selectedItems$ctrl.add(listCast);

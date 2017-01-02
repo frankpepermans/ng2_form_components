@@ -8,9 +8,8 @@ import 'package:tuple/tuple.dart';
 
 import 'package:angular2/angular2.dart';
 import 'package:angular2/platform/browser.dart' show DOCUMENT;
-import 'package:dorm/dorm.dart' show Entity;
 
-import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, StatePhase, StateService;
+import 'package:ng2_state/ng2_state.dart' show StatefulComponent, SerializableTuple1, SerializableTuple1Immutable, StatePhase, StateService;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show FormComponent;
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
@@ -137,9 +136,9 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   @override Stream<SerializableTuple1<String>> provideState() => _modelTransformation$ctrl.stream
     .where((String value) => value != null && value.isNotEmpty)
     .distinct((String vA, String vB) => vA.compareTo(vB) == 0)
-    .map((String value) => new SerializableTuple1<String>()..item1 = value);
+    .map((String value) => new SerializableTuple1Immutable<String>(item1: value));
 
-  @override void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
     final SerializableTuple1<String> tuple = entity as SerializableTuple1<String>;
     final String incoming = tuple.item1;
 

@@ -3,7 +3,6 @@ library ng2_form_components.components.side_panel;
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart' as rx;
-import 'package:dorm/dorm.dart';
 import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart' show BeforeDestroyChild;
@@ -12,7 +11,7 @@ import 'package:ng2_form_components/src/components/animation/side_panel_animatio
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, SerializableTuple1Immutable, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'side-panel',
@@ -63,10 +62,10 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => _isOpen$ctrl.stream
-    .map((bool isOpen) => new SerializableTuple1<bool>()..item1 = isOpen);
+  @override Stream<Comparable<dynamic>> provideState() => _isOpen$ctrl.stream
+    .map((bool isOpen) => new SerializableTuple1Immutable<bool>(item1: isOpen));
 
-  @override void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
     final SerializableTuple1<bool> tuple = entity as SerializableTuple1<bool>;
 
     _isOpen$ctrl.add(tuple.item1);

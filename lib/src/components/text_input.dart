@@ -4,13 +4,12 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
-import 'package:dorm/dorm.dart';
 
 import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple2Immutable, StatePhase, StateService, StatefulComponent;
 
 typedef void TextInputAction(String inputValue);
 
@@ -77,14 +76,14 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() {
+  @override Stream<Comparable<dynamic>> provideState() {
     return new rx.Observable<SerializableTuple2<String, bool>>.merge(<Stream<SerializableTuple2<String, bool>>>[
-      _input$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = false),
-      _action$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = true)
+      _input$ctrl.stream.map((String inputValue) => new SerializableTuple2Immutable<String, bool>(item1: inputValue, item2: false)),
+      _action$ctrl.stream.map((String inputValue) => new SerializableTuple2Immutable<String, bool>(item1: inputValue, item2: true))
     ]);
   }
 
-  @override void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
     final SerializableTuple2<String, bool> tuple = entity as SerializableTuple2<String, bool>;
 
     inputValue = _internalValue = tuple.item1;

@@ -4,7 +4,6 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
-import 'package:dorm/dorm.dart' show Entity;
 import 'package:tuple/tuple.dart' show Tuple2;
 import 'package:angular2/angular2.dart';
 
@@ -23,7 +22,7 @@ import 'package:ng2_form_components/src/components/item_renderers/default_hierar
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ItemRendererEvent, ListRendererEvent, ListRendererService;
 
-import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple3, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show State, SerializableTuple1, SerializableTuple1Immutable, SerializableTuple3, SerializableTuple3Immutable, StatePhase, StateService, StatefulComponent;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show ResolveChildrenHandler, ResolveRendererHandler;
 
@@ -202,18 +201,19 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() {
+  @override Stream<Comparable<dynamic>> provideState() {
     return new rx.Observable<SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
-      rx.observable(super.provideState()).startWith(<SerializableTuple1<int>>[new SerializableTuple1<int>()..item1 = 0]),
+      rx.observable(super.provideState()).startWith(const <SerializableTuple1<int>>[const SerializableTuple1Immutable<int>(item1: 0)]),
       internalSelectedItemsChanged.startWith(const [const []]),
       rx.observable(_openListItems$Ctrl.stream)
         .where((_) => !autoOpenChildren)
         .startWith(const [const []])
     ], (SerializableTuple1<int> scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) =>
-      new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
-        ..item1 = scrollPosition.item1
-        ..item2 = selectedItems
-        ..item3 = openItems, asBroadcastStream: true);
+      new SerializableTuple3Immutable<int, List<ListItem<T>>, List<ListItem<T>>>(
+          item1: scrollPosition.item1,
+          item2: selectedItems,
+          item3: openItems
+      ), asBroadcastStream: true);
   }
 
   @override void ngAfterViewInit() {
@@ -224,19 +224,18 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     hierarchySelectedItems = null;
   }
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple3<int, List<Entity>, List<Entity>> tuple = entity as SerializableTuple3<int, List<Entity>, List<Entity>>;
+  @override void receiveState(Comparable<dynamic> entity, StatePhase phase) {
+    final SerializableTuple3<int, List<Comparable<dynamic>>, List<Comparable<dynamic>>> tuple = entity as SerializableTuple3<int, List<Comparable<dynamic>>, List<Comparable<dynamic>>>;
     final List<ListItem<T>> listCast = <ListItem<T>>[];
     final List<ListItem<T>> listCast2 = <ListItem<T>>[];
 
-    tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    tuple.item2.forEach((Comparable<dynamic> entity) => listCast.add(entity as ListItem<T>));
 
-    super.receiveState(new SerializableTuple1<int>()
-      ..item1 = tuple.item1, phase);
+    super.receiveState(new SerializableTuple1Immutable<int>(item1: tuple.item1), phase);
 
     _receivedSelection = listCast;
 
-    tuple.item3.forEach((Entity entity) {
+    tuple.item3.forEach((Comparable<dynamic> entity) {
       final ListItem<T> listItem = entity as ListItem<T>;
       _isOpenMap[listItem] = true;
 

@@ -5,7 +5,6 @@ import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
-import 'package:dorm/dorm.dart';
 
 import 'package:angular2/angular2.dart';
 
@@ -15,7 +14,7 @@ import 'package:ng2_form_components/src/components/list_renderer.dart';
 import 'package:ng2_form_components/src/components/list_item.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple3, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple2Immutable, SerializableTuple3, SerializableTuple3Immutable, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'auto-complete',
@@ -125,7 +124,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   //-----------------------------
 
   @override
-  Stream<Entity> provideState() {
+  Stream<Comparable<dynamic>> provideState() {
     final rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>> superProvider = super.provideState() as rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>;
 
     return new rx.Observable<SerializableTuple3<bool, Iterable<ListItem<T>>, String>>.combineLatest(<Stream<dynamic>>[
@@ -134,16 +133,17 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
         .startWith(const <String>[''])
         .distinct((String vA, String vB) => vA.compareTo(vB) == 0)
     ], (SerializableTuple2<bool, Iterable<ListItem<T>>> tuple, String input) =>
-      new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
-        ..item1 = tuple.item1
-        ..item2 = tuple.item2
-        ..item3 = input
+      new SerializableTuple3Immutable<bool, Iterable<ListItem<T>>, String>(
+          item1: tuple.item1,
+          item2: tuple.item2,
+          item3: input
+      )
     );
   }
 
   @override
-  void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple3<bool, Iterable<Entity>, String> tuple = entity as SerializableTuple3<bool, Iterable<Entity>, String>;
+  void receiveState(Comparable<dynamic> entity, StatePhase phase) {
+    final SerializableTuple3<bool, Iterable<Comparable<dynamic>>, String> tuple = entity as SerializableTuple3<bool, Iterable<Comparable<dynamic>>, String>;
 
     if (phase == StatePhase.REPLAY) _focus$ctrl.add(true);
 
@@ -155,9 +155,10 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       _input$ctrl.add(tuple.item3);
     }
 
-    super.receiveState(new SerializableTuple2<bool, List<Entity>>()
-      ..item1 = tuple.item1
-      ..item2 = tuple.item2, phase);
+    super.receiveState(new SerializableTuple2Immutable<bool, List<Comparable<dynamic>>>(
+        item1: tuple.item1,
+        item2: tuple.item2
+    ), phase);
   }
 
   @override

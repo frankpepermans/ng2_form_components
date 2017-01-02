@@ -10,13 +10,11 @@ dependencies:
   dart_to_js_script_rewriter: ^0.1.0
   rxdart: any
   tuple: any
-  dorm: any
   ng2_state:
     git: git@github.com:frankpepermans/ng2_state.git
 dev_dependencies:
   faker: any
 transformers:
-- dorm/src/code_transform/meta_transformer
 - angular2:
     platform_directives:
     - 'package:angular2/common.dart#COMMON_DIRECTIVES'

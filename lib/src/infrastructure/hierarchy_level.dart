@@ -1,29 +1,8 @@
 library domain.hierarchy_level;
 
-import 'package:dorm/dorm.dart';
-
-@Ref('domain.hierarchy_level')
-class HierarchyLevel extends Entity implements Comparable<HierarchyLevel> {
-
-  @override String get refClassName => 'domain.hierarchy_level';
-
-  @Property(LABEL_SYMBOL, 'label', String, 'label')
-  @Id('')
-  static const String LABEL = 'label';
-  static const Symbol LABEL_SYMBOL = const Symbol('domain.hierarchy_level.label');
-
+class HierarchyLevel implements Comparable<HierarchyLevel> {
   String label;
-
-  @Property(CHILDREN_SYMBOL, 'children', List, 'children')
-  @Transient()
-  static const String CHILDREN = 'children';
-  static const Symbol CHILDREN_SYMBOL = const Symbol('domain.hierarchy_level.children');
-
   List<HierarchyLevel> children;
-
-  HierarchyLevel() : super();
-
-  static HierarchyLevel construct() => new HierarchyLevel();
 
   @override int compareTo(HierarchyLevel other) {
     if (other != null) return (other.label.compareTo(label) == 0) ? 0 : 1;
@@ -31,4 +10,8 @@ class HierarchyLevel extends Entity implements Comparable<HierarchyLevel> {
     return -1;
   }
 
+  Map<String, dynamic> toJson() => <String, dynamic>{
+    'label': label,
+    'children': children
+  };
 }
