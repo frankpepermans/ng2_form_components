@@ -220,13 +220,13 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   void _initStreams() {
     final Element element = _contentElement.nativeElement as Element;
 
-    _contentSubscription = new rx.Observable<String>.combineLatest(<Stream<dynamic>>[
+    _contentSubscription = rx.Observable.combineTwoLatest(
       rx.observable(_content$ctrl.stream)
-        .startWith(<String>[model])
+        .startWith(model)
         .distinct(),
       rx.observable(_interceptorChanged$ctrl.stream)
-        .startWith(const <bool>[false])
-    ], (String newContent, _) => newContent)
+        .startWith(false)
+    , (String newContent, _) => newContent)
       .listen((String newContent) {
         _setInnerHtml(newContent);
 

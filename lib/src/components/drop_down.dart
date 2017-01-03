@@ -148,15 +148,15 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
+  @override Stream<Entity> provideState() => rx.Observable.combineTwoLatest(
       rx.observable(_selectedItems$ctrl.stream)
-        .startWith(<Iterable<ListItem<T>>>[selectedItems]),
+          .startWith(selectedItems),
       rx.observable(_openClose$ctrl.stream)
-        .startWith(<bool>[isOpen])
-        .distinct((bool vA, bool vB) => vA == vB)
-    ], (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
-      ..item1 = isOpen
-      ..item2 = items);
+          .startWith(isOpen)
+          .distinct((bool vA, bool vB) => vA == vB)
+      , (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
+    ..item1 = isOpen
+    ..item2 = items);
 
   @override void receiveState(Entity entity, StatePhase phase) {
     final SerializableTuple2<bool, Iterable<Entity>> tuple = entity as SerializableTuple2<bool, Iterable<Entity>>;
@@ -238,10 +238,10 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = new rx.Observable<Tuple2<String, Iterable<ListItem<T>>>>.combineLatest(<Stream<dynamic>>[
-      rx.observable(_headerLabel$ctrl.stream).startWith(const <String>['']),
-      rx.observable(_selectedItems$ctrl.stream).startWith(const [const []])
-    ], (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
+    _currentHeaderLabelSubscription = rx.Observable.combineTwoLatest(
+      rx.observable(_headerLabel$ctrl.stream).startWith(''),
+      rx.observable(_selectedItems$ctrl.stream).startWith(const [])
+    , (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
     .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
       if (updateHeaderLabelWithSelection && tuple.item2 != null && tuple.item2.isNotEmpty) {
         if (tuple.item2.length == 1) {
@@ -283,13 +283,13 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
         }
       });
 
-    _selectedItemsSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest(<Stream<dynamic>>[
+    _selectedItemsSubscription = rx.Observable.combineTwoLatest(
       rx.observable(_openClose$ctrl.stream)
-        .startWith(<bool>[isOpen])
+        .startWith(isOpen)
         .distinct((bool vA, bool vB) => vA == vB)
         .flatMapLatest(_awaitCloseAnimation),
-      rx.observable(_selectedItems$ctrl.stream).startWith(const [const []])
-    ], (bool isOpen, Iterable<ListItem<T>> selectedItems) {
+      rx.observable(_selectedItems$ctrl.stream).startWith(const [])
+    , (bool isOpen, Iterable<ListItem<T>> selectedItems) {
       if (!isOpen) return selectedItems;
 
       return null;

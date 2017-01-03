@@ -51,12 +51,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @Output() Stream<String> get inputValue => _inputValue$ctrl.stream.distinct();
   @Output() Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
   @Output() Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
-  @Output() Stream<bool> get hasValue => new rx.Observable<bool>.combineLatest(<Stream<String>>[
+  @Output() Stream<bool> get hasValue => rx.Observable.combineTwoLatest(
       rx.observable(_value$ctrl.stream)
-        .startWith(const <String>['']),
+        .startWith(''),
       rx.observable(inputValue)
-        .startWith(const <String>[null])
-    ], (String a, String b) {
+        .startWith(null)
+    , (String a, String b) {
       if (b == null) return a.trim().isNotEmpty;
 
       return b.trim().isNotEmpty;
@@ -150,10 +150,10 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _valueSubscription = _value$ctrl.stream
       .listen((String value) => setState(() => startValue = value));
 
-    _inputTypeSubscription = new rx.Observable<String>.combineLatest(<Stream<String>>[
+    _inputTypeSubscription = rx.Observable.combineTwoLatest(
       _inputType$ctrl.stream,
       _inputValue$ctrl.stream
-      ], (String inputType, String inputValue) {print('here');
+      , (String inputType, String inputValue) {print('here');
         if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') return inputValue;
         else if (inputType == 'date') {
           if (inputValue != null) {

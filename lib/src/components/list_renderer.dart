@@ -381,11 +381,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       setState(() => internalSelectedItems = items);
     });
 
-    _selectedItems$ = new rx.Observable<List<ListItem<T>>>.zip(<Stream<dynamic>>[
+    _selectedItems$ = rx.Observable.zipTwo(
       _incomingSelection$ctrl.stream,
       rx.observable(_selectedItems$ctrl.stream)
-        .startWith(<List<ListItem<T>>>[internalSelectedItems as List<ListItem<T>>])
-    ], (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
+        .startWith(internalSelectedItems as List<ListItem<T>>)
+    , (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
       if (incoming == null) return new List<ListItem<T>>.unmodifiable(const []);
 
       List<ListItem<T>> newList = currentList.toList(growable: true);
@@ -403,10 +403,10 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       return new List<ListItem<T>>.unmodifiable(newList);
     }, asBroadcastStream: true);
 
-    _clearSelectionSubscription = new rx.Observable<Iterable<ListItem<T>>>.combineLatest(<Stream<dynamic>>[
+    _clearSelectionSubscription = rx.Observable.combineTwoLatest(
       _clearSelection$ctrl.stream,
-      _selectedItems$.startWith(const [const []])
-    ], (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
+      _selectedItems$.startWith(const [])
+    , (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
       .where((Iterable<ListItem<T>> items) => items.isNotEmpty)
       .listen((Iterable<ListItem<T>> items) => items.forEach(_incomingSelection$ctrl.add));
 
@@ -433,11 +433,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _itemRendererEventSubscription = _itemRendererEvent$ctrl.stream
       .listen(_handleItemRendererEvent);
 
-    _dropEffectSubscription = new rx.Observable<ItemRendererEvent<int, Comparable<dynamic>>>.combineLatest(<Stream<dynamic>>[
+    _dropEffectSubscription = rx.Observable.combineThreeLatest(
       _dataProvider$ctrl.stream,
       _dropEffect$ctrl.stream,
       _domChange$ctrl.stream
-    ], (_, ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent, __) => dropEffectEvent)
+    , (_, ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent, __) => dropEffectEvent)
       .listen(listRendererService.triggerEvent);
 
     observer = new MutationObserver(notifyDomChanged)

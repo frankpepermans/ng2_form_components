@@ -78,12 +78,12 @@ class DragDrop implements OnDestroy {
   }
 
   void _initStreams() {
-    _initSubscription = new rx.Observable<bool>.combineLatest(<Stream<dynamic>>[
+    _initSubscription = rx.Observable.combineTwoLatest(
       rx.observable(_listItem$ctrl.stream)
-        .startWith(<ListItem<Comparable<dynamic>>>[null]),
+        .startWith(null),
       rx.observable(_handler$ctrl.stream)
-        .startWith(<ListDragDropHandler>[null])
-    ], (ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
+        .startWith(null)
+    , (ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
       if (listItem != null && handler != null) {
         final ListDragDropHandlerType type = dragDropService.typeHandler(listItem);
 

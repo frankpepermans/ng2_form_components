@@ -128,16 +128,16 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   Stream<Entity> provideState() {
     final rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>> superProvider = super.provideState() as rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>;
 
-    return new rx.Observable<SerializableTuple3<bool, Iterable<ListItem<T>>, String>>.combineLatest(<Stream<dynamic>>[
-      superProvider,
-      rx.observable(_input$ctrl.stream)
-        .startWith(const <String>[''])
-        .distinct((String vA, String vB) => vA.compareTo(vB) == 0)
-    ], (SerializableTuple2<bool, Iterable<ListItem<T>>> tuple, String input) =>
-      new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
-        ..item1 = tuple.item1
-        ..item2 = tuple.item2
-        ..item3 = input
+    return rx.Observable.combineTwoLatest(
+        superProvider,
+        rx.observable(_input$ctrl.stream)
+            .startWith('')
+            .distinct((String vA, String vB) => vA.compareTo(vB) == 0)
+        , (SerializableTuple2<bool, Iterable<ListItem<T>>> tuple, String input) =>
+    new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
+      ..item1 = tuple.item1
+      ..item2 = tuple.item2
+      ..item3 = input
     );
   }
 
@@ -248,24 +248,24 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       .debounce(const Duration(milliseconds: 50))
       .where((String input) => input.length >= minCharsRequired);
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream<dynamic>>[
-      rx.observable(_focus$ctrl.stream)
-        .distinct((bool bA, bool bB) => bA == bB)
-        .startWith(const <bool>[false]),
-      rx.observable(_dataProviderChanged$ctrl.stream),
-      rx.observable(selectedItemsChanged)
-        .startWith(<Iterable<ListItem<T>>>[null])
-    ], (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, dataProvider, selectedItems, true), asBroadcastStream: true);
+    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = rx.Observable.combineThreeLatest(
+        rx.observable(_focus$ctrl.stream)
+            .distinct((bool bA, bool bB) => bA == bB)
+            .startWith(false),
+        rx.observable(_dataProviderChanged$ctrl.stream),
+        rx.observable(selectedItemsChanged)
+            .startWith(const [])
+        , (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, dataProvider, selectedItems, true), asBroadcastStream: true);
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.combineLatest(<Stream<dynamic>>[
-      rx.observable(_focus$ctrl.stream)
-        .distinct((bool bA, bool bB) => bA == bB)
-        .startWith(const <bool>[false]),
-      rx.observable(_input$ctrl.stream)
-        .startWith(const <String>[null]),
-      rx.observable(selectedItemsChanged)
-        .startWith(<Iterable<ListItem<T>>>[null])
-    ], (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false), asBroadcastStream: true);
+    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = rx.Observable.combineThreeLatest(
+        rx.observable(_focus$ctrl.stream)
+            .distinct((bool bA, bool bB) => bA == bB)
+            .startWith(false),
+        rx.observable(_input$ctrl.stream)
+            .startWith(null),
+        rx.observable(selectedItemsChanged)
+            .startWith(null)
+        , (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false), asBroadcastStream: true);
 
     final rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> merged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.merge(<Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>>[
       mergedDataProviderChanged$,
