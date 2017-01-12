@@ -11,7 +11,7 @@ import 'list_item.dart' as sup;
 
 class ListItem<T extends Comparable<dynamic>> extends Entity
     with sup.ListItem<T>
-    implements Comparable<ListItem<Comparable<dynamic>>> {
+    implements Comparable<sup.ListItem<Comparable<dynamic>>> {
   /// refClassName
   @override
   String get refClassName =>
@@ -25,6 +25,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
 
   final DormProxy<String> _container =
       new DormProxy<String>(CONTAINER, CONTAINER_SYMBOL);
+  @override
   String get container => _container.value;
   set container(String value) {
     _container.value = value;
@@ -36,6 +37,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       #i112ng2_form_components_lib_src_components_list_item_data;
 
   final DormProxy<T> _data = new DormProxy<T>(DATA, DATA_SYMBOL);
+  @override
   T get data => _data.value;
   set data(T value) {
     _data.value = value;
@@ -48,6 +50,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
 
   final DormProxy<bool> _isAlwaysOpen =
       new DormProxy<bool>(ISALWAYSOPEN, ISALWAYSOPEN_SYMBOL);
+  @override
   bool get isAlwaysOpen => _isAlwaysOpen.value;
   set isAlwaysOpen(bool value) {
     _isAlwaysOpen.value = value;
@@ -60,6 +63,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
 
   final DormProxy<ListItem<T>> _parent =
       new DormProxy<ListItem<T>>(PARENT, PARENT_SYMBOL);
+  @override
   ListItem<T> get parent => _parent.value;
   set parent(ListItem<T> value) {
     _parent.value = value;
@@ -72,6 +76,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
 
   final DormProxy<bool> _selectable =
       new DormProxy<bool>(SELECTABLE, SELECTABLE_SYMBOL);
+  @override
   bool get selectable => _selectable.value;
   set selectable(bool value) {
     _selectable.value = value;
@@ -82,6 +87,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       [String _R, Entity _C()]) {
     _R ??= 'i112ng2_form_components_lib_src_components_list_item';
     _C ??= () => new ListItem<T>();
+    Entity.DO_SCAN(_R, _C);
     Entity.ASSEMBLER.scan(
         _R,
         _C,
@@ -141,6 +147,6 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       _selectable
     ]);
   }
-  static ListItem<T> construct/*<T extends Comparable<dynamic>>*/() =>
+  static ListItem/*<T>*/ construct/*<T extends Comparable<dynamic>>*/() =>
       new ListItem<T>();
 }

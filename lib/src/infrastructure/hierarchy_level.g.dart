@@ -11,7 +11,7 @@ import 'hierarchy_level.dart' as sup;
 
 class HierarchyLevel extends Entity
     with sup.HierarchyLevel
-    implements Comparable<HierarchyLevel> {
+    implements Comparable<dynamic> {
   /// refClassName
   @override
   String get refClassName =>
@@ -25,6 +25,7 @@ class HierarchyLevel extends Entity
 
   final DormProxy<List<HierarchyLevel>> _children =
       new DormProxy<List<HierarchyLevel>>(CHILDREN, CHILDREN_SYMBOL);
+  @override
   List<HierarchyLevel> get children => _children.value;
   set children(List<HierarchyLevel> value) {
     _children.value = value;
@@ -36,6 +37,7 @@ class HierarchyLevel extends Entity
       #i112ng2_form_components_lib_src_infrastructure_hierarchy_level_label;
 
   final DormProxy<String> _label = new DormProxy<String>(LABEL, LABEL_SYMBOL);
+  @override
   String get label => _label.value;
   set label(String value) {
     _label.value = value;
@@ -45,6 +47,7 @@ class HierarchyLevel extends Entity
   static void DO_SCAN /**/ ([String _R, Entity _C()]) {
     _R ??= 'i112ng2_form_components_lib_src_infrastructure_hierarchy_level';
     _C ??= () => new HierarchyLevel();
+    Entity.DO_SCAN(_R, _C);
     Entity.ASSEMBLER.scan(
         _R,
         _C,
@@ -76,5 +79,5 @@ class HierarchyLevel extends Entity
     Entity.ASSEMBLER
         .registerProxies(this, <DormProxy<dynamic>>[_children, _label]);
   }
-  static HierarchyLevel construct /**/ () => new HierarchyLevel();
+  static HierarchyLevel /**/ construct /**/ () => new HierarchyLevel();
 }

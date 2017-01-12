@@ -3,7 +3,7 @@ library ng2_form_components.domain.list_item;
 import 'package:dorm/dorm.dart';
 
 @dorm
-abstract class ListItem<T extends Comparable<dynamic>> extends Entity implements Comparable<ListItem<Comparable<dynamic>>> {
+abstract class ListItem<T extends Comparable<dynamic>> implements Entity, Comparable<ListItem<Comparable<dynamic>>> {
 
   T get data;
   @DefaultValue('')
