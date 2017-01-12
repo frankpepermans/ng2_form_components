@@ -5,7 +5,7 @@ import 'dart:html';
 import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
-import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
+import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent;
 

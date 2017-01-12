@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:ng2_form_components/src/components/list_renderer.dart';
 
-import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
+import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
 
 class ListRendererService {
 

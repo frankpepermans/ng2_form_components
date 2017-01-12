@@ -2,7 +2,7 @@ library ng2_form_components.infrastructure.drag_drop_service;
 
 import 'package:angular2/angular2.dart';
 
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
 

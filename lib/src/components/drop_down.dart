@@ -12,7 +12,7 @@ import 'package:angular2/angular2.dart';
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/list_renderer.dart';
 import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.dart';
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart';
 
@@ -37,31 +37,31 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   LabelHandler _labelHandler;
   LabelHandler get labelHandler => _labelHandler;
   @Input() set labelHandler(LabelHandler value) {
-    _labelHandler = value;
+    setState(() => _labelHandler = value);
   }
 
   Iterable<ListItem<T>> _dataProvider;
   Iterable<ListItem<T>> get dataProvider => _dataProvider;
   @Input() set dataProvider(Iterable<ListItem<T>> value) {
-    _dataProvider = value;
+    setState(() => _dataProvider = value);
   }
 
   bool _updateHeaderLabelWithSelection = true;
   bool get updateHeaderLabelWithSelection => _updateHeaderLabelWithSelection;
   @Input() set updateHeaderLabelWithSelection(bool value) {
-    _updateHeaderLabelWithSelection = value;
+    setState(() => _updateHeaderLabelWithSelection = value);
   }
 
   Iterable<ListItem<T>> _selectedItems = <ListItem<T>>[];
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
   @Input() set selectedItems(Iterable<ListItem<T>> value) {
-    _selectedItems = value;
+    setState(() => _selectedItems = value);
   }
 
   String _headerLabel;
   String get headerLabel => _headerLabel;
   @Input() set headerLabel(String value) {
-    _headerLabel = value;
+    setState(() => _headerLabel = value);
   }
 
   String _className = 'ng2-form-components-drop-down';
@@ -77,25 +77,25 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
   @Input() set allowMultiSelection(bool value) {
-    _allowMultiSelection = value;
+    setState(() => _allowMultiSelection = value);
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
   @Input() set childOffset(int value) {
-    _childOffset = value;
+    setState(() => _childOffset = value);
   }
 
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input() set resolveRendererHandler(ResolveRendererHandler value) {
-    _resolveRendererHandler = value;
+    setState(() => _resolveRendererHandler = value);
   }
 
   Function _defaultHandler;
   Function get defaultHandler => _defaultHandler;
   @Input() set defaultHandler(Function value) {
-    _defaultHandler = value;
+    setState(() => _defaultHandler = value);
   }
 
   @Input() bool resetAfterSelection = false;

@@ -12,7 +12,7 @@ import 'package:angular2/angular2.dart';
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
 import 'package:ng2_form_components/src/components/internal/drag_drop_list_item_renderer.dart' show DragDropListItemRenderer;
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 
 import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.dart' show DefaultListItemRenderer;
 
@@ -74,25 +74,25 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   LabelHandler _labelHandler;
   LabelHandler get labelHandler => _labelHandler;
   @Input() set labelHandler(LabelHandler value) {
-    _labelHandler = value;
+    setState(() => _labelHandler = value);
   }
 
   ListDragDropHandler _dragDropHandler;
   ListDragDropHandler get dragDropHandler => _dragDropHandler;
   @Input() set dragDropHandler(ListDragDropHandler value) {
-    _dragDropHandler = value;
+    setState(() => _dragDropHandler = value);
   }
 
   NgForTracker _ngForTracker;
   NgForTracker get ngForTracker => _ngForTracker;
   @Input() set ngForTracker(NgForTracker value) {
-    _ngForTracker = value;
+    setState(() => _ngForTracker = value);
   }
 
   ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input() set resolveRendererHandler(ResolveRendererHandler value) {
-    _resolveRendererHandler = value;
+    setState(() => _resolveRendererHandler = value);
   }
 
   List<ListItem<T>> _dataProvider = <ListItem<T>>[];
@@ -104,37 +104,37 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   List<ListItem<T>> _selectedItems = <ListItem<T>>[];
   List<ListItem<T>> get selectedItems => _selectedItems;
   @Input() set selectedItems(List<ListItem<T>> value) {
-    _selectedItems = value;
+    setState(() => _selectedItems = value);
   }
 
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
   @Input() set allowMultiSelection(bool value) {
-    _allowMultiSelection = value;
+    setState(() => _allowMultiSelection = value);
   }
 
   bool _moveSelectionOnTop = false;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
   @Input() set moveSelectionOnTop(bool value) {
-    _moveSelectionOnTop = value;
+    setState(() => _moveSelectionOnTop = value);
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
   @Input() set childOffset(int value) {
-    _childOffset = value;
+    setState(() => _childOffset = value);
   }
 
   List<ListRendererEvent<dynamic, Comparable<dynamic>>> _rendererEvents;
   List<ListRendererEvent<dynamic, Comparable<dynamic>>> get rendererEvents => _rendererEvents;
   @Input() set rendererEvents(List<ListRendererEvent<dynamic, Comparable<dynamic>>> value) {
-    _rendererEvents = value;
+    setState(() => _rendererEvents = value);
   }
 
   int _pageOffset = 0;
   int get pageOffset => _pageOffset;
   @Input() set pageOffset(int value) {
-    _pageOffset = value;
+    setState(() => _pageOffset = value);
   }
 
   String _className = 'ng2-form-components-list-renderer';
@@ -150,7 +150,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   @Input() set listRendererService(ListRendererService value) {
     if (_listRendererService != null) _listRendererService.close();
 
-    _listRendererService = value;
+    setState(() => _listRendererService = value);
   }
 
   //-----------------------------

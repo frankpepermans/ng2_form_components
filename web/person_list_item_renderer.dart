@@ -6,7 +6,7 @@ import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_i
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService;
 

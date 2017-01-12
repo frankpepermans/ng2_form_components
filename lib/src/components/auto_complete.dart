@@ -12,7 +12,7 @@ import 'package:angular2/angular2.dart';
 import 'package:ng2_form_components/src/components/drop_down.dart';
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/list_renderer.dart';
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 
 import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, SerializableTuple3, StatePhase, StateService, StatefulComponent;
@@ -68,13 +68,13 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   bool _moveSelectionOnTop = true;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
   @Input() set moveSelectionOnTop(bool value) {
-    _moveSelectionOnTop = value;
+    setState(() => _moveSelectionOnTop = value);
   }
 
   int _minCharsRequired = 3;
   int get minCharsRequired => _minCharsRequired;
   @Input() set minCharsRequired(int value) {
-    _minCharsRequired = value;
+    setState(() => _minCharsRequired = value);
   }
 
   //-----------------------------

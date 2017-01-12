@@ -1,6 +1,6 @@
 library ng2_form_components;
 
-export 'package:ng2_form_components/src/components/list_item.dart'
+export 'package:ng2_form_components/src/components/list_item.g.dart'
     show ListItem;
 
 export 'src/components/internal/form_component.dart'
@@ -63,7 +63,7 @@ export 'src/components/form_input.dart'
 export 'src/infrastructure/list_renderer_service.dart'
     show ListRendererService, ItemRendererEvent, ListRendererEvent;
 
-export 'src/infrastructure/hierarchy_level.dart'
+export 'src/infrastructure/hierarchy_level.g.dart'
     show HierarchyLevel;
 
 export 'src/utils/window_listeners.dart'

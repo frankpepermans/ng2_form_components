@@ -14,13 +14,21 @@ dependencies:
   ng2_state:
     git: git@github.com:frankpepermans/ng2_state.git
 dev_dependencies:
+  build_runner: '>=0.1.0'
+  source_gen: '>=0.5.0'
   faker: any
+dependency_overrides:
+  build: '^0.6.0'
 transformers:
-- dorm/src/code_transform/meta_transformer
-- angular2:
-    platform_directives:
-    - 'package:angular2/common.dart#COMMON_DIRECTIVES'
-    platform_pipes:
-    - 'package:angular2/common.dart#COMMON_PIPES'
-    entry_points: web/main.dart
-- dart_to_js_script_rewriter
+  - angular2:
+      platform_directives:
+      - 'package:angular2/common.dart#COMMON_DIRECTIVES'
+      platform_pipes:
+      - 'package:angular2/common.dart#COMMON_PIPES'
+      entry_points: web/main.dart
+  - angular2/transform/reflection_remover:
+      $include:
+        - web/main.dart
+        - web/orm_init.dart
+        - lib/src/src/common/common_directives.dart
+  - dart_to_js_script_rewriter

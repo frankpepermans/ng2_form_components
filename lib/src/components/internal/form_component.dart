@@ -6,7 +6,7 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_state/ng2_state.dart';
 
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 
 typedef dynamic LabelHandler(dynamic data);
 
@@ -26,7 +26,9 @@ abstract class FormComponent<T extends Comparable<dynamic>> extends ComponentSta
   // constructor
   //-----------------------------
 
-  FormComponent(this.elementRef);
+  FormComponent(this.elementRef) {
+    stateChangeCallback = () {};
+  }
 
   //-----------------------------
   // static internal properties

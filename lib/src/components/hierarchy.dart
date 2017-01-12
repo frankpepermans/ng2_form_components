@@ -15,7 +15,7 @@ import 'package:ng2_form_components/src/components/internal/list_item_renderer.d
 import 'package:ng2_form_components/src/components/internal/drag_drop_list_item_renderer.dart' show DragDropListItemRenderer;
 
 import 'package:ng2_form_components/src/components/list_renderer.dart' show ListRenderer, ClearSelectionWhereHandler, NgForTracker;
-import 'package:ng2_form_components/src/components/list_item.dart' show ListItem;
+import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
 
 import 'package:ng2_form_components/src/components/animation/hierarchy_animation.dart' show HierarchyAnimation;
 
@@ -98,25 +98,25 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   int _level = 0;
   int get level => _level;
   @Input() set level(int value) {
-    _level = value;
+    setState(() => _level = value);
   }
 
   bool _autoOpenChildren = false;
   bool get autoOpenChildren => _autoOpenChildren;
   @Input() set autoOpenChildren(bool value) {
-    _autoOpenChildren = value;
+    setState(() => _autoOpenChildren = value);
   }
 
   List<ListItem<Comparable<dynamic>>> _hierarchySelectedItems;
   List<ListItem<Comparable<dynamic>>> get hierarchySelectedItems => _hierarchySelectedItems;
   @Input() set hierarchySelectedItems(List<ListItem<Comparable<dynamic>>> value) {
-    _hierarchySelectedItems = value;
+    setState(() => _hierarchySelectedItems = value);
   }
 
   List<int> _levelsThatBreak = const [];
   List<int> get levelsThatBreak => _levelsThatBreak;
   @Input() set levelsThatBreak(List<int> value) {
-    _levelsThatBreak = value;
+    setState(() => _levelsThatBreak = value);
   }
 
   @override @Input() set ngForTracker(NgForTracker value) {
@@ -126,7 +126,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   ResolveChildrenHandler _resolveChildrenHandler;
   ResolveChildrenHandler get resolveChildrenHandler => _resolveChildrenHandler;
   @Input() set resolveChildrenHandler(ResolveChildrenHandler value) {
-    _resolveChildrenHandler = value;
+    setState(() => _resolveChildrenHandler = value);
   }
 
   bool _allowToggle = false;
@@ -138,7 +138,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   ShouldOpenDiffer _shouldOpenDiffer = (ListItem<Comparable<dynamic>> itemA, ListItem<Comparable<dynamic>> itemB) => itemA.compareTo(itemB) == 0;
   ShouldOpenDiffer get shouldOpenDiffer => _shouldOpenDiffer;
   @Input() set shouldOpenDiffer(ShouldOpenDiffer value) {
-    _shouldOpenDiffer = value;
+    setState(() => _shouldOpenDiffer = value);
   }
 
   @override @Input() set resolveRendererHandler(ResolveRendererHandler value) {

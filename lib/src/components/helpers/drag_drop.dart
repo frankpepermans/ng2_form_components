@@ -8,7 +8,7 @@ import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
 import 'package:dorm/dorm.dart';
 
-import 'package:ng2_form_components/src/components/list_item.dart';
+import 'package:ng2_form_components/src/components/list_item.g.dart';
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
 
 import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
