@@ -48,30 +48,22 @@ class HierarchyLevel extends Entity
     _R ??= 'i112ng2_form_components_lib_src_infrastructure_hierarchy_level';
     _C ??= () => new HierarchyLevel();
     Entity.DO_SCAN(_R, _C);
-    Entity.ASSEMBLER.scan(
-        _R,
-        _C,
-        const <Map<String, dynamic>>[
-          const <String, dynamic>{
-            'symbol': HierarchyLevel.CHILDREN_SYMBOL,
-            'name': 'children',
-            'type': List,
-            'typeStaticStr': 'List<HierarchyLevel>',
-            'metatags': const <dynamic>[
-              const Transient(),
-            ]
-          },
-          const <String, dynamic>{
-            'symbol': HierarchyLevel.LABEL_SYMBOL,
-            'name': 'label',
-            'type': String,
-            'typeStaticStr': 'String',
-            'metatags': const <dynamic>[
-              const Id(''),
-            ]
-          },
-        ],
-        true);
+    Entity.ASSEMBLER.scan(_R, _C, const <PropertyData>[
+      const PropertyData(
+          symbol: HierarchyLevel.CHILDREN_SYMBOL,
+          name: 'children',
+          type: List,
+          metatags: const <dynamic>[
+            const Transient(),
+          ]),
+      const PropertyData(
+          symbol: HierarchyLevel.LABEL_SYMBOL,
+          name: 'label',
+          type: String,
+          metatags: const <dynamic>[
+            const Id(''),
+          ]),
+    ]);
   }
 
   /// Ctr

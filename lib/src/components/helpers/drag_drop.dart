@@ -216,8 +216,7 @@ class DragDrop implements OnDestroy {
     if (transferDataEncoded.isEmpty) return null;
 
     final EntityFactory<Entity> factory = new EntityFactory<Entity>();
-    final List<dynamic> result = factory.spawn(serializer.incoming(transferDataEncoded), serializer,
-        (Entity serverEntity, Entity clientEntity) => ConflictManager.AcceptClient);
+    final List<dynamic> result = factory.spawn(serializer.incoming(transferDataEncoded), serializer);
 
     return result.first as ListItem<Comparable<dynamic>>;
   }

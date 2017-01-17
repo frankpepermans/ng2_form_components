@@ -88,53 +88,39 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
     _R ??= 'i112ng2_form_components_lib_src_components_list_item';
     _C ??= () => new ListItem<T>();
     Entity.DO_SCAN(_R, _C);
-    Entity.ASSEMBLER.scan(
-        _R,
-        _C,
-        const <Map<String, dynamic>>[
-          const <String, dynamic>{
-            'symbol': ListItem.CONTAINER_SYMBOL,
-            'name': 'container',
-            'type': String,
-            'typeStaticStr': 'String',
-            'metatags': const <dynamic>[
-              const DefaultValue(''),
-            ]
-          },
-          const <String, dynamic>{
-            'symbol': ListItem.DATA_SYMBOL,
-            'name': 'data',
-            'type': dynamic,
-            'typeStaticStr': 'T',
-            'metatags': const <dynamic>[]
-          },
-          const <String, dynamic>{
-            'symbol': ListItem.ISALWAYSOPEN_SYMBOL,
-            'name': 'isAlwaysOpen',
-            'type': bool,
-            'typeStaticStr': 'bool',
-            'metatags': const <dynamic>[
-              const DefaultValue(false),
-            ]
-          },
-          const <String, dynamic>{
-            'symbol': ListItem.PARENT_SYMBOL,
-            'name': 'parent',
-            'type': ListItem,
-            'typeStaticStr': 'ListItem<T>',
-            'metatags': const <dynamic>[]
-          },
-          const <String, dynamic>{
-            'symbol': ListItem.SELECTABLE_SYMBOL,
-            'name': 'selectable',
-            'type': bool,
-            'typeStaticStr': 'bool',
-            'metatags': const <dynamic>[
-              const DefaultValue(true),
-            ]
-          },
-        ],
-        true);
+    Entity.ASSEMBLER.scan(_R, _C, const <PropertyData>[
+      const PropertyData(
+          symbol: ListItem.CONTAINER_SYMBOL,
+          name: 'container',
+          type: String,
+          metatags: const <dynamic>[
+            const DefaultValue(''),
+          ]),
+      const PropertyData(
+          symbol: ListItem.DATA_SYMBOL,
+          name: 'data',
+          type: dynamic,
+          metatags: const <dynamic>[]),
+      const PropertyData(
+          symbol: ListItem.ISALWAYSOPEN_SYMBOL,
+          name: 'isAlwaysOpen',
+          type: bool,
+          metatags: const <dynamic>[
+            const DefaultValue(false),
+          ]),
+      const PropertyData(
+          symbol: ListItem.PARENT_SYMBOL,
+          name: 'parent',
+          type: ListItem,
+          metatags: const <dynamic>[]),
+      const PropertyData(
+          symbol: ListItem.SELECTABLE_SYMBOL,
+          name: 'selectable',
+          type: bool,
+          metatags: const <dynamic>[
+            const DefaultValue(true),
+          ]),
+    ]);
   }
 
   /// Ctr
