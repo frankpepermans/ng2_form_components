@@ -28,7 +28,14 @@ transformers:
       entry_points: web/main.dart
   - angular2/transform/reflection_remover:
       $include:
-        - web/main.dart
-        - web/orm_init.dart
-        - lib/src/src/common/common_directives.dart
+        - lib/src/components/auto_complete.dart
+        - lib/src/components/drop_down.dart
+        - lib/src/components/form_input.dart
+        - lib/src/components/hierarchy.dart
+        - lib/src/components/html_text_transform_component.dart
+        - lib/src/components/html_text_transform_menu.dart
+        - lib/src/components/list_renderer.dart
+        - lib/src/components/side_panel.dart
+        - lib/src/components/text_input.dart
+        - lib/src/components/toaster.dart
   - dart_to_js_script_rewriter
