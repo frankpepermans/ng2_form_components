@@ -195,7 +195,17 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     if (event.keyCode == 10 || event.keyCode == 13) {
       event.preventDefault();
 
-      documentReference.execCommand('insertHTML', false, '<br><br>');
+      Selection selection = window.getSelection();
+
+      if (selection != null) {
+        Range range = selection.getRangeAt(0)
+          ..insertNode(new Element.br())
+          ..collapse(false);
+
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+
     }
   }
 
@@ -292,7 +302,9 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
           fragment.setInnerHtml(element.innerHtml
               .replaceAll(r'<div>', '')
-              .replaceAll(r'</div>', '<br>'), treeSanitizer: NodeTreeSanitizer.trusted);
+              .replaceAll(r'</div>', '<br>'), treeSanitizer: NodeTreeSanitizer.trusted, validator: new NodeValidatorBuilder.common()
+                ..allowTextElements()
+                ..allowImages());
 
           _updateInnerHtmlTrusted(fragment.innerHtml);
         }
