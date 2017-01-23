@@ -27,6 +27,9 @@ export 'src/infrastructure/drag_drop_service.dart'
 export 'src/components/side_panel.dart'
     show SidePanel;
 
+export 'src/components/window.dart'
+    show Window;
+
 export 'src/components/html_text_transform_component.dart'
     show HTMLTextTransformComponent, RangeModifier, ContentInterceptor;
 

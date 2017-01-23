@@ -1,0 +1,7 @@
+<div #header class="window--header">
+    <label class="window--header-label">{{headerText}}</label>
+    <div class="window--header-close" (click)="handleClose()"><i class="fa fa-close"></i></div>
+</div>
+<div class="window--container">
+    <ng-content></ng-content>
+</div>

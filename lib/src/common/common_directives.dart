@@ -12,6 +12,7 @@ export 'package:ng2_form_components/src/components/toaster.dart';
 export 'package:ng2_form_components/src/components/text_input.dart';
 export 'package:ng2_form_components/src/components/side_panel.dart';
 export 'package:ng2_form_components/src/components/form_input.dart';
+export 'package:ng2_form_components/src/components/window.dart';
 
 const List<List<Type>> COMMON_DIRECTIVES = const <List<Type>>[
   COMPONENT_DIRECTIVES
@@ -27,5 +28,6 @@ const List<Type> COMPONENT_DIRECTIVES = const <Type>[
   Toaster,
   TextInput,
   SidePanel,
-  FormInput
+  FormInput,
+  Window
 ];

@@ -1,0 +1,11 @@
+:host {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    height: 500px;
+    left: 20px;
+    top: 20px;
+    border: 1px solid #333;
+    background: #fff;
+}
