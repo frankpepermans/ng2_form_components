@@ -1,7 +1,5 @@
 analyzer:
  strong-mode: true
- exclude:
-     - web/orm_init.dart
 linter:
   rules:
     - always_declare_return_types

@@ -1,6 +1,6 @@
 name: ng2_form_components
 description: Angular 2 stateful form components
-version: 0.0.97
+version: 0.0.98
 environment:
   sdk: '>=1.21.0 <2.0.0'
 dependencies:

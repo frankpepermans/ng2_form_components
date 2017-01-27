@@ -10,7 +10,7 @@ import 'package:ng2_form_components/ng2_form_components.dart';
 import 'package:faker/faker.dart';
 
 import 'person_list_item_renderer.dart';
-import 'person.dart' as domain;
+import 'person.g.dart' as domain;
 
 import 'orm_init.dart' show ormInitialize;
 

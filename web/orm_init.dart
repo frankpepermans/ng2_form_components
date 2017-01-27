@@ -6,7 +6,7 @@ import 'package:dorm/dorm.dart';
 
 import 'package:ng2_form_components/ng2_form_components.dart';
 
-import 'person.dart' as domain;
+import 'person.g.dart' as domain;
 
 void ormInitialize() {
   Entity.ASSEMBLER.usePointers = false;
