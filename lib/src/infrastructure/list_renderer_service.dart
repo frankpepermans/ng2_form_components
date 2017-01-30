@@ -28,12 +28,16 @@ class ListRendererService {
 
   bool removeRenderer(ListRenderer<Comparable<dynamic>> renderer) => renderers.remove(renderer);
 
-  void triggerSelection(ListItem<Comparable<dynamic>> listItem) => _rendererSelection$ctrl.add(listItem);
+  void triggerSelection(ListItem<Comparable<dynamic>> listItem) {
+    if (!_rendererSelection$ctrl.isClosed) _rendererSelection$ctrl.add(listItem);
+  }
 
-  void triggerEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => _event$ctrl.add(event);
+  void triggerEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
+    if (!_event$ctrl.isClosed) _event$ctrl.add(event);
+  }
 
   void respondEvents(List<ListRendererEvent<dynamic, Comparable<dynamic>>> events) {
-    _responder$ctrl.add(events);
+    if (!_responder$ctrl.isClosed) _responder$ctrl.add(events);
 
     lastResponders = events;
   }
@@ -47,12 +51,15 @@ class ListRendererService {
   }
 
   void close() {
-    /*_rendererSelection$ctrl.close();
+    _isOpenChange$ctrl.close();
+    _rendererSelection$ctrl.close();
     _event$ctrl.close();
-    _responder$ctrl.close();*/
+    _responder$ctrl.close();
   }
 
-  void notifyIsOpenChange() => _isOpenChange$ctrl.add(true);
+  void notifyIsOpenChange() {
+    if (!_isOpenChange$ctrl.isClosed) _isOpenChange$ctrl.add(true);
+  }
 }
 
 class ListRendererEvent<T, U extends Comparable<dynamic>> {

@@ -128,7 +128,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   Stream<Entity> provideState() {
     final rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>> superProvider = super.provideState() as rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>;
 
-    return rx.Observable.combineTwoLatest(
+    return rx.Observable.combineLatest2(
         superProvider,
         rx.observable(_input$ctrl.stream)
             .startWith('')
@@ -248,16 +248,16 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       .debounce(const Duration(milliseconds: 50))
       .where((String input) => input.length >= minCharsRequired);
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = rx.Observable.combineThreeLatest(
+    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = rx.Observable.combineLatest3(
         rx.observable(_focus$ctrl.stream)
             .distinct((bool bA, bool bB) => bA == bB)
             .startWith(false),
         rx.observable(_dataProviderChanged$ctrl.stream),
         rx.observable(selectedItemsChanged)
             .startWith(const [])
-        , (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, dataProvider, selectedItems, true), asBroadcastStream: true);
+        , (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, dataProvider, selectedItems, true)).asBroadcastStream();
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = rx.Observable.combineThreeLatest(
+    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = rx.Observable.combineLatest3(
         rx.observable(_focus$ctrl.stream)
             .distinct((bool bA, bool bB) => bA == bB)
             .startWith(false),
@@ -265,12 +265,12 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
             .startWith(null),
         rx.observable(selectedItemsChanged)
             .startWith(null)
-        , (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false), asBroadcastStream: true);
+        , (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false)).asBroadcastStream();
 
     final rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> merged$ = new rx.Observable<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>.merge(<Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>>[
       mergedDataProviderChanged$,
       mergedSelectedItemsChangedChanged$
-    ], asBroadcastStream: true);
+    ]).asBroadcastStream();
 
     _mergedDataProviderChangedSubscription = rx.observable(_inputCriteriaMet$ctrl.stream)
       .distinct((bool bA, bool bB) => bA == bB)

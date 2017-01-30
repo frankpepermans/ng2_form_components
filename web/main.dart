@@ -25,7 +25,7 @@ void main() {
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: const <dynamic>[StateService, const Provider(DragDropService, useClass: NoDragDropService)/*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/],
-    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster]
+    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster, WindowContainer]
 )
 class AppComponent {
 

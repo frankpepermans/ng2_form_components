@@ -230,7 +230,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   void _initStreams() {
     final Element element = _contentElement.nativeElement as Element;
 
-    _contentSubscription = rx.Observable.combineTwoLatest(
+    _contentSubscription = rx.Observable.combineLatest2(
       rx.observable(_content$ctrl.stream)
         .startWith(model)
         .distinct(),
@@ -265,7 +265,8 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       rx.observable(element.onKeyDown)
         .flatMapLatest((_) => documentReference.onKeyUp.take(1)),
       rx.observable(_rangeTrigger$ctrl.stream),
-    ], asBroadcastStream: true)
+    ])
+      .asBroadcastStream()
       .map((_) => window.getSelection())
       .map((Selection selection) {
         if (selection.rangeCount > 0) {

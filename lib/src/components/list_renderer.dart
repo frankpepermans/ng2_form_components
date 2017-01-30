@@ -59,7 +59,7 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransfor
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
-class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit {
+class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, AfterViewInit {
 
   ElementRef _scrollPane;
   ElementRef get scrollPane => _scrollPane;
@@ -105,6 +105,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   List<ListItem<T>> get selectedItems => _selectedItems;
   @Input() set selectedItems(List<ListItem<T>> value) {
     setState(() => _selectedItems = value);
+
+    internalSelectedItems?.forEach(handleSelection);
+    selectedItems?.forEach(handleSelection);
   }
 
   bool _allowMultiSelection = false;
@@ -129,12 +132,20 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   List<ListRendererEvent<dynamic, Comparable<dynamic>>> get rendererEvents => _rendererEvents;
   @Input() set rendererEvents(List<ListRendererEvent<dynamic, Comparable<dynamic>>> value) {
     setState(() => _rendererEvents = value);
+
+    listRendererService?.respondEvents(rendererEvents);
   }
 
   int _pageOffset = 0;
   int get pageOffset => _pageOffset;
   @Input() set pageOffset(int value) {
     setState(() => _pageOffset = value);
+
+    if (value == 0) {
+      scrollPane?.nativeElement?.scrollTop = 0;
+
+      _initScrollPositionStream();
+    }
   }
 
   String _className = 'ng2-form-components-list-renderer';
@@ -145,10 +156,13 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     cssMap = <String, bool>{value: true};
   }
 
+  bool _closeListRendererService = true;
   ListRendererService _listRendererService = new ListRendererService();
   ListRendererService get listRendererService => _listRendererService;
   @Input() set listRendererService(ListRendererService value) {
-    if (_listRendererService != null) _listRendererService.close();
+    _listRendererService?.close();
+
+    if (value != null) _closeListRendererService = false;
 
     setState(() => _listRendererService = value);
   }
@@ -239,39 +253,15 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     }
   }
 
-  @override void ngOnChanges(Map<String, SimpleChange> changes) {
-    //bool doMarkForCheck = false;
-
-    //if (changes.containsKey('dataProvider')) doMarkForCheck = true;
-
-    if (changes.containsKey('selectedItems')) {
-      internalSelectedItems.forEach(handleSelection);
-
-      if (selectedItems != null) selectedItems.forEach(handleSelection);
-
-      //doMarkForCheck = true;
-    }
-
-    if (changes.containsKey('pageOffset')) {
-      if (pageOffset == 0) {
-        if (scrollPane != null) scrollPane.nativeElement.scrollTop = 0;
-
-        _initScrollPositionStream();
-      }
-    }
-
-    if (changes.containsKey('rendererEvents')) listRendererService.respondEvents(rendererEvents);
-
-    //if (doMarkForCheck) changeDetector.markForCheck();
-  }
-
   @override
   void ngOnDestroy() {
     super.ngOnDestroy();
 
     observer.disconnect();
 
-    _listRendererService.close();
+    listRendererService.removeRenderer(this);
+
+    if (_closeListRendererService) _listRendererService.close();
 
     _dataProviderSubscription?.cancel();
     _internalSelectedItemsSubscription?.cancel();
@@ -284,8 +274,6 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _scrollAfterDataProviderSubscription.cancel();
     _itemRendererEventSubscription?.cancel();
     _dropEffectSubscription?.cancel();
-
-    listRendererService.removeRenderer(this);
 
     _selectedItems$ctrl.close();
     _incomingSelection$ctrl.close();
@@ -381,7 +369,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       setState(() => internalSelectedItems = items);
     });
 
-    _selectedItems$ = rx.Observable.zipTwo(
+    _selectedItems$ = rx.Observable.zip2(
       _incomingSelection$ctrl.stream,
       rx.observable(_selectedItems$ctrl.stream)
         .startWith(internalSelectedItems as List<ListItem<T>>)
@@ -401,9 +389,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       }
 
       return new List<ListItem<T>>.unmodifiable(newList);
-    }, asBroadcastStream: true);
+    }).asBroadcastStream();
 
-    _clearSelectionSubscription = rx.Observable.combineTwoLatest(
+    _clearSelectionSubscription = rx.Observable.combineLatest2(
       _clearSelection$ctrl.stream,
       _selectedItems$.startWith(const [])
     , (ClearSelectionWhereHandler handler, List<ListItem<T>> selectedItems) => selectedItems.where(handler))
@@ -433,7 +421,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _itemRendererEventSubscription = _itemRendererEvent$ctrl.stream
       .listen(_handleItemRendererEvent);
 
-    _dropEffectSubscription = rx.Observable.combineThreeLatest(
+    _dropEffectSubscription = rx.Observable.combineLatest3(
       _dataProvider$ctrl.stream,
       _dropEffect$ctrl.stream,
       _domChange$ctrl.stream

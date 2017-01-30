@@ -78,7 +78,7 @@ class DragDrop implements OnDestroy {
   }
 
   void _initStreams() {
-    _initSubscription = rx.Observable.combineTwoLatest(
+    _initSubscription = rx.Observable.combineLatest2(
       rx.observable(_listItem$ctrl.stream)
         .startWith(null),
       rx.observable(_handler$ctrl.stream)
@@ -115,7 +115,7 @@ class DragDrop implements OnDestroy {
         .map((_) => -1),
       element.onDrop
         .map((_) => -1)
-    ], asBroadcastStream: true)
+    ]).asBroadcastStream()
       .scan((int acc, int value, _) => acc + value, 0)
       .map((int result) => result > 0)
       .distinct();

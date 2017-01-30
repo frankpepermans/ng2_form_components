@@ -51,7 +51,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @Output() Stream<String> get inputValue => _inputValue$ctrl.stream.distinct();
   @Output() Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
   @Output() Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
-  @Output() Stream<bool> get hasValue => rx.Observable.combineTwoLatest(
+  @Output() Stream<bool> get hasValue => rx.Observable.combineLatest2(
       rx.observable(_value$ctrl.stream)
         .startWith(''),
       rx.observable(inputValue)
@@ -150,7 +150,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _valueSubscription = _value$ctrl.stream
       .listen((String value) => setState(() => startValue = value));
 
-    _inputTypeSubscription = rx.Observable.combineTwoLatest(
+    _inputTypeSubscription = rx.Observable.combineLatest2(
       _inputType$ctrl.stream,
       _inputValue$ctrl.stream
       , (String inputType, String inputValue) {print('here');

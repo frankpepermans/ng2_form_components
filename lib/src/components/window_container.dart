@@ -8,14 +8,14 @@ import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
 
 @Component(
-    selector: 'window',
-    templateUrl: 'window.html',
-    styleUrls: const <String>['window.css'],
-    providers: const <dynamic>[const Provider(StatefulComponent, useExisting: Window)],
+    selector: 'window-container',
+    templateUrl: 'window_container.html',
+    styleUrls: const <String>['window_container.css'],
+    providers: const <dynamic>[const Provider(StatefulComponent, useExisting: WindowContainer)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
-class Window extends ComponentState implements StatefulComponent, OnDestroy, AfterViewInit {
+class WindowContainer extends ComponentState implements StatefulComponent, OnDestroy, AfterViewInit {
 
   @ViewChild('header') ElementRef headerRef;
 
@@ -40,7 +40,7 @@ class Window extends ComponentState implements StatefulComponent, OnDestroy, Aft
 
   @override String stateGroup, stateId;
 
-  Window(
+  WindowContainer(
       @Inject(ElementRef) this.elementRef);
 
   @override Stream<Entity> provideState() => _dragPosition$ctrl.stream

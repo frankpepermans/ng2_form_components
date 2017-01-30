@@ -148,7 +148,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => rx.Observable.combineTwoLatest(
+  @override Stream<Entity> provideState() => rx.Observable.combineLatest2(
       rx.observable(_selectedItems$ctrl.stream)
           .startWith(selectedItems),
       rx.observable(_openClose$ctrl.stream)
@@ -238,7 +238,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = rx.Observable.combineTwoLatest(
+    _currentHeaderLabelSubscription = rx.Observable.combineLatest2(
       rx.observable(_headerLabel$ctrl.stream).startWith(''),
       rx.observable(_selectedItems$ctrl.stream).startWith(const [])
     , (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
@@ -283,7 +283,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
         }
       });
 
-    _selectedItemsSubscription = rx.Observable.combineTwoLatest(
+    _selectedItemsSubscription = rx.Observable.combineLatest2(
       rx.observable(_openClose$ctrl.stream)
         .startWith(isOpen)
         .distinct((bool vA, bool vB) => vA == vB)
