@@ -1,6 +1,7 @@
 library ng2_form_components.components.html_text_transform_component;
 
 import 'dart:async';
+import 'dart:convert';
 import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
@@ -95,7 +96,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   StreamSubscription<HTMLTextTransformation> _menuSubscription;
   StreamSubscription<KeyboardEvent> _keyboardSubscription;
   StreamSubscription<KeyboardEvent> _noInputOnSelectionSubscription;
-  StreamSubscription<String> _pasteSubscription;
+  StreamSubscription<ClipboardEvent> _pasteSubscription;
   StreamSubscription<Range> _activeRangeSubscription;
   StreamSubscription<String> _contentSubscription;
   StreamSubscription<String> _mutationObserverSubscription;
@@ -295,20 +296,15 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       ..observe(element, characterData: true, subtree: true, characterDataOldValue: true, childList: true, attributes: true);
 
     _pasteSubscription = rx.observable(element.onPaste)
-      .flatMapLatest((_) => _modelTransformation$ctrl.stream)
-      .listen((String value) {
-        if (value != null && value.length > 5 && value.trim().substring(0, 5) == '<div>') {
-          final DocumentFragment fragment = new DocumentFragment();
-          final Element element = _contentElement.nativeElement as Element;
+      .listen((ClipboardEvent event) {
+        final String dataRaw = event.clipboardData.getData('text/plain');
+        final String content = const HtmlEscape().convert(dataRaw)
+            .replaceAll(new RegExp(r'[\r]'), '<BR>')
+            .replaceAll(new RegExp(r'[\n]'), '');
 
-          fragment.setInnerHtml(element.innerHtml
-              .replaceAll(r'<div>', '')
-              .replaceAll(r'</div>', '<br>'), treeSanitizer: NodeTreeSanitizer.trusted, validator: new NodeValidatorBuilder.common()
-                ..allowTextElements()
-                ..allowImages());
+        event.preventDefault();
 
-          _updateInnerHtmlTrusted(fragment.innerHtml);
-        }
+        _updateInnerHtmlTrusted(content);
       });
 
     _range$subscription = _rangeTransform$
