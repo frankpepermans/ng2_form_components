@@ -153,7 +153,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _inputTypeSubscription = rx.Observable.combineLatest2(
       _inputType$ctrl.stream,
       _inputValue$ctrl.stream
-      , (String inputType, String inputValue) {print('here');
+      , (String inputType, String inputValue) {
         if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') return inputValue;
         else if (inputType == 'date') {
           if (inputValue != null) {
