@@ -406,6 +406,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
             .flatMapLatest((_) => new Stream<num>.fromFuture(window.animationFrame))
             .debounce(const Duration(milliseconds: 50)),
           new Stream<dynamic>.periodic(const Duration(milliseconds: 200))
+            .take(1)
         ])
           .take(1)
           .listen((_) {
