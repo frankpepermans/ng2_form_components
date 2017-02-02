@@ -279,7 +279,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
           .where((Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) => tuple.item4 == isCriteriaMet)
           .map((Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(tuple.item1, tuple.item2, tuple.item3, isCriteriaMet)))
       .map(_rebuildMergedDataProvider)
-      .tap((Tuple2<bool, List<ListItem<T>>> tuple) {
+      .call(onData:(Tuple2<bool, List<ListItem<T>>> tuple) {
         mergedDataProvider = tuple.item2;
 
         showLoading = false;

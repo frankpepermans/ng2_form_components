@@ -53,11 +53,11 @@ class Toaster implements OnDestroy {
       .flatMap((_ToastMessage message) => new Stream<num>.fromFuture(window.animationFrame)
         .map((_) => message))
       .flatMap((_ToastMessage message) => message.appear)
-      .tap(messageQueue.add)
-      .tap((_) => changeDetector.markForCheck())
+      .call(onData: messageQueue.add)
+      .call(onData: (_) => changeDetector.markForCheck())
       .flatMap((_ToastMessage message) => message.disappear)
-      .tap(messageQueue.remove)
-      .tap((_ToastMessage message) => message.close())
+      .call(onData: messageQueue.remove)
+      .call(onData: (_ToastMessage message) => message.close())
       .listen((_) => changeDetector.markForCheck());
   }
 

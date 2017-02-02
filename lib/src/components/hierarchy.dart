@@ -332,7 +332,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
       return new Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>>(childHierarchy, new List<Hierarchy<Comparable<dynamic>>>.unmodifiable(clone));
     })
-      .tap((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
+      .call(onData:(Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
       .where((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => tuple.item1.item2)
       .map((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => new Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>(tuple.item1.item1, tuple.item2))
       .flatMap((Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))

@@ -107,7 +107,7 @@ class DragDrop implements OnDestroy {
 
     dragDetection$ = new rx.Observable<int>.merge(<Stream<int>>[
       rx.observable(element.onDragEnter)
-        .tap((_) {
+        .call(onData:(_) {
           heightOnDragEnter = element.client.height;
         })
         .map((_) => 1),
