@@ -1,3 +1,5 @@
+library ng2_form_components.components.window_container;
+
 import 'dart:async';
 import 'dart:html';
 
@@ -12,8 +14,19 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
 @Component(
     selector: 'window-container',
     templateUrl: 'window_container.html',
-    styleUrls: const <String>['window_container.css'],
-    providers: const <dynamic>[const Provider(StatefulComponent, useExisting: WindowContainer)],
+    styles: const <String>['''
+    :host {
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        width: 400px;
+        height: 500px;
+        left: 20px;
+        top: 20px;
+        border: 1px solid #333;
+        background: #fff;
+    }'''],
+    providers: const <Provider>[const Provider(StatefulComponent, useExisting: WindowContainer)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )

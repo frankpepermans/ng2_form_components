@@ -19,15 +19,15 @@ const List<List<Type>> COMMON_DIRECTIVES = const <List<Type>>[
 ];
 
 const List<Type> COMPONENT_DIRECTIVES = const <Type>[
-  ListRenderer,
-  Hierarchy,
-  DropDown,
   AutoComplete,
+  DropDown,
+  FormInput,
+  Hierarchy,
   HTMLTextTransformComponent,
   HTMLTextTransformMenu,
-  Toaster,
-  TextInput,
+  ListRenderer,
   SidePanel,
-  FormInput,
+  TextInput,
+  Toaster,
   WindowContainer
 ];
