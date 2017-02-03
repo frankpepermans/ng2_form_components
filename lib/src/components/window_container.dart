@@ -7,6 +7,8 @@ import 'package:ng2_state/ng2_state.dart';
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
 
+import 'package:ng2_form_components/src/components/internal/form_component.dart';
+
 @Component(
     selector: 'window-container',
     templateUrl: 'window_container.html',
@@ -15,11 +17,10 @@ import 'package:dorm/dorm.dart';
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
-class WindowContainer extends ComponentState implements StatefulComponent, OnDestroy, AfterViewInit {
+class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T> implements StatefulComponent, OnDestroy, AfterViewInit {
 
   @ViewChild('header') ElementRef headerRef;
 
-  final ElementRef elementRef;
   final WindowListeners windowListeners = new WindowListeners();
 
   String _headerText;
@@ -31,17 +32,12 @@ class WindowContainer extends ComponentState implements StatefulComponent, OnDes
   @Output() Stream<bool> get close => _close$ctrl.stream;
 
   final StreamController<bool> _close$ctrl = new StreamController<bool>.broadcast();
-  final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
   final StreamController<_DragPosition> _dragPosition$ctrl = new rx.BehaviourSubject<_DragPosition>.broadcast();
 
   StreamSubscription<_DragPosition> _dragSubscription, _dragCommitSubscription;
 
-  @override Stream<bool> get onDestroy => _onDestroy$ctrl.stream;
-
-  @override String stateGroup, stateId;
-
   WindowContainer(
-      @Inject(ElementRef) this.elementRef);
+      @Inject(ElementRef) ElementRef elementRef) : super(elementRef);
 
   @override Stream<Entity> provideState() => _dragPosition$ctrl.stream
       .distinct((_DragPosition dA, _DragPosition dB) => dA.left == dB.left && dA.top == dB.top)
@@ -56,10 +52,9 @@ class WindowContainer extends ComponentState implements StatefulComponent, OnDes
   }
 
   @override void ngOnDestroy() {
-    _onDestroy$ctrl.add(true);
+    super.ngOnDestroy();
 
     _close$ctrl.close();
-    _onDestroy$ctrl.close();
     _dragPosition$ctrl.close();
 
     _dragSubscription?.cancel();
