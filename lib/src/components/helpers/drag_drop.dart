@@ -40,6 +40,7 @@ class DragDrop implements OnDestroy {
   final StreamController<ListItem<Comparable<dynamic>>> _listItem$ctrl = new StreamController<ListItem<Comparable<dynamic>>>();
   final StreamController<ListDragDropHandler> _handler$ctrl = new StreamController<ListDragDropHandler>();
   final StreamController<DropResult> _onDrop$ctrl = new StreamController<DropResult>.broadcast();
+  final StreamController<bool> _removeAllStyles$ctrl = new StreamController<bool>.broadcast();
 
   StreamSubscription<bool> _initSubscription;
   StreamSubscription<MouseEvent> _dropHandlerSubscription;
@@ -75,16 +76,31 @@ class DragDrop implements OnDestroy {
     _listItem$ctrl.close();
     _handler$ctrl.close();
     _onDrop$ctrl.close();
+    _removeAllStyles$ctrl.close();
   }
 
   void _initStreams() {
-    _initSubscription = rx.Observable.combineLatest2(
+    _initSubscription = rx.Observable.combineLatest3(
       rx.observable(_listItem$ctrl.stream)
         .startWith(null),
       rx.observable(_handler$ctrl.stream)
-        .startWith(null)
-    , (ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
-      if (listItem != null && handler != null) {
+        .startWith(null),
+      rx.observable(_removeAllStyles$ctrl.stream)
+        .startWith(false)
+    , _updateStyles)
+      .listen(null);
+  }
+
+  bool _updateStyles(ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler, bool removeAllStyles) {
+    if (listItem != null && handler != null) {
+      if (removeAllStyles) {
+        final Element element = elementRef.nativeElement;
+
+        helpers.updateElementClasses(element, dragDropService.resolveDropClassName(listItem), false);
+        helpers.updateElementClasses(element, 'ngDragDrop--drop-inside', false);
+        helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--above', false);
+        helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--below', false);
+      } else {
         final ListDragDropHandlerType type = dragDropService.typeHandler(listItem);
 
         if (type != ListDragDropHandlerType.NONE) _setupAsDragDrop(listItem);
@@ -92,10 +108,9 @@ class DragDrop implements OnDestroy {
         if (type == ListDragDropHandlerType.SORT || type == ListDragDropHandlerType.ALL) _createSortHandlers(listItem, handler);
         if (type == ListDragDropHandlerType.SWAP || type == ListDragDropHandlerType.ALL) _createDropHandler(listItem, handler);
       }
+    }
 
-      return true;
-    })
-      .listen((_) {});
+    return true;
   }
 
   void _setupAsDragDrop(ListItem<Comparable<dynamic>> listItem) {
@@ -221,13 +236,7 @@ class DragDrop implements OnDestroy {
     return result.first as ListItem<Comparable<dynamic>>;
   }
 
-  void _removeAllStyles(dynamic _) {
-    final Element element = elementRef.nativeElement;
-
-    helpers.updateElementClasses(element, 'ngDragDrop--drop-inside', false);
-    helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--above', false);
-    helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--below', false);
-  }
+  void _removeAllStyles(dynamic _) => _removeAllStyles$ctrl.add(true);
 
   num _getActualOffsetY(Element element, num clientY) {
     return clientY - element.getBoundingClientRect().top;

@@ -57,7 +57,11 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       rx.observable(inputValue)
         .startWith(null)
     , (String a, String b) {
-      if (b == null) return a.trim().isNotEmpty;
+      if (b == null) {
+        if (a != null) return a.trim().isNotEmpty;
+
+        return false;
+      }
 
       return b.trim().isNotEmpty;
     })
@@ -208,5 +212,4 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   }
 
   void handleBlur(FocusEvent event) => _blurEvent$ctrl.add(event);
-
 }
