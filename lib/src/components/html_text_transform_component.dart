@@ -3,6 +3,7 @@ library ng2_form_components.components.html_text_transform_component;
 import 'dart:async';
 import 'dart:convert';
 import 'dart:html';
+import 'dart:math';
 
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
@@ -34,7 +35,6 @@ typedef String ContentInterceptor(String value);
 class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, OnInit {
 
   final ElementRef element;
-  final HtmlDocument documentReference;
   final HTMLTransform transformer = new HTMLTransform();
   final WindowListeners windowListeners = new WindowListeners();
 
@@ -120,14 +120,13 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   //-----------------------------
 
   HTMLTextTransformComponent(
-    @Inject(ElementRef) ElementRef elementRef,
-    @Inject(DOCUMENT) this.documentReference) :
+    @Inject(ElementRef) ElementRef elementRef) :
       this.element = elementRef,
       super(elementRef) {
     if (!_HAS_MODIFIED_INSERT_LINE_RULE) {
       _HAS_MODIFIED_INSERT_LINE_RULE = true;
 
-      documentReference.execCommand('insertBrOnReturn');
+      document.execCommand('insertBrOnReturn');
     }
   }
 
@@ -244,27 +243,13 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         _contentModifier(null, null);
       });
 
-    _mutationObserverSubscription = rx.observable(_mutationObserver$ctrl.stream)
-      .debounce(const Duration(milliseconds: 80))
-      .listen((String content) {
-        if (!_modelTransformation$ctrl.isClosed) {
-          if (model == null || model.compareTo(contentElement.nativeElement.innerHtml) != 0) {
-            model = contentElement.nativeElement.innerHtml;
-
-            _content$ctrl.add(model);
-
-            _modelTransformation$ctrl.add(model);
-          }
-        }
-      });
-
     _range$ = new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
       element.onMouseDown,
       rx.observable(element.onMouseDown)
-        .flatMapLatest((_) => documentReference.onMouseUp.take(1)),
+        .flatMapLatest((_) => document.onMouseUp.take(1)),
       element.onKeyDown,
       rx.observable(element.onKeyDown)
-        .flatMapLatest((_) => documentReference.onKeyUp.take(1)),
+        .flatMapLatest((_) => document.onKeyUp.take(1)),
       rx.observable(_rangeTrigger$ctrl.stream),
     ])
       .asBroadcastStream()
@@ -308,16 +293,41 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       });
 
     _range$subscription = _rangeTransform$
+      .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) {
+        final Future<dynamic> cancelFuture = _mutationObserverSubscription.cancel();
+
+        if (cancelFuture != null) {
+          return new Stream<dynamic>.fromFuture(cancelFuture.whenComplete(() => _maybeInjectPlaceholderTag(tuple))).map((_) => tuple);
+        }
+
+        _maybeInjectPlaceholderTag(tuple);
+
+        return new rx.Observable<Tuple2<Range, HTMLTextTransformation>>.just(tuple);
+      })
       .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) => new Stream<HTMLTextTransformation>.fromFuture(tuple.item2.setup())
         .map((HTMLTextTransformation transformation) {
-          transformation.owner = tuple.item2;
-          transformation.doRemoveTag = tuple.item2.doRemoveTag;
-          transformation.outerContainer = tuple.item2.outerContainer;
+          transformation?.owner = tuple.item2;
+          transformation?.doRemoveTag = tuple.item2?.doRemoveTag;
 
           return new Tuple2<Range, HTMLTextTransformation>(tuple.item1, transformation);
         }))
-      .where((Tuple2<Range, HTMLTextTransformation> tuple) => tuple.item2 != null)
-      .listen(_transformContent);
+      .listen((Tuple2<Range, HTMLTextTransformation> tuple) {
+        _initMutationObserver();
+
+        if (tuple.item2 != null) {
+          _transformContent(tuple);
+        } else {
+          final String contentWithoutPlaceholder = element.innerHtml
+              .replaceAll('<font face="ng2_fc_trans">', '')
+              .replaceAll('<\/font>', '');
+
+          element.setInnerHtml(contentWithoutPlaceholder, treeSanitizer: NodeTreeSanitizer.trusted);
+
+          _updateInnerHtmlTrusted(contentWithoutPlaceholder);
+
+          _rangeTrigger$ctrl.add(true);
+        }
+      });
 
     _hasRangeSubscription = _range$
       .map(_hasValidRange)
@@ -330,9 +340,29 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
           return event;
         })
-        .takeUntil(documentReference.onMouseUp)
+        .takeUntil(document.onMouseUp)
       )
-      .listen((_) {});
+      .listen(null);
+
+    _initMutationObserver();
+  }
+
+  void _initMutationObserver() {
+    final Element element = _contentElement.nativeElement as Element;
+
+    _mutationObserverSubscription = rx.observable(_mutationObserver$ctrl.stream)
+        .debounce(const Duration(milliseconds: 80))
+        .listen((String content) {
+          if (!_modelTransformation$ctrl.isClosed) {
+            if (model == null || model.compareTo(element.innerHtml) != 0) {
+              model = element.innerHtml;
+
+              _content$ctrl.add(model);
+
+              _modelTransformation$ctrl.add(model);
+            }
+          }
+        });
   }
 
   void _setInnerHtml(String newContent) {
@@ -368,6 +398,40 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     if (!_mutationObserver$ctrl.isClosed) _mutationObserver$ctrl.add(contentElement.nativeElement.innerHtml);
   }
 
+  void _maybeInjectPlaceholderTag(Tuple2<Range, HTMLTextTransformation> tuple) {
+    final String tag = tuple.item2.tag.toLowerCase();
+
+    switch (tag) {
+      case 'b':
+      case 'i':
+      case 'u':
+      case 'ol':
+      case 'ul':
+      case 'justifyleft':
+      case 'justifycenter':
+      case 'justifyright':
+      case 'justifyfull':
+      case 'header':
+      case 'clear':
+      case 'undo':
+      case 'redo':
+        return;
+      default:
+        final DivElement element = contentElement.nativeElement;
+        final bool isEditable = element.contentEditable == 'true';
+
+        if (!isEditable) element.contentEditable = 'true';
+
+        window.getSelection()
+          ..removeAllRanges()
+          ..addRange(tuple.item1);
+
+        document.execCommand('fontName', false, 'ng2_fc_trans');
+
+        if (!isEditable) element.contentEditable = 'false';
+    }
+  }
+
   void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
     final String tag = tuple.item2.tag.toLowerCase();
 
@@ -399,116 +463,22 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       case 'redo':
         _execDocumentCommand('redo'); return;
       default:
-        if ((tuple.item1.startContainer != tuple.item1.endContainer) || (tuple.item1.startOffset != tuple.item1.endOffset)) {
-          _injectCustomTag(tuple);
-          _rangeTrigger$ctrl.add(true);
-        }
+        final DivElement element = _contentElement.nativeElement as DivElement;
+
+        _updateInnerHtmlTrusted(element.innerHtml
+            .replaceAll('<font face="ng2_fc_trans">', _writeOpeningTag(tuple.item2))
+            .replaceAll('<\/font>', _writeClosingTag(tuple.item2)));
+
+        _rangeTrigger$ctrl.add(true);
+
+        return;
     }
   }
 
   void _execDocumentCommand(String command, [bool showUI = null, String value = null]) {
-    documentReference.execCommand(command, showUI, value);
+    document.execCommand(command, showUI, value);
 
     _rangeTrigger$ctrl.add(true);
-  }
-
-  List<Node> _listAllNodes(Node node, {List<Node> allNodes}) {
-    allNodes.add(node);
-
-    node.childNodes.forEach((Node childNode) => _listAllNodes(childNode, allNodes: allNodes));
-
-    return allNodes;
-  }
-
-  void _injectCustomTag(Tuple2<Range, HTMLTextTransformation> tuple) {
-    final StringBuffer buffer = new StringBuffer();
-    final Range range = tuple.item1;
-    final List<Node> allNodes = <Node>[];
-    Node root = range.commonAncestorContainer;
-    bool isRangeModified = false;
-
-    while (root != contentElement.nativeElement) {
-      if (root.parent.text.compareTo(root.text) == 0) root = root.parent;
-      else break;
-    }
-
-    _listAllNodes(root, allNodes: allNodes);
-
-    allNodes.forEach((Node node) {
-      if (node is Element) {
-        String nodeName = node.nodeName.toLowerCase();
-
-        if (nodeName == 'li' || node.attributes.containsKey('editor-wrap-on-selection')) {
-          if (node.contains(range.startContainer)) {
-            range.setStartBefore(node);
-
-            isRangeModified = true;
-          }
-
-          if (node.contains(range.endContainer)) {
-            range.setEndAfter(node);
-
-            isRangeModified = true;
-          }
-
-          if (node == root) {
-            range.setStartBefore(node);
-            range.setEndAfter(node);
-
-            isRangeModified = true;
-          }
-        }
-      }
-    });
-
-    if (isRangeModified) {
-      final Selection selection = window.getSelection();
-
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-
-    final DocumentFragment extractedContent = range.extractContents();
-
-    if (tuple.item2.doRemoveTag) {
-      transformer.removeTransformation(tuple.item2, extractedContent);
-
-      if (tuple.item2.outerContainer != null) {
-        buffer.write('<tmp_tag>');
-        buffer.write(tuple.item2.body != null ? tuple.item2.body : extractedContent.innerHtml);
-        buffer.write('</tmp_tag>');
-      } else {
-        buffer.write(extractedContent.innerHtml);
-      }
-
-      tuple.item2.doRemoveTag = false;
-    } else {
-      buffer.write(_writeOpeningTag(tuple.item2));
-      buffer.write(tuple.item2.body != null ? tuple.item2.body : extractedContent.innerHtml);
-      buffer.write(_writeClosingTag(tuple.item2));
-    }
-
-    range.insertNode(new DocumentFragment.html(buffer.toString(), treeSanitizer: NodeTreeSanitizer.trusted));
-
-    if (tuple.item2.outerContainer != null) {
-      range.selectNode(tuple.item2.outerContainer);
-
-      final DocumentFragment extractedParentContent = range.extractContents();
-      String result = extractedParentContent.innerHtml;
-
-      result = result.replaceFirst(r'<tmp_tag>', _writeClosingTag(tuple.item2));
-      result = result.replaceFirst(r'</tmp_tag>', _writeOpeningTag(tuple.item2));
-
-      tuple.item2.outerContainer = null;
-
-      range.insertNode(new DocumentFragment.html(result, treeSanitizer: NodeTreeSanitizer.trusted));
-    }
-
-    _rangeTrigger$ctrl.add(true);
-
-    /*_modelTransformation$ctrl.stream
-      .take(1)
-      .listen((_) => window.getSelection().removeAllRanges());*/
   }
 
   String _writeOpeningTag(HTMLTextTransformation transformation) {
@@ -597,7 +567,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
           while (currentNode != null && currentNode != this.element.nativeElement) {
             if (transformer.toNodeNameFromElement(currentNode) == tag) {
               transformation.doRemoveTag = true;
-              transformation.outerContainer = currentNode;
 
               break;
             }

@@ -35,15 +35,7 @@ class HTMLTextTransformation {
     if (owner != null) owner.doRemoveTag = value;
   }
 
-  Node _outerContainer;
-  Node get outerContainer => _outerContainer;
-  set outerContainer(Node value) {
-    _outerContainer = value;
-
-    if (owner != null) owner.outerContainer = value;
-  }
-
-  HTMLTextTransformation(String tag, String label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled, bool allowRemove, AsyncTransformation setup, bool doRemoveTag, Node outerContainer, String body}) :
+  HTMLTextTransformation(String tag, String label, {Map<String, String> style, String className, Map<String, String> attributes, String id, bool enabled, bool allowRemove, AsyncTransformation setup, bool doRemoveTag, String body}) :
     this.tag = tag,
     this.label = label,
     this.body = body,
@@ -54,10 +46,9 @@ class HTMLTextTransformation {
     this._enabled = enabled ?? true,
     this.setup = setup ?? (() => new Future<HTMLTextTransformation>.value(new HTMLTextTransformation(
         tag, label, style: style, className: className, attributes: attributes, id: id, enabled: enabled, allowRemove: allowRemove,
-        doRemoveTag: doRemoveTag, outerContainer: outerContainer, body: body
+        doRemoveTag: doRemoveTag, body: body
     ))),
     this.allowRemove = allowRemove ?? true,
-    this._doRemoveTag = doRemoveTag ?? false,
-    this._outerContainer = outerContainer;
+    this._doRemoveTag = doRemoveTag ?? false;
 
 }

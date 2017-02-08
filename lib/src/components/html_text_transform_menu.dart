@@ -1,6 +1,7 @@
 library ng2_form_components.components.html_text_transform_menu;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'package:angular2/angular2.dart';
 import 'package:ng2_form_components/src/components/helpers/html_text_transformation.dart' show HTMLTextTransformation;
@@ -53,7 +54,12 @@ class HTMLTextTransformMenu extends ComponentState implements OnDestroy {
   // template methods
   //-----------------------------
 
-  void triggerButton(HTMLTextTransformation transformationType) => _transformation$ctrl.add(transformationType);
+  void triggerButton(HTMLTextTransformation transformationType, MouseEvent event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    _transformation$ctrl.add(transformationType);
+  }
 
   //-----------------------------
   // inner methods
