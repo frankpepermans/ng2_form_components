@@ -80,6 +80,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   StreamSubscription<String> _inputTypeSubscription;
   StreamSubscription<String> _valueSubscription;
 
+  bool _setFocusRequested = false;
+
   //-----------------------------
   // public properties
   //-----------------------------
@@ -125,6 +127,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
         if (textareaHeight != newValue) setState(() => textareaHeight = newValue);
       });
     }
+
+    if (_setFocusRequested) setFocus();
   }
 
   @override void ngOnDestroy() {
@@ -143,7 +147,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   void setFocus() {
     final Element element = elementRef.nativeElement;
 
-    element.children.first.focus();
+    if (element.children.isNotEmpty) {
+      element.children.first.focus();
+
+      _setFocusRequested = false;
+    }
+    else _setFocusRequested = true;
   }
 
   //-----------------------------

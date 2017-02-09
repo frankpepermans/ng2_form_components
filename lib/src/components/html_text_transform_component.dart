@@ -466,7 +466,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         final DivElement element = _contentElement.nativeElement as DivElement;
 
         _updateInnerHtmlTrusted(element.innerHtml
-            .replaceAll('<font face="ng2_fc_trans">', _writeOpeningTag(tuple.item2))
+            .replaceAllMapped('<font face="ng2_fc_trans">', (Match match) => _writeOpeningTag(tuple.item2))
             .replaceAll('<\/font>', _writeClosingTag(tuple.item2)));
 
         _rangeTrigger$ctrl.add(true);
@@ -481,8 +481,27 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _rangeTrigger$ctrl.add(true);
   }
 
+  String _generateUid() {
+    final StringBuffer buffer = new StringBuffer();
+    final Random rnd = new Random();
+
+    buffer.write(rnd.nextInt(0xfffffff).toRadixString(16));
+    buffer.write('-');
+    buffer.write(rnd.nextInt(0xffff).toRadixString(16));
+    buffer.write('-');
+    buffer.write(rnd.nextInt(0xffff).toRadixString(16));
+    buffer.write('-');
+    buffer.write(rnd.nextInt(0xffff).toRadixString(16));
+    buffer.write('-');
+    buffer.write(rnd.nextInt(0xffffffff).toRadixString(16));
+    buffer.write(rnd.nextInt(0xffff).toRadixString(16));
+
+    return buffer.toString();
+  }
+
   String _writeOpeningTag(HTMLTextTransformation transformation) {
     final StringBuffer buffer = new StringBuffer();
+    final List<String> attributes = <String>['uid="${_generateUid()}"'];
 
     buffer.write('<${transformation.tag}');
 
@@ -499,17 +518,13 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     }
 
     if (transformation.attributes != null) {
-      final List<String> attributes = <String>[];
-
       transformation.attributes.forEach((String K, String V) {
         if (V == null || V.toLowerCase() == 'true') attributes.add(K);
         else attributes.add('$K="$V"');
       });
-
-      buffer.write(' ${attributes.join(' ')}');
     }
 
-    buffer.write('>');
+    buffer.write(' ${attributes.join(' ')}>');
 
     return buffer.toString();
   }
