@@ -289,21 +289,10 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
         event.preventDefault();
 
-        _updateInnerHtmlTrusted(content);
+        document.execCommand('insertHTML', false, content);
       });
 
     _range$subscription = _rangeTransform$
-      .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) {
-        final Future<dynamic> cancelFuture = _mutationObserverSubscription.cancel();
-
-        if (cancelFuture != null) {
-          return new Stream<dynamic>.fromFuture(cancelFuture.whenComplete(() => _maybeInjectPlaceholderTag(tuple))).map((_) => tuple);
-        }
-
-        _maybeInjectPlaceholderTag(tuple);
-
-        return new rx.Observable<Tuple2<Range, HTMLTextTransformation>>.just(tuple);
-      })
       .flatMapLatest((Tuple2<Range, HTMLTextTransformation> tuple) => new Stream<HTMLTextTransformation>.fromFuture(tuple.item2.setup())
         .map((HTMLTextTransformation transformation) {
           transformation?.owner = tuple.item2;
@@ -318,8 +307,8 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
           _transformContent(tuple);
         } else {
           final String contentWithoutPlaceholder = element.innerHtml
-              .replaceAll('<font face="ng2_fc_trans">', '')
-              .replaceAll('<\/font>', '');
+              .replaceAllMapped(new RegExp(r'<mark[\s]+start(|="")><\/mark>'), (Match match) => '')
+              .replaceAll(new RegExp(r'<mark[\s]+end(|="")><\/mark>'), '');
 
           element.setInnerHtml(contentWithoutPlaceholder, treeSanitizer: NodeTreeSanitizer.trusted);
 
@@ -345,6 +334,12 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       .listen(null);
 
     _initMutationObserver();
+  }
+
+  Range _extractSelectionToString(Range forRange) {
+    _rangeToString$ctrl.add(forRange);
+
+    return forRange;
   }
 
   void _initMutationObserver() {
@@ -398,40 +393,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     if (!_mutationObserver$ctrl.isClosed) _mutationObserver$ctrl.add(contentElement.nativeElement.innerHtml);
   }
 
-  void _maybeInjectPlaceholderTag(Tuple2<Range, HTMLTextTransformation> tuple) {
-    final String tag = tuple.item2.tag.toLowerCase();
-
-    switch (tag) {
-      case 'b':
-      case 'i':
-      case 'u':
-      case 'ol':
-      case 'ul':
-      case 'justifyleft':
-      case 'justifycenter':
-      case 'justifyright':
-      case 'justifyfull':
-      case 'header':
-      case 'clear':
-      case 'undo':
-      case 'redo':
-        return;
-      default:
-        final DivElement element = contentElement.nativeElement;
-        final bool isEditable = element.contentEditable == 'true';
-
-        if (!isEditable) element.contentEditable = 'true';
-
-        window.getSelection()
-          ..removeAllRanges()
-          ..addRange(tuple.item1);
-
-        document.execCommand('fontName', false, 'ng2_fc_trans');
-
-        if (!isEditable) element.contentEditable = 'false';
-    }
-  }
-
   void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
     final String tag = tuple.item2.tag.toLowerCase();
 
@@ -463,17 +424,70 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       case 'redo':
         _execDocumentCommand('redo'); return;
       default:
-        final DivElement element = _contentElement.nativeElement as DivElement;
+        final Element customElement = _createCustomNode(tuple.item2);
 
-        _updateInnerHtmlTrusted(element.innerHtml
-            .replaceAllMapped('<font face="ng2_fc_trans">', (Match match) => _writeOpeningTag(tuple.item2))
-            .replaceAll('<\/font>', _writeClosingTag(tuple.item2)));
+        _expandRange(tuple.item1);
+
+        try {
+          tuple.item1.surroundContents(customElement);
+        } catch (error) {
+          final DocumentFragment fragment = tuple.item1.extractContents();
+
+          customElement.append(fragment);
+
+          tuple.item1.collapse(true);
+
+          window.getSelection()
+            ..removeAllRanges()
+            ..addRange(tuple.item1);
+
+          tuple.item1.insertNode(customElement);
+
+          final List<Element> allListElements = new List<Element>()
+              ..addAll(querySelectorAll('span'))
+              ..addAll(querySelectorAll('li'))
+              ..addAll(querySelectorAll('ol'))
+              ..addAll(querySelectorAll('ul'));
+
+          allListElements
+              .where(_isEmptyElement)
+              .forEach((Element element) => element.replaceWith(new DocumentFragment.html('')));
+
+          allListElements
+              .where(_containsPilcrowOnly)
+              .forEach((Element element) => element.replaceWith(element.firstChild));
+        }
 
         _rangeTrigger$ctrl.add(true);
 
         return;
     }
   }
+
+  void _expandRange(Range range) {
+    final DocumentFragment fragment = range.cloneContents();
+    final String selectedText = fragment.text.replaceAll('¶', '');
+
+    Node ancestorNode = range.commonAncestorContainer;
+    Node targetNode;
+
+    while(ancestorNode.text.replaceAll('¶', '').compareTo(selectedText) == 0) {
+      targetNode = ancestorNode;
+      ancestorNode = ancestorNode.parentNode;
+    }
+
+    if (targetNode != null) {
+      range.selectNode(targetNode);
+
+      window.getSelection()
+        ..removeAllRanges()
+        ..addRange(range);
+    }
+  }
+
+  bool _isEmptyElement(Element element) => element.text.trim().isEmpty;
+
+  bool _containsPilcrowOnly(Element element) => element.children.length == 1 && element.firstChild.nodeName.toLowerCase().compareTo('figure') == 0;
 
   void _execDocumentCommand(String command, [bool showUI = null, String value = null]) {
     document.execCommand(command, showUI, value);
@@ -499,42 +513,26 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     return buffer.toString();
   }
 
-  String _writeOpeningTag(HTMLTextTransformation transformation) {
-    final StringBuffer buffer = new StringBuffer();
-    final List<String> attributes = <String>['uid="${_generateUid()}"'];
+  Element _createCustomNode(HTMLTextTransformation transformation) {
+    final Element element = new Element.tag(transformation.tag);
 
-    buffer.write('<${transformation.tag}');
+    element.attributes['uid'] = _generateUid();
 
-    if (transformation.id != null) buffer.write(' id="${transformation.id}"');
-
-    if (transformation.className != null) buffer.write(' class="${transformation.className}"');
+    if (transformation.id != null) element.attributes['id'] = transformation.id;
+    if (transformation.className != null) element.className = transformation.className;
 
     if (transformation.style != null) {
-      final List<String> styleParts = <String>[];
-
-      transformation.style.forEach((String K, String V) => styleParts.add('$K:$V'));
-
-      buffer.write(' style="${styleParts.join(';')}"');
+      transformation.style.forEach((String K, String V) => element.style.setProperty(K, V));
     }
 
     if (transformation.attributes != null) {
       transformation.attributes.forEach((String K, String V) {
-        if (V == null || V.toLowerCase() == 'true') attributes.add(K);
-        else attributes.add('$K="$V"');
+        if (V == null || V.toLowerCase() == 'true') element.attributes[K] = '';
+        else element.attributes[K] = V;
       });
     }
 
-    buffer.write(' ${attributes.join(' ')}>');
-
-    return buffer.toString();
-  }
-
-  String _writeClosingTag(HTMLTextTransformation transformation) => '</${transformation.tag}>';
-
-  Range _extractSelectionToString(Range forRange) {
-    _rangeToString$ctrl.add(forRange);
-
-    return forRange;
+    return element;
   }
 
   Range _resetButtons(Range forRange) {
