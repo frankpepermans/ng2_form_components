@@ -82,6 +82,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   @Output() Stream<bool> get blur => _blurTrigger$ctrl.stream;
   @Output() Stream<bool> get focus => _focusTrigger$ctrl.stream;
   @Output() Stream<Range> get rangeSelection => _activeRange$ctrl.stream;
+  @Output() Stream<bool> get transformationSuccess => _transformationSuccess$ctrl.stream;
 
   //-----------------------------
   // private properties
@@ -112,6 +113,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   final StreamController<Range> _rangeToString$ctrl = new StreamController<Range>();
   final StreamController<String> _content$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _interceptorChanged$ctrl = new StreamController<bool>();
+  final StreamController<bool> _transformationSuccess$ctrl = new StreamController<bool>.broadcast();
 
   MutationObserver _observer;
 
@@ -426,36 +428,39 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       default:
         final Element customElement = _createCustomNode(tuple.item2);
 
-        _expandRange(tuple.item1);
+        if (tuple.item2.shouldExpand) _expandRange(tuple.item1);
 
         try {
           tuple.item1.surroundContents(customElement);
         } catch (error) {
-          final DocumentFragment fragment = tuple.item1.extractContents();
+          if (!tuple.item2.shouldExpand) _transformationSuccess$ctrl.add(false);
+          else {
+            final DocumentFragment fragment = tuple.item1.extractContents();
 
-          customElement.append(fragment);
+            customElement.append(fragment);
 
-          tuple.item1.collapse(true);
+            tuple.item1.collapse(true);
 
-          window.getSelection()
-            ..removeAllRanges()
-            ..addRange(tuple.item1);
+            window.getSelection()
+              ..removeAllRanges()
+              ..addRange(tuple.item1);
 
-          tuple.item1.insertNode(customElement);
+            tuple.item1.insertNode(customElement);
 
-          final List<Element> allListElements = new List<Element>()
+            final List<Element> allListElements = new List<Element>()
               ..addAll(querySelectorAll('span'))
               ..addAll(querySelectorAll('li'))
               ..addAll(querySelectorAll('ol'))
               ..addAll(querySelectorAll('ul'));
 
-          allListElements
-              .where(_isEmptyElement)
-              .forEach((Element element) => element.replaceWith(new DocumentFragment.html('')));
+            allListElements
+                .where(_isEmptyElement)
+                .forEach((Element element) => element.replaceWith(new DocumentFragment.html('')));
 
-          allListElements
-              .where(_containsPilcrowOnly)
-              .forEach((Element element) => element.replaceWith(element.firstChild));
+            allListElements
+                .where(_containsPilcrowOnly)
+                .forEach((Element element) => element.replaceWith(element.firstChild));
+          }
         }
 
         _rangeTrigger$ctrl.add(true);
@@ -466,13 +471,14 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
   void _expandRange(Range range) {
     final DocumentFragment fragment = range.cloneContents();
-    final String selectedText = fragment.text.replaceAll('¶', '');
+    final String selectedText = fragment.text
+        .replaceAll('¶', '');
 
     Node ancestorNode = range.commonAncestorContainer;
     Node targetNode;
 
     while(ancestorNode.text.replaceAll('¶', '').compareTo(selectedText) == 0) {
-      targetNode = ancestorNode;
+      targetNode = ancestorNode;print(ancestorNode.text);
       ancestorNode = ancestorNode.parentNode;
     }
 
