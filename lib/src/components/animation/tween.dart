@@ -10,7 +10,7 @@ import 'package:angular2/angular2.dart';
 )
 class Tween implements OnInit, OnDestroy {
 
-  int _duration = 600;
+  int _duration = 300;
   int get duration => _duration;
   @Input() set duration(int value) {
     _duration = value;

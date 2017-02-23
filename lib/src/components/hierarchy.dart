@@ -61,6 +61,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     forceAnimateOnOpen = false;
 
     _cleanupOpenMap();
+    _cleanUpListeners();
 
     super.dataProvider = value;
   }
@@ -189,14 +190,14 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   StreamSubscription<Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler>> _clearChildHierarchiesSubscription;
   StreamSubscription<Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>> _registerChildHierarchySubscription;
   StreamSubscription<Map<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>> _selectionBuilderSubscription;
-  StreamSubscription<Map<ListItem<T>, bool>> _beforeDestroyChildSubscription;
-  StreamSubscription<int> _onBeforeDestroyChildSubscription;
 
   Stream<List<ListItem<Comparable<dynamic>>>> _selection$;
 
   bool forceAnimateOnOpen = false;
 
   List<ListItem<T>> _receivedSelection;
+
+  final Map<ListItem<T>, StreamSubscription<Tuple2<Map<ListItem<T>, bool>, int>>> _onBeforeDestroyChildSubscriptions = <ListItem<T>, StreamSubscription<Tuple2<Map<ListItem<T>, bool>, int>>>{};
 
   //-----------------------------
   // constructor
@@ -262,24 +263,19 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     if (tuple.item3.isNotEmpty) deliverStateChanges();
   }
 
-  @override Stream<int> ngBeforeDestroyChild([List<dynamic> args]) async* {
+  @override Stream<int> ngBeforeDestroyChild([List<dynamic> args]) {
     final List<int> argsCast = args as List<int>;
-    final Completer<int> completer = new Completer<int>();
 
     beforeDestroyChild.add(argsCast.first);
 
-    _onBeforeDestroyChildSubscription = new rx.Observable<int>.merge(<Stream<int>>[
+    return new rx.Observable<int>.amb(<Stream<int>>[
       beforeDestroyChild.stream
         .where((int index) => index == argsCast.first),
       onDestroy
         .map((_) => 0)
     ])
       .take(1)
-      .listen((_) => completer.complete(argsCast.first));
-
-    await completer.future;
-
-    yield args.first;
+      .map((_) => argsCast.first);
   }
 
   @override void ngOnDestroy() {
@@ -290,8 +286,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     _clearChildHierarchiesSubscription?.cancel();
     _registerChildHierarchySubscription?.cancel();
     _selectionBuilderSubscription?.cancel();
-    _beforeDestroyChildSubscription?.cancel();
-    _onBeforeDestroyChildSubscription?.cancel();
+
+    _cleanUpListeners();
 
     _childHierarchies$ctrl.close();
     _clearChildHierarchies$ctrl.close();
@@ -435,6 +431,63 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     return '${index}_$level';
   }
 
+  Future<Null> autoOpenChildrenNow() {
+    int index = 0;
+
+    return forEachAsync(dataProvider, (ListItem<T> listItem) async {
+      if (!isOpen(listItem)) {
+        await maybeToggleChildren(listItem, index);
+
+        if (subHierarchy != null) await subHierarchy.autoOpenChildrenNow();
+
+        deliverStateChanges();
+      }
+
+      index++;
+
+      return new Future<Null>.value();
+    });
+  }
+
+  Future<Null> autoCloseChildrenNow() {
+    int index = 0;
+
+    return forEachAsync(dataProvider, (ListItem<T> listItem) async {
+      if (isOpen(listItem)) {
+        if (subHierarchy != null) await subHierarchy.autoCloseChildrenNow();
+
+        await maybeToggleChildren(listItem, index);
+
+        deliverStateChanges();
+      }
+
+      index++;
+
+      return new Future<Null>.value();
+    });
+  }
+
+  Future<Null> forEachAsync/*<T>*/(Iterable/*<T>*/ list, Future<dynamic> asyncOperation(/*=T*/ current)) {
+    if (list == null) return new Future<Null>.value();
+
+    final Completer<Null> completer = new Completer<Null>();
+    final int len = list.length;
+    int index = 0;
+
+    void moveNext() {
+      if (index < len) {
+        asyncOperation(list.elementAt(index++))
+            .whenComplete(moveNext);
+      } else {
+        completer.complete();
+      }
+    }
+
+    moveNext();
+
+    return completer.future;
+  }
+
   bool resolveOpenState(ListItem<T> listItem, int index) {
     if (autoOpenChildren && !_isOpenMap.containsKey(listItem)) toggleChildren(listItem, index);
 
@@ -459,13 +512,17 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     return result;
   }
 
-  void maybeToggleChildren(ListItem<T> listItem, int index) {
-    if (!allowToggle) toggleChildren(listItem, index);
+  Future<Null> maybeToggleChildren(ListItem<T> listItem, int index) {
+    if (!allowToggle) return toggleChildren(listItem, index);
+
+    return new Future<Null>.value();
   }
 
-  void toggleChildren(ListItem<T> listItem, int index) {
+  Future<Null> toggleChildren(ListItem<T> listItem, int index) async {
+    final Completer<Null> completer = new Completer<Null>();
     final List<ListItem<T>> openItems = <ListItem<T>>[];
     final Map<ListItem<T>, bool> clone = <ListItem<T>, bool>{};
+    final StreamSubscription<Tuple2<Map<ListItem<T>, bool>, int>> existingSubscription = _onBeforeDestroyChildSubscriptions[listItem];
     ListItem<T> match;
 
     forceAnimateOnOpen = true;
@@ -494,29 +551,41 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     listItemMatch = clone.keys.firstWhere((ListItem<T> item) => item.compareTo(listItem) == 0, orElse: () => null);
 
+    if (existingSubscription != null) await existingSubscription.cancel();
+
     if (listItemMatch != null && clone[listItem]) {
       _isOpenMap = clone;
 
       if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
+
+      completer.complete();
     } else {
-      _beforeDestroyChildSubscription?.cancel();
+      if (resolveChildren(listItem).isEmpty) {
+        _isOpenMap = clone;
 
-      _beforeDestroyChildSubscription = ngBeforeDestroyChild(<int>[index])
-        .where((int i) => i == index)
-        .take(1)
-        .map((_) => clone)
-        .listen((Map<ListItem<T>, bool> clone) {
-          _isOpenMap = clone;
+        if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
 
-          if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
+        completer.complete();
+      } else {
+        _onBeforeDestroyChildSubscriptions[listItem] = ngBeforeDestroyChild(<int>[index])
+            .map((int i) => new Tuple2<Map<ListItem<T>, bool>, int>(clone, i))
+            .listen((Tuple2<Map<ListItem<T>, bool>, int> tuple) {
+          if (tuple.item2 == index) {
+            _isOpenMap = tuple.item1;
 
-          listRendererService.notifyIsOpenChange();
+            if (!_openListItems$Ctrl.isClosed) _openListItems$Ctrl.add(openItems);
 
-          deliverStateChanges();
-        });
+            listRendererService.notifyIsOpenChange();
+
+            deliverStateChanges();
+          }
+        }, onDone: () => completer.complete());
+      }
     }
 
     listRendererService.notifyIsOpenChange();
+
+    return completer.future;
   }
 
   void _cleanupOpenMap() {
@@ -529,6 +598,11 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     removeList.forEach(_isOpenMap.remove);
 
     listRendererService.notifyIsOpenChange();
+  }
+
+  void _cleanUpListeners() {
+    _onBeforeDestroyChildSubscriptions.values.forEach((_) => _.cancel());
+    _onBeforeDestroyChildSubscriptions.clear();
   }
 
   List<ListItem<T>> resolveChildren(ListItem<T> listItem) {

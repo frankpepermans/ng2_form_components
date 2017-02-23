@@ -366,7 +366,14 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _internalSelectedItemsSubscription = _selectedItems$ctrl.stream.listen((Iterable<ListItem<T>> items) {
       listRendererService.respondEvents(<ListRendererEvent<Iterable<ListItem<T>>, Comparable<dynamic>>>[new ListRendererEvent<Iterable<ListItem<T>>, Comparable<dynamic>>('selectionChanged', null, items)]);
 
-      setState(() => internalSelectedItems = items);
+      setState(() {
+        internalSelectedItems = items;
+
+        listRendererService.respondEvents(
+            <ListRendererEvent<T, T>>[
+              new ListRendererEvent<T, T>('selectionChanged', null, null)
+            ]);
+      });
     });
 
     _selectedItems$ = rx.Observable.zip2(
