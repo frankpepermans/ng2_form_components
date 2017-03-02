@@ -221,12 +221,15 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       internalSelectedItemsChanged.startWith(const []),
       rx.observable(_openListItems$Ctrl.stream)
         .where((_) => !autoOpenChildren)
-        .startWith(const [])
     , (Entity scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) =>
       new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
         ..item1 = (scrollPosition as SerializableTuple1<int>)?.item1
         ..item2 = selectedItems
-        ..item3 = openItems).asBroadcastStream();
+        ..item3 = openItems).asBroadcastStream()
+    .startWith(new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
+      ..item1 = 0
+      ..item2 = const []
+      ..item3 = const []);
   }
 
   @override void ngAfterViewInit() {
@@ -256,7 +259,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       listCast2.add(listItem);
     });
 
-    _openListItems$Ctrl.add(listCast2);
+    if (listCast2.isNotEmpty) _openListItems$Ctrl.add(listCast2);
 
     listRendererService.notifyIsOpenChange();
 
@@ -397,12 +400,11 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     if (selectedItems != null && selectedItems.isNotEmpty) {
       if (level == 0) selectedItems.forEach(handleSelection);
       else {
-        new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
+        new rx.Observable<dynamic>.amb(<Stream<dynamic>>[
           rx.observable(_domModified$ctrl.stream)
             .flatMapLatest((_) => new Stream<num>.fromFuture(window.animationFrame))
             .debounce(const Duration(milliseconds: 50)),
           new Stream<dynamic>.periodic(const Duration(milliseconds: 200))
-            .take(1)
         ])
           .take(1)
           .listen((_) {

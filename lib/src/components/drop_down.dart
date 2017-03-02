@@ -187,7 +187,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   @override Stream<bool> ngBeforeDestroyChild([List<dynamic> args]) async* {
     final Completer<bool> completer = new Completer<bool>();
 
-    _beforeDestroyChildSubscription = new rx.Observable<bool>.merge(<Stream<bool>>[
+    _beforeDestroyChildSubscription = new rx.Observable<bool>.amb(<Stream<bool>>[
       beforeDestroyChild.stream
         .where((bool isDone) => isDone),
       onDestroy

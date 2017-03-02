@@ -3,7 +3,7 @@
         <input #searchInput type="text" [placeholder]="headerLabel" (input)="handleInput($event)" (focus)="handleFocus()" [value]="inputValue">
         <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>
         <i *ngIf="showLoading" class="fa fa-spinner fa-spin space-right"></i>
-        <i *ngIf="!showLoading" [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
+        <i *ngIf="!showLoading" [ngClass]="{'fa-chevron-down': !isOpen, 'fa-chevron-up': isOpen}" class="fa drop-down-icon"></i>
     </div>
     <div *ngIf="hasDropDownValues" class="drop-down-list">
         <div tween [beforeDestroyChildTrigger]="beforeDestroyChild" class="mask">

@@ -3,7 +3,7 @@
         <div class="header">
             <span class="header-label">{{currentHeaderLabel}}</span>
             <label *ngIf="selectedItems != null && selectedItems.isNotEmpty" class="num-selected">{{selectedItems.length}}</label>
-            <i [ngClass]="{'fa-caret-down': !isOpen, 'fa-caret-up': isOpen}" class="fa drop-down-icon"></i>
+            <i [ngClass]="{'fa-chevron-down': !isOpen, 'fa-chevron-up': isOpen}" class="fa drop-down-icon"></i>
         </div>
     </div>
     <div *ngIf="isOpen && dataProvider != null && dataProvider.isNotEmpty" class="drop-down-list">
