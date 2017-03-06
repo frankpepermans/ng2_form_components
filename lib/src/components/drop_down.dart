@@ -243,14 +243,19 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
       rx.observable(_selectedItems$ctrl.stream).startWith(const [])
     , (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
     .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
+      Stream<String> returnValue;
+
       if (updateHeaderLabelWithSelection && tuple.item2 != null && tuple.item2.isNotEmpty) {
         if (tuple.item2.length == 1) {
           final dynamic resolvedLabel = labelHandler(tuple.item2.first.data);
 
-          if (resolvedLabel is String) return new Stream<String>.fromIterable(<String>[resolvedLabel]);
-          else return resolvedLabel as Stream<String>;
+          if (resolvedLabel is String) {
+            returnValue = new rx.Observable<String>.just(resolvedLabel);
+          } else {
+            returnValue = resolvedLabel;
+          }
         } else {
-          return rx.observable(new Stream<ListItem<T>>.fromIterable(tuple.item2))
+          returnValue = rx.observable(new Stream<ListItem<T>>.fromIterable(tuple.item2))
             .flatMap((ListItem<T> listItem) {
               final dynamic resolvedLabel = labelHandler(listItem.data);
 
@@ -262,7 +267,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
         }
       }
 
-      return new Stream<String>.fromIterable(<String>[tuple.item1]);
+      returnValue ??= new rx.Observable<String>.just(tuple.item1);
+
+      return returnValue;
     })
     .listen((String headerLabel) {
       if (currentHeaderLabel != headerLabel) setState(() => currentHeaderLabel = headerLabel);
