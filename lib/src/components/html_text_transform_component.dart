@@ -418,7 +418,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       case 'justifyfull':
         _execDocumentCommand('justifyFull'); return;
       case 'header':
-        _execDocumentCommand('fontSize', false, '32px'); return;
+        _execDocumentCommand('fontSize', false, '26px'); return;
       case 'clear':
         _execDocumentCommand('removeFormat'); return;
       case 'undo':
