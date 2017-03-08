@@ -71,7 +71,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
     setState(() => _moveSelectionOnTop = value);
   }
 
-  int _minCharsRequired = 3;
+  int _minCharsRequired = 2;
   int get minCharsRequired => _minCharsRequired;
   @Input() set minCharsRequired(int value) {
     setState(() => _minCharsRequired = value);

@@ -417,56 +417,58 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         _execDocumentCommand('justifyRight'); return;
       case 'justifyfull':
         _execDocumentCommand('justifyFull'); return;
-      case 'header':
-        _execDocumentCommand('fontSize', false, '26px'); return;
+      case 'h1':
+      case 'h2':
+      case 'h3':
+        _removeTagsInRange(tuple.item1, const <String>['h1', 'h2', 'h3']); break;
       case 'clear':
+        _removeTagsInRange(tuple.item1, const <String>['h1', 'h2', 'h3']);
+
         _execDocumentCommand('removeFormat'); return;
       case 'undo':
         _execDocumentCommand('undo'); return;
       case 'redo':
         _execDocumentCommand('redo'); return;
-      default:
-        final Element customElement = _createCustomNode(tuple.item2);
-
-        if (tuple.item2.shouldExpand) _expandRange(tuple.item1);
-
-        try {
-          tuple.item1.surroundContents(customElement);
-        } catch (error) {
-          if (!tuple.item2.shouldExpand) _transformationSuccess$ctrl.add(false);
-          else {
-            final DocumentFragment fragment = tuple.item1.extractContents();
-
-            customElement.append(fragment);
-
-            tuple.item1.collapse(true);
-
-            window.getSelection()
-              ..removeAllRanges()
-              ..addRange(tuple.item1);
-
-            tuple.item1.insertNode(customElement);
-
-            final List<Element> allListElements = new List<Element>()
-              ..addAll(querySelectorAll('span'))
-              ..addAll(querySelectorAll('li'))
-              ..addAll(querySelectorAll('ol'))
-              ..addAll(querySelectorAll('ul'));
-
-            allListElements
-                .where(_isEmptyElement)
-                .forEach((Element element) => element.replaceWith(new DocumentFragment.html('')));
-
-            allListElements
-                .where(_containsPilcrowOnly)
-                .forEach((Element element) => element.replaceWith(element.firstChild));
-          }
-        }
-
-        _rangeTrigger$ctrl.add(true);
-
-        return;
     }
+
+    final Element customElement = _createCustomNode(tuple.item2);
+
+    if (tuple.item2.shouldExpand) _expandRange(tuple.item1);
+
+    try {
+      tuple.item1.surroundContents(customElement);
+    } catch (error) {
+      if (!tuple.item2.shouldExpand) _transformationSuccess$ctrl.add(false);
+      else {
+        final DocumentFragment fragment = tuple.item1.extractContents();
+
+        customElement.append(fragment);
+
+        tuple.item1.collapse(true);
+
+        window.getSelection()
+          ..removeAllRanges()
+          ..addRange(tuple.item1);
+
+        tuple.item1.insertNode(customElement);
+
+        final List<Element> allListElements = new List<Element>()
+          ..addAll(querySelectorAll('span'))
+          ..addAll(querySelectorAll('li'))
+          ..addAll(querySelectorAll('ol'))
+          ..addAll(querySelectorAll('ul'));
+
+        allListElements
+            .where(_isEmptyElement)
+            .forEach((Element element) => element.replaceWith(new DocumentFragment.html('')));
+
+        allListElements
+            .where(_containsPilcrowOnly)
+            .forEach((Element element) => element.replaceWith(element.firstChild));
+      }
+    }
+
+    _rangeTrigger$ctrl.add(true);
   }
 
   void _expandRange(Range range) {
@@ -478,7 +480,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     Node targetNode;
 
     while(ancestorNode.text.replaceAll('¶', '').compareTo(selectedText) == 0) {
-      targetNode = ancestorNode;print(ancestorNode.text);
+      targetNode = ancestorNode;
       ancestorNode = ancestorNode.parentNode;
     }
 
@@ -489,6 +491,28 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         ..removeAllRanges()
         ..addRange(range);
     }
+  }
+
+  void _removeTagsInRange(Range range, List<String> affectedNodes) {
+    _expandRange(range);
+
+    final DocumentFragment fragment = range.cloneContents();
+    String selectedText = fragment.innerHtml;
+
+    affectedNodes
+      .forEach((String nodeName) {
+        selectedText = selectedText.replaceAllMapped(new RegExp('<$nodeName[^>]*>'), ((_) => ''));
+        selectedText = selectedText.replaceAllMapped(new RegExp('</$nodeName[^>]*>'), ((_) => ''));
+      });
+
+    final DocumentFragment textFragment = new DocumentFragment.html(selectedText, treeSanitizer: NodeTreeSanitizer.trusted);
+
+    range.deleteContents();
+    range.insertNode(textFragment);
+
+    window.getSelection()
+      ..removeAllRanges()
+      ..addRange(range);
   }
 
   bool _isEmptyElement(Element element) => element.text.trim().isEmpty;
