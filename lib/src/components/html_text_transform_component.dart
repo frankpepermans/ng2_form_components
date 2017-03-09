@@ -501,8 +501,16 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     affectedNodes
       .forEach((String nodeName) {
-        selectedText = selectedText.replaceAllMapped(new RegExp('<$nodeName[^>]*>'), ((_) => ''));
-        selectedText = selectedText.replaceAllMapped(new RegExp('</$nodeName[^>]*>'), ((_) => ''));
+        final RegExp openingTagRegExp = new RegExp('<$nodeName[^>]*>');
+        final RegExp closingTagRegExp = new RegExp('</$nodeName[^>]*>');
+
+        final Iterable<Match> openingTagMatches = openingTagRegExp.allMatches(selectedText);
+        final Iterable<Match> closingTagMatches = closingTagRegExp.allMatches(selectedText);
+
+        if (openingTagMatches.length == closingTagMatches.length) {
+          selectedText = selectedText.replaceAllMapped(openingTagRegExp, ((_) => ''));
+          selectedText = selectedText.replaceAllMapped(closingTagRegExp, ((_) => ''));
+        }
       });
 
     final DocumentFragment textFragment = new DocumentFragment.html(selectedText, treeSanitizer: NodeTreeSanitizer.trusted);
