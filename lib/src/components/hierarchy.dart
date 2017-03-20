@@ -185,7 +185,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   Map<ListItem<T>, bool> _isOpenMap = <ListItem<T>, bool>{};
 
-  StreamSubscription<bool> _windowMutationListener;
+  StreamSubscription<dynamic> _windowMutationListener;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _eventSubscription;
   StreamSubscription<Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler>> _clearChildHierarchiesSubscription;
   StreamSubscription<Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>> _registerChildHierarchySubscription;
@@ -308,6 +308,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   void _initStreams() {
     _windowMutationListener = domChange$
+      .asyncMap((_) => window.animationFrame)
       .listen(_handleDomChange);
 
     _eventSubscription = rx.observable(_listRendererService$ctrl.stream)
@@ -392,7 +393,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     }
   }
 
-  void _handleDomChange(bool _) {
+  void _handleDomChange(dynamic _) {
     if (!_domModified$ctrl.isClosed) _domModified$ctrl.add(true);
   }
 
@@ -402,7 +403,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       else {
         new rx.Observable<dynamic>.amb(<Stream<dynamic>>[
           rx.observable(_domModified$ctrl.stream)
-            .flatMapLatest((_) => new Stream<num>.fromFuture(window.animationFrame))
+            .asyncMap((_) => window.animationFrame)
             .debounce(const Duration(milliseconds: 50)),
           new Stream<dynamic>.periodic(const Duration(milliseconds: 200))
         ])

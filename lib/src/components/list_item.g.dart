@@ -83,8 +83,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   }
 
   /// DO_SCAN
-  static void DO_SCAN/*<T extends Comparable<dynamic>>*/(
-      [String _R, Entity _C()]) {
+  static void DO_SCAN<T extends Comparable<dynamic>>([String _R, Entity _C()]) {
     _R ??= 'i112ng2_form_components_lib_src_components_list_item';
     _C ??= () => new ListItem<T>();
     Entity.DO_SCAN(_R, _C);
@@ -133,6 +132,6 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       _selectable
     ]);
   }
-  static ListItem/*<T>*/ construct/*<T extends Comparable<dynamic>>*/() =>
-      new ListItem<T>();
+  static ListItem<T>
+      construct<T extends Comparable<dynamic>>() => new ListItem<T>();
 }

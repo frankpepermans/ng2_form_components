@@ -72,5 +72,8 @@ export 'src/infrastructure/hierarchy_level.g.dart'
 export 'src/utils/window_listeners.dart'
     show WindowListeners;
 
+export 'src/utils/mutation_observer_stream.dart'
+    show MutationObserverStream;
+
 export 'src/components/item_renderers/drop_effect_item_renderer.dart'
     show DropEffectItemRenderer;

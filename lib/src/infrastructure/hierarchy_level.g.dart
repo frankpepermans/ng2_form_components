@@ -44,7 +44,7 @@ class HierarchyLevel extends Entity
   }
 
   /// DO_SCAN
-  static void DO_SCAN /**/ ([String _R, Entity _C()]) {
+  static void DO_SCAN([String _R, Entity _C()]) {
     _R ??= 'i112ng2_form_components_lib_src_infrastructure_hierarchy_level';
     _C ??= () => new HierarchyLevel();
     Entity.DO_SCAN(_R, _C);
@@ -71,5 +71,5 @@ class HierarchyLevel extends Entity
     Entity.ASSEMBLER
         .registerProxies(this, <DormProxy<dynamic>>[_children, _label]);
   }
-  static HierarchyLevel /**/ construct /**/ () => new HierarchyLevel();
+  static HierarchyLevel construct() => new HierarchyLevel();
 }

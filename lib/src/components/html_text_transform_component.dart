@@ -20,23 +20,27 @@ import 'package:ng2_form_components/src/components/helpers/html_transform.dart' 
 
 import 'package:ng2_form_components/src/components/html_text_transform_menu.dart' show HTMLTextTransformMenu;
 
-import 'package:ng2_form_components/src/utils/window_listeners.dart' show WindowListeners;
+import 'package:ng2_form_components/src/utils/mutation_observer_stream.dart' show MutationObserverStream;
 
 typedef Range RangeModifier(Range range);
 typedef String ContentInterceptor(String value);
 
 @Component(
-  selector: 'html-text-transform-component',
-  templateUrl: 'html_text_transform_component.html',
-  providers: const <dynamic>[StateService, DOCUMENT, const Provider(StatefulComponent, useExisting: HTMLTextTransformComponent)],
-  changeDetection: ChangeDetectionStrategy.Stateful,
-  preserveWhitespace: false
+    selector: 'html-text-transform-component',
+    templateUrl: 'html_text_transform_component.html',
+    styles: const <String>['''
+    :host {
+      width: 100%
+    }
+    '''],
+    providers: const <dynamic>[StateService, DOCUMENT, const Provider(StatefulComponent, useExisting: HTMLTextTransformComponent)],
+    changeDetection: ChangeDetectionStrategy.Stateful,
+    preserveWhitespace: false
 )
-class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, OnInit {
+class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> implements StatefulComponent, OnDestroy, OnInit, AfterViewInit {
 
   final ElementRef element;
   final HTMLTransform transformer = new HTMLTransform();
-  final WindowListeners windowListeners = new WindowListeners();
 
   ElementRef _contentElement;
   ElementRef get contentElement => _contentElement;
@@ -101,10 +105,10 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   StreamSubscription<Range> _activeRangeSubscription;
   StreamSubscription<String> _contentSubscription;
   StreamSubscription<String> _mutationObserverSubscription;
+  StreamSubscription<dynamic> _documentKeyboardSubscription;
 
   final StreamController<Range> _activeRange$ctrl = new StreamController<Range>.broadcast();
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
-  final StreamController<String> _mutationObserver$ctrl = new StreamController<String>.broadcast();
   final StreamController<String> _modelTransformation$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _hasSelectedRange$ctrl = new StreamController<bool>();
   final StreamController<bool> _rangeTrigger$ctrl = new StreamController<bool>();
@@ -114,8 +118,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   final StreamController<String> _content$ctrl = new StreamController<String>.broadcast();
   final StreamController<bool> _interceptorChanged$ctrl = new StreamController<bool>();
   final StreamController<bool> _transformationSuccess$ctrl = new StreamController<bool>.broadcast();
-
-  MutationObserver _observer;
 
   //-----------------------------
   // Constructor
@@ -157,8 +159,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   @override void ngOnDestroy() {
     super.ngOnDestroy();
 
-    _observer.disconnect();
-
     _activeRangeSubscription?.cancel();
     _range$subscription?.cancel();
     _hasRangeSubscription?.cancel();
@@ -168,6 +168,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _pasteSubscription?.cancel();
     _contentSubscription?.cancel();
     _mutationObserverSubscription?.cancel();
+    _documentKeyboardSubscription?.cancel();
 
     _activeRange$ctrl.close();
     _transformation$ctrl.close();
@@ -178,7 +179,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _focusTrigger$ctrl.close();
     _rangeToString$ctrl.close();
     _content$ctrl.close();
-    _mutationObserver$ctrl.close();
     _interceptorChanged$ctrl.close();
   }
 
@@ -193,19 +193,40 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     }
   }
 
-  void _handleKeyDown(KeyboardEvent event) {
+  Future<Null> _handleKeyDown(KeyboardEvent event) async {
     if (event.keyCode == 10 || event.keyCode == 13) {
       event.preventDefault();
 
       Selection selection = window.getSelection();
 
       if (selection != null) {
-        Range range = selection.getRangeAt(0)
-          ..insertNode(new Element.br())
-          ..collapse(false);
+        final Range range = selection.getRangeAt(0);
+        final Element breakElement = new Element.br();
+        final Node text = new Element.article()
+          ..style.display = 'inline'
+          ..style.fontSize = '0'
+          ..setInnerHtml('_');
+
+        range
+          ..insertNode(breakElement)
+          ..collapse(false)
+          ..insertNode(text);
+
+        range.setStartBefore(text);
+        range.collapse(false);
 
         selection.removeAllRanges();
         selection.addRange(range);
+
+        await window.animationFrame;
+
+        await _documentKeyboardSubscription?.cancel();
+
+        final Element element = _contentElement.nativeElement as Element;
+
+        _documentKeyboardSubscription = new rx.Observable<dynamic>.amb(<Stream<dynamic>>[document.onKeyDown, element.onBlur])
+            .take(1)
+            .listen(null, onDone: text.remove);
       }
 
     }
@@ -239,11 +260,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       rx.observable(_interceptorChanged$ctrl.stream)
         .startWith(false)
     , (String newContent, _) => newContent)
-      .listen((String newContent) {
-        _setInnerHtml(newContent);
-
-        _contentModifier(null, null);
-      });
+      .listen((String newContent) => _setInnerHtml(newContent));
 
     _range$ = new rx.Observable<dynamic>.merge(<Stream<dynamic>>[
       element.onMouseDown,
@@ -279,9 +296,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         .map((HTMLTextTransformation transformationType) => new Tuple2<Range, HTMLTextTransformation>(range, transformationType))
       );
 
-    _observer = new MutationObserver(_contentModifier)
-      ..observe(element, characterData: true, subtree: true, characterDataOldValue: true, childList: true, attributes: true);
-
     _pasteSubscription = rx.observable(element.onPaste)
       .listen((ClipboardEvent event) {
         final String dataRaw = event.clipboardData.getData('text/plain');
@@ -303,8 +317,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
           return new Tuple2<Range, HTMLTextTransformation>(tuple.item1, transformation);
         }))
       .listen((Tuple2<Range, HTMLTextTransformation> tuple) {
-        _initMutationObserver();
-
         if (tuple.item2 != null) {
           _transformContent(tuple);
         } else {
@@ -335,31 +347,31 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       )
       .listen(null);
 
-    _initMutationObserver();
+
+  }
+
+  @override void ngAfterViewInit() {
+    final Element element = _contentElement.nativeElement as Element;
+
+    _mutationObserverSubscription = rx.observable(new MutationObserverStream(element))
+        .skip(1)
+        .where((_) => !_modelTransformation$ctrl.isClosed)
+        .debounce(const Duration(milliseconds: 80))
+        .map((_) => element.innerHtml)
+        .where((String value) => model == null || value != model)
+        .listen((String content) {
+          model = content;
+
+          _content$ctrl.add(content);
+
+          _modelTransformation$ctrl.add(content);
+        });
   }
 
   Range _extractSelectionToString(Range forRange) {
     _rangeToString$ctrl.add(forRange);
 
     return forRange;
-  }
-
-  void _initMutationObserver() {
-    final Element element = _contentElement.nativeElement as Element;
-
-    _mutationObserverSubscription = rx.observable(_mutationObserver$ctrl.stream)
-        .debounce(const Duration(milliseconds: 80))
-        .listen((String content) {
-          if (!_modelTransformation$ctrl.isClosed) {
-            if (model == null || model.compareTo(element.innerHtml) != 0) {
-              model = element.innerHtml;
-
-              _content$ctrl.add(model);
-
-              _modelTransformation$ctrl.add(model);
-            }
-          }
-        });
   }
 
   void _setInnerHtml(String newContent) {
@@ -389,10 +401,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     if (!isOwnRange) return false;
 
     return true;
-  }
-
-  void _contentModifier(List<MutationRecord> records, _) {
-    if (!_mutationObserver$ctrl.isClosed) _mutationObserver$ctrl.add(contentElement.nativeElement.innerHtml);
   }
 
   void _transformContent(Tuple2<Range, HTMLTextTransformation> tuple) {
@@ -479,7 +487,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     Node ancestorNode = range.commonAncestorContainer;
     Node targetNode;
 
-    while(ancestorNode.text.replaceAll('¶', '').compareTo(selectedText) == 0) {
+    while(ancestorNode != contentElement.nativeElement && !_isHtmlList(ancestorNode) && ancestorNode.text.replaceAll('¶', '').compareTo(selectedText) == 0) {
       targetNode = ancestorNode;
       ancestorNode = ancestorNode.parentNode;
     }
@@ -492,6 +500,11 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         ..addRange(range);
     }
   }
+
+  bool _isHtmlList(Node element) => (
+    element is OListElement ||
+    element is UListElement
+  );
 
   void _removeTagsInRange(Range range, List<String> affectedNodes) {
     _expandRange(range);

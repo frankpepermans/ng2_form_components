@@ -38,7 +38,7 @@ class Person extends Entity with sup.Person implements Comparable<dynamic> {
   }
 
   /// DO_SCAN
-  static void DO_SCAN /**/ ([String _R, Entity _C()]) {
+  static void DO_SCAN([String _R, Entity _C()]) {
     _R ??= 'i102ng2_form_components_web_person';
     _C ??= () => new Person();
     Entity.DO_SCAN(_R, _C);
@@ -60,5 +60,5 @@ class Person extends Entity with sup.Person implements Comparable<dynamic> {
   Person() : super() {
     Entity.ASSEMBLER.registerProxies(this, <DormProxy<dynamic>>[_image, _name]);
   }
-  static Person /**/ construct /**/ () => new Person();
+  static Person construct() => new Person();
 }

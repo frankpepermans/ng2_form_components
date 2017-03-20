@@ -3,13 +3,16 @@ library ng2_form_components.utils.window_listeners;
 import 'dart:async';
 import 'dart:html';
 
+import 'package:ng2_form_components/src/utils/mutation_observer_stream.dart';
+
 class WindowListeners {
 
-  Stream<bool> get windowMutation => _windowMutation.stream;
-  Stream<bool> get windowResize => _windowResize.stream;
+  Stream<bool> get windowMutation => new MutationObserverStream(document.body).skip(1);
+  Stream<bool> get windowResize => _maybeConstructResizeListener();
 
-  final StreamController<bool> _windowMutation = new StreamController<bool>.broadcast();
   final StreamController<bool> _windowResize = new StreamController<bool>.broadcast();
+
+  bool _hasResizeListener = false;
 
   static WindowListeners _instance;
 
@@ -21,15 +24,18 @@ class WindowListeners {
     return _instance;
   }
 
-  WindowListeners._internal() {
-    new MutationObserver(_onModified).observe(document, subtree: true, childList: true, attributes: true, characterData: true);
-
-    window.addEventListener('resize', _onWindowResize);
-  }
-
-
-  void _onModified(__, _) => _windowMutation.add(true);
+  WindowListeners._internal();
 
   void _onWindowResize(_) => _windowResize.add(true);
+
+  Stream<bool> _maybeConstructResizeListener() {
+    if (!_hasResizeListener) {
+      _hasResizeListener = true;
+
+      window.addEventListener('resize', _onWindowResize);
+    }
+
+    return _windowResize.stream;
+  }
 
 }

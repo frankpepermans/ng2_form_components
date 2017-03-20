@@ -24,7 +24,7 @@ typedef bool IsSelectedHandler(ListItem<Comparable<dynamic>> listItem);
 typedef bool ClearSelectionWhereHandler(ListItem<Comparable<dynamic>> listItem);
 typedef dynamic NgForTracker(int index, ListItem<Comparable<dynamic>> listItem);
 
-@Pipe(name: 'selectedItems')
+@Pipe('selectedItems')
 @Injectable()
 class SelectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransform {
 
@@ -37,7 +37,7 @@ class SelectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransform 
   }
 }
 
-@Pipe(name: 'unselectedItems')
+@Pipe('unselectedItems')
 @Injectable()
 class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransform {
 
@@ -209,7 +209,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   StreamSubscription<MouseEvent> _domClickSubscription;
   StreamSubscription<bool> _scrollPositionSubscription;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _rendererEventSubscription;
-  StreamSubscription<bool> _domChangeSubscription;
+  StreamSubscription<dynamic> _domChangeSubscription;
   StreamSubscription<int> _scrollAfterDataProviderSubscription;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEventSubscription;
   StreamSubscription<ItemRendererEvent<int, Comparable<dynamic>>> _dropEffectSubscription;
@@ -257,7 +257,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   void ngOnDestroy() {
     super.ngOnDestroy();
 
-    observer.disconnect();
+    observer?.disconnect();
 
     listRendererService.removeRenderer(this);
 
@@ -289,6 +289,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
   @override void ngAfterViewInit() {
     listRendererService.addRenderer(this);
+
+    observer = new MutationObserver(notifyDomChanged)
+      ..observe(element.nativeElement, subtree: true, childList: true, attributes: false);
 
     _domClickSubscription = window.onMouseDown.listen((MouseEvent event) {
       Node target = event.target as Node;
@@ -325,12 +328,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
         _domChangeSubscription = null;
       })
-      .flatMapLatest((bool value) => _animationFrame().take(1).map((_) => value))
+      .asyncMap((_) => window.animationFrame)
       .listen(_attemptRequiredScrollPosition);
-  }
-
-  Stream<num> _animationFrame() async* {
-    yield await window.animationFrame;
   }
 
   void scrollIntoView(T entry) {
@@ -362,7 +361,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   void _initStreams() {
     _dataProviderSubscription = _dataProvider$ctrl.stream
       .listen((List<ListItem<T>> dataProvider) {
-        if (dataProvider != _dataProvider) setState(() => _dataProvider = dataProvider);
+        if (dataProvider != _dataProvider) {
+          setState(() => _dataProvider = dataProvider);
+        }
       });
 
     _internalSelectedItemsSubscription = _selectedItems$ctrl.stream.listen((Iterable<ListItem<T>> items) {
@@ -436,9 +437,6 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
       _domChange$ctrl.stream
     , (_, ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent, __) => dropEffectEvent)
       .listen(listRendererService.triggerEvent);
-
-    observer = new MutationObserver(notifyDomChanged)
-      ..observe(element.nativeElement, subtree: true, childList: true);
   }
 
   void _handleItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
@@ -449,7 +447,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     if (!_domChange$ctrl.isClosed) _domChange$ctrl.add(true);
   }
 
-  void _attemptRequiredScrollPosition(bool _) {
+  void _attemptRequiredScrollPosition(dynamic _) {
     final Element scrollPaneElement = scrollPane.nativeElement;
     final num targetPosition = math.min(scrollPaneElement.scrollHeight - scrollPaneElement.clientHeight, _pendingScrollTop);
 
