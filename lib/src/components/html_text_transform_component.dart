@@ -105,7 +105,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
   StreamSubscription<Range> _activeRangeSubscription;
   StreamSubscription<String> _contentSubscription;
   StreamSubscription<String> _mutationObserverSubscription;
-  StreamSubscription<dynamic> _documentKeyboardSubscription;
 
   final StreamController<Range> _activeRange$ctrl = new StreamController<Range>.broadcast();
   final StreamController<HTMLTextTransformation> _transformation$ctrl = new StreamController<HTMLTextTransformation>.broadcast();
@@ -168,7 +167,6 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _pasteSubscription?.cancel();
     _contentSubscription?.cancel();
     _mutationObserverSubscription?.cancel();
-    _documentKeyboardSubscription?.cancel();
 
     _activeRange$ctrl.close();
     _transformation$ctrl.close();
@@ -202,33 +200,18 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
       if (selection != null) {
         final Range range = selection.getRangeAt(0);
         final Element breakElement = new Element.br();
-        final Node text = new Element.article()
-          ..style.display = 'inline'
-          ..style.fontSize = '0'
-          ..setInnerHtml('_');
+        final Text text = new Text('\u00A0');
 
         range
-          ..insertNode(breakElement)
-          ..collapse(false)
-          ..insertNode(text);
+          ..insertNode(text)
+          ..insertNode(breakElement);
 
-        range.setStartBefore(text);
-        range.collapse(false);
+        range.setStart(text, 0);
+        range.setEnd(text, 0);
 
         selection.removeAllRanges();
         selection.addRange(range);
-
-        await window.animationFrame;
-
-        await _documentKeyboardSubscription?.cancel();
-
-        final Element element = _contentElement.nativeElement as Element;
-
-        _documentKeyboardSubscription = new rx.Observable<dynamic>.amb(<Stream<dynamic>>[document.onKeyDown, element.onBlur])
-            .take(1)
-            .listen(null, onDone: text.remove);
       }
-
     }
   }
 
