@@ -66,10 +66,17 @@ class HierarchyLevel extends Entity
     ]);
   }
 
-  /// Ctr
+  /// Constructor
   HierarchyLevel() : super() {
     Entity.ASSEMBLER
         .registerProxies(this, <DormProxy<dynamic>>[_children, _label]);
   }
+
+  /// Internal constructor
   static HierarchyLevel construct() => new HierarchyLevel();
+
+  /// Duplicates the [HierarchyLevel] and any recusrive entities to a new [HierarchyLevel]
+  @override
+  HierarchyLevel duplicate({List<Symbol> ignoredSymbols: null}) =>
+      super.duplicate(ignoredSymbols: ignoredSymbols);
 }

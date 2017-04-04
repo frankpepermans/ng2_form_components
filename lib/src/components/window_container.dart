@@ -45,7 +45,7 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T> im
   @Output() Stream<bool> get close => _close$ctrl.stream;
 
   final StreamController<bool> _close$ctrl = new StreamController<bool>.broadcast();
-  final StreamController<_DragPosition> _dragPosition$ctrl = new rx.BehaviourSubject<_DragPosition>.broadcast();
+  final StreamController<_DragPosition> _dragPosition$ctrl = new rx.BehaviorSubject<_DragPosition>();
 
   StreamSubscription<_DragPosition> _dragSubscription, _dragCommitSubscription;
 

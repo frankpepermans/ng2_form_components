@@ -351,6 +351,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
         .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.nativeElement.scrollHeight, scrollTop >= scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight - 20))
         .where((Tuple2<int, bool> tuple) => tuple.item2)
         .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
+        .asStream()
         .map((Tuple2<int, bool> tuple) => tuple.item2)
         .listen((bool value) {
           if (!_scrolledToBottom$ctrl.isClosed) _scrolledToBottom$ctrl.add(value);

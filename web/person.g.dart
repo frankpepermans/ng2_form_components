@@ -56,9 +56,16 @@ class Person extends Entity with sup.Person implements Comparable<dynamic> {
     ]);
   }
 
-  /// Ctr
+  /// Constructor
   Person() : super() {
     Entity.ASSEMBLER.registerProxies(this, <DormProxy<dynamic>>[_image, _name]);
   }
+
+  /// Internal constructor
   static Person construct() => new Person();
+
+  /// Duplicates the [Person] and any recusrive entities to a new [Person]
+  @override
+  Person duplicate({List<Symbol> ignoredSymbols: null}) =>
+      super.duplicate(ignoredSymbols: ignoredSymbols);
 }

@@ -122,7 +122,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
     ]);
   }
 
-  /// Ctr
+  /// Constructor
   ListItem() : super() {
     Entity.ASSEMBLER.registerProxies(this, <DormProxy<dynamic>>[
       _container,
@@ -132,6 +132,13 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       _selectable
     ]);
   }
+
+  /// Internal constructor
   static ListItem<T>
       construct<T extends Comparable<dynamic>>() => new ListItem<T>();
+
+  /// Duplicates the [ListItem] and any recusrive entities to a new [ListItem]
+  @override
+  ListItem<T> duplicate({List<Symbol> ignoredSymbols: null}) =>
+      super.duplicate(ignoredSymbols: ignoredSymbols);
 }

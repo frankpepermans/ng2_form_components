@@ -199,15 +199,30 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
       if (selection != null) {
         final Range range = selection.getRangeAt(0);
-        final Element breakElement = new Element.br();
-        final Text text = new Text('\u00A0');
 
-        range
-          ..insertNode(text)
-          ..insertNode(breakElement);
+        if (_isInsideList(range)) {
+          final Element liElement = new LIElement();
 
-        range.setStart(text, 0);
-        range.setEnd(text, 0);
+          _expandRange(range, until: (Node node) => _isHtmlList(node) && node != contentElement.nativeElement);
+
+          range.collapse(false);
+
+          range
+            ..insertNode(liElement);
+
+          range.setStart(liElement, 0);
+          range.setEnd(liElement, 0);
+        } else {
+          final Element breakElement = new Element.br();
+          final Text text = new Text('\u00A0');
+
+          range
+            ..insertNode(text)
+            ..insertNode(breakElement);
+
+          range.setStart(text, 0);
+          range.setEnd(text, 0);
+        }
 
         selection.removeAllRanges();
         selection.addRange(range);
@@ -424,12 +439,12 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
     final Element customElement = _createCustomNode(tuple.item2);
 
-    if (tuple.item2.shouldExpand) _expandRange(tuple.item1);
+    final Range range = (tuple.item2.shouldExpand) ? _expandRange(tuple.item1) : tuple.item1;
 
     try {
-      tuple.item1.surroundContents(customElement);
+      range.surroundContents(customElement);
     } catch (error) {
-      if (!tuple.item2.shouldExpand) _transformationSuccess$ctrl.add(false);
+      /*if (!tuple.item2.shouldExpand) */_transformationSuccess$ctrl.add(false);/*
       else {
         final DocumentFragment fragment = tuple.item1.extractContents();
 
@@ -456,32 +471,92 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         allListElements
             .where(_containsPilcrowOnly)
             .forEach((Element element) => element.replaceWith(element.firstChild));
-      }
+      }*/
     }
 
     _rangeTrigger$ctrl.add(true);
   }
 
-  void _expandRange(Range range) {
-    final DocumentFragment fragment = range.cloneContents();
-    final String selectedText = fragment.text
-        .replaceAll('¶', '');
+  Range _expandRange(Range range, {bool until(Node node)}) {
+    String selectedText;
+    Range clonedRange;
+    DocumentFragment fragment;
 
-    Node ancestorNode = range.commonAncestorContainer;
+    until ??= (Node node) {
+      print('"${node.text}" - "$selectedText"');
+      return node == contentElement.nativeElement || _isHtmlList(node) || !_textMatches(node.text, selectedText);
+    };
+
+    List<Node> ancestorNodes = <Node>[range.startContainer, range.endContainer];
     Node targetNode;
+    int index = 0;
 
-    while(ancestorNode != contentElement.nativeElement && !_isHtmlList(ancestorNode) && ancestorNode.text.replaceAll('¶', '').compareTo(selectedText) == 0) {
-      targetNode = ancestorNode;
+    ancestorNodes.forEach((Node ancestorNode) {
+      clonedRange = new Range()
+        ..selectNodeContents(ancestorNode);
+
+      if (index == 0) {
+        clonedRange.setStart(ancestorNode, range.startOffset);
+      } else {
+        clonedRange.setEnd(ancestorNode, range.endOffset);
+      }
+
+      targetNode = null;
+      fragment = clonedRange.cloneContents();
+      selectedText = fragment.text
+          .replaceAll('¶', '');
+
+      while(ancestorNode != null && !until(ancestorNode)) {
+        targetNode = ancestorNode;
+        ancestorNode = ancestorNode.parentNode;
+      }
+
+      if (targetNode != null) {
+        clonedRange = range.cloneRange();
+
+        if (index == 0) {
+          clonedRange.setStartBefore(targetNode);
+        } else {
+          clonedRange.setEndAfter(targetNode);
+        }
+
+        range = clonedRange;
+      }
+
+      index++;
+    });
+
+    window.getSelection()
+      ..removeAllRanges()
+      ..addRange(range);
+
+    return range;
+  }
+
+  bool _textMatches(String left, String right) {
+    final String nLeft = left
+        .replaceAll('¶', '')
+        .trim();
+
+    final String nRight = right
+        .replaceAll('¶', '')
+        .trim();
+
+    return nLeft.compareTo(nRight) == 0;
+  }
+
+  bool _isInsideList(Range range) {
+    Node ancestorNode = range.commonAncestorContainer;
+
+    while (ancestorNode != contentElement.nativeElement) {
+      String nodeName = ancestorNode.nodeName.toLowerCase();
+
+      if (nodeName.compareTo('li') == 0) return true;
+
       ancestorNode = ancestorNode.parentNode;
     }
 
-    if (targetNode != null) {
-      range.selectNode(targetNode);
-
-      window.getSelection()
-        ..removeAllRanges()
-        ..addRange(range);
-    }
+    return false;
   }
 
   bool _isHtmlList(Node element) => (
@@ -493,19 +568,24 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     _expandRange(range);
 
     final DocumentFragment fragment = range.cloneContents();
-    String selectedText = fragment.innerHtml;
+    String selectedText = fragment.innerHtml;print(selectedText);
 
     affectedNodes
       .forEach((String nodeName) {
         final RegExp openingTagRegExp = new RegExp('<$nodeName[^>]*>');
-        final RegExp closingTagRegExp = new RegExp('</$nodeName[^>]*>');
 
         final Iterable<Match> openingTagMatches = openingTagRegExp.allMatches(selectedText);
-        final Iterable<Match> closingTagMatches = closingTagRegExp.allMatches(selectedText);
 
-        if (openingTagMatches.length == closingTagMatches.length) {
+        if (nodeName.compareTo('br') == 0) {print(selectedText);
           selectedText = selectedText.replaceAllMapped(openingTagRegExp, ((_) => ''));
-          selectedText = selectedText.replaceAllMapped(closingTagRegExp, ((_) => ''));
+        } else {
+          final RegExp closingTagRegExp = new RegExp('</$nodeName[^>]*>');
+          final Iterable<Match> closingTagMatches = closingTagRegExp.allMatches(selectedText);
+
+          if (openingTagMatches.length == closingTagMatches.length) {
+            selectedText = selectedText.replaceAllMapped(openingTagRegExp, ((_) => ''));
+            selectedText = selectedText.replaceAllMapped(closingTagRegExp, ((_) => ''));
+          }
         }
       });
 
