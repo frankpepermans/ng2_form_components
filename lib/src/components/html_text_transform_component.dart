@@ -444,7 +444,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
     try {
       range.surroundContents(customElement);
     } catch (error) {
-      /*if (!tuple.item2.shouldExpand) */_transformationSuccess$ctrl.add(false);/*
+      if (!tuple.item2.shouldExpand) _transformationSuccess$ctrl.add(false);
       else {
         final DocumentFragment fragment = tuple.item1.extractContents();
 
@@ -471,7 +471,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
         allListElements
             .where(_containsPilcrowOnly)
             .forEach((Element element) => element.replaceWith(element.firstChild));
-      }*/
+      }
     }
 
     _rangeTrigger$ctrl.add(true);
@@ -576,7 +576,7 @@ class HTMLTextTransformComponent extends FormComponent<Comparable<dynamic>> impl
 
         final Iterable<Match> openingTagMatches = openingTagRegExp.allMatches(selectedText);
 
-        if (nodeName.compareTo('br') == 0) {print(selectedText);
+        if (nodeName.compareTo('br') == 0) {
           selectedText = selectedText.replaceAllMapped(openingTagRegExp, ((_) => ''));
         } else {
           final RegExp closingTagRegExp = new RegExp('</$nodeName[^>]*>');

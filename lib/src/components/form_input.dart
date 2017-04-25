@@ -169,6 +169,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       , (String inputType, String inputValue) {
         if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') return inputValue;
         else if (inputType == 'date') {
+          if (_isValidDateFormat(inputValue)) return inputValue;
+
           if (inputValue != null) {
             final List<String> parts = inputValue.split('/');
 
@@ -182,6 +184,14 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
           deliverStateChanges();
         });
     }
+
+  bool _isValidDateFormat(String value) {
+    if (value == null || value.isEmpty) return false;
+
+    final List<String> parts = value.split('-');
+
+    return parts.length == 3;
+  }
 
   //-----------------------------
   // template methods

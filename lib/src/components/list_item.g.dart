@@ -123,7 +123,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   }
 
   /// Constructor
-  ListItem() : super() {
+  ListItem() {
     Entity.ASSEMBLER.registerProxies(this, <DormProxy<dynamic>>[
       _container,
       _data,
@@ -134,11 +134,42 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   }
 
   /// Internal constructor
-  static ListItem<T>
-      construct<T extends Comparable<dynamic>>() => new ListItem<T>();
+  static ListItem<T> construct<T extends Comparable<dynamic>>() =>
+      new ListItem<T>();
+
+  /// withContainer
+  ListItem<T> withContainer(String value) =>
+      duplicate(ignoredSymbols: const <Symbol>[ListItem.CONTAINER_SYMBOL])
+        ..container = value;
+
+  /// withData
+  ListItem<T> withData(T value) =>
+      duplicate(ignoredSymbols: const <Symbol>[ListItem.DATA_SYMBOL])
+        ..data = value;
+
+  /// withIsAlwaysOpen
+  ListItem<T> withIsAlwaysOpen(bool value) =>
+      duplicate(ignoredSymbols: const <Symbol>[ListItem.ISALWAYSOPEN_SYMBOL])
+        ..isAlwaysOpen = value;
+
+  /// withParent
+  ListItem<T> withParent(ListItem<T> value) =>
+      duplicate(ignoredSymbols: const <Symbol>[ListItem.PARENT_SYMBOL])
+        ..parent = value;
+
+  /// withSelectable
+  ListItem<T> withSelectable(bool value) =>
+      duplicate(ignoredSymbols: const <Symbol>[ListItem.SELECTABLE_SYMBOL])
+        ..selectable = value;
 
   /// Duplicates the [ListItem] and any recusrive entities to a new [ListItem]
   @override
   ListItem<T> duplicate({List<Symbol> ignoredSymbols: null}) =>
       super.duplicate(ignoredSymbols: ignoredSymbols);
+
+  /// toString implementation for debugging purposes
+  @override
+  String toString() {
+    return 'i112ng2_form_components_lib_src_components_list_item';
+  }
 }

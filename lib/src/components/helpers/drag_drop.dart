@@ -15,6 +15,14 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
 import 'package:ng2_form_components/src/utils/html_helpers.dart';
 
+final SerializerJson<String, Map<String, dynamic>> _serializer = new SerializerJson<String, Map<String, dynamic>>()
+  ..outgoing(const [])
+  ..addRule(
+      DateTime,
+          (int value) => (value != null) ? new DateTime.fromMillisecondsSinceEpoch(value, isUtc:true) : null,
+          (DateTime value) => value?.millisecondsSinceEpoch
+  );
+
 @Directive(
   selector: '[ngDragDrop]',
   providers: const <Type>[HtmlHelpers]
@@ -51,7 +59,6 @@ class DragDrop implements OnDestroy {
   StreamSubscription<ListItem<Comparable<dynamic>>> _swapDropSubscription;
   StreamSubscription<Tuple2<ListItem<Comparable<dynamic>>, int>> _sortDropSubscription;
 
-  SerializerJson<String, Map<String, dynamic>> serializer;
   bool _areStreamsSet = false;
   num heightOnDragEnter = 0;
 
@@ -81,10 +88,8 @@ class DragDrop implements OnDestroy {
 
   void _initStreams() {
     _initSubscription = rx.Observable.combineLatest3(
-      rx.observable(_listItem$ctrl.stream)
-        .startWith(null),
-      rx.observable(_handler$ctrl.stream)
-        .startWith(null),
+      _listItem$ctrl.stream.take(1),
+      _handler$ctrl.stream.take(1),
       rx.observable(_removeAllStyles$ctrl.stream)
         .startWith(false)
     , _updateStyles)
@@ -142,18 +147,10 @@ class DragDrop implements OnDestroy {
       .where((bool value) => !value)
       .map((_) => true);
 
-    serializer = new SerializerJson<String, Map<String, dynamic>>()
-      ..outgoing(const [])
-      ..addRule(
-          DateTime,
-          (int value) => (value != null) ? new DateTime.fromMillisecondsSinceEpoch(value, isUtc:true) : null,
-          (DateTime value) => value?.millisecondsSinceEpoch
-      );
-
     _dragStartSubscription = element.onDragStart
       .listen((MouseEvent event) {
         event.dataTransfer.effectAllowed = 'move';
-        event.dataTransfer.setData('text/plain', serializer.outgoing(<Entity>[listItem]));
+        event.dataTransfer.setData('text/plain', _serializer.outgoing(<Entity>[listItem]));
 
         helpers.updateElementClasses(element, 'ngDragDrop--active', true);
       });
@@ -231,7 +228,7 @@ class DragDrop implements OnDestroy {
     if (transferDataEncoded.isEmpty) return null;
 
     final EntityFactory<Entity> factory = new EntityFactory<Entity>();
-    final List<dynamic> result = factory.spawn(serializer.incoming(transferDataEncoded), serializer);
+    final List<dynamic> result = factory.spawn(_serializer.incoming(transferDataEncoded), _serializer);
 
     return result.first as ListItem<Comparable<dynamic>>;
   }
