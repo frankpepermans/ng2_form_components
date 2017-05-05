@@ -486,8 +486,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   }
 
   void handleSelection(ListItem<T> listItem) {
-    _clearSelection$ctrl.add((_) => false);
-    _incomingSelection$ctrl.add(listItem);
+    if (!_clearSelection$ctrl.isClosed) _clearSelection$ctrl.add((_) => false);
+    if (!_incomingSelection$ctrl.isClosed) _incomingSelection$ctrl.add(listItem);
   }
 
   String getHierarchyOffset(ListItem<T> listItem) {

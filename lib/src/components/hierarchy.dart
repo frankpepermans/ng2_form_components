@@ -245,14 +245,14 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     final List<ListItem<T>> listCast = <ListItem<T>>[];
     final List<ListItem<T>> listCast2 = <ListItem<T>>[];
 
-    tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    tuple.item2?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     super.receiveState(new SerializableTuple1<int>()
       ..item1 = tuple.item1, phase);
 
     _receivedSelection = listCast;
 
-    tuple.item3.forEach((Entity entity) {
+    tuple.item3?.forEach((Entity entity) {
       final ListItem<T> listItem = entity as ListItem<T>;
       _isOpenMap[listItem] = true;
 
@@ -263,7 +263,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     listRendererService.notifyIsOpenChange();
 
-    if (tuple.item3.isNotEmpty) deliverStateChanges();
+    if (tuple.item3 != null && tuple.item3.isNotEmpty) deliverStateChanges();
   }
 
   @override Stream<int> ngBeforeDestroyChild([List<dynamic> args]) {
@@ -630,7 +630,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   @override void handleSelection(ListItem<Comparable<dynamic>> listItem) {
     super.handleSelection(listItem);
 
-    if (!allowMultiSelection) _clearChildHierarchies$ctrl.add((ListItem<Comparable<dynamic>> listItem) => true);
+    if (!allowMultiSelection && !_clearChildHierarchies$ctrl.isClosed) _clearChildHierarchies$ctrl.add((ListItem<Comparable<dynamic>> listItem) => true);
   }
 
   Type listItemRendererHandler(_, [ListItem<Comparable<dynamic>> listItem]) => resolveRendererHandler(level, listItem);
