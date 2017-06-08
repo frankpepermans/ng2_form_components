@@ -52,9 +52,9 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @Output() Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
   @Output() Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
   @Output() Stream<bool> get hasValue => rx.Observable.combineLatest2(
-      rx.observable(_value$ctrl.stream)
+      new rx.Observable<String>(_value$ctrl.stream)
         .startWith(''),
-      rx.observable(inputValue)
+      new rx.Observable<String>(inputValue)
         .startWith(null)
     , (String a, String b) {
       if (b == null) {

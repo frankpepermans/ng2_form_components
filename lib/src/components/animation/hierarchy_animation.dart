@@ -87,7 +87,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   }
 
   @override void tweenOpen() {
-    _openSubscription = rx.observable(_animation$ctrl.stream)
+    _openSubscription = new rx.Observable<num>(_animation$ctrl.stream)
       .where((_) => animations.isNotEmpty && animations.first.level == level)
       .take(1)
       .listen((_) {

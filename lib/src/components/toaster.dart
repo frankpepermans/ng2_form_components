@@ -49,15 +49,15 @@ class Toaster implements OnDestroy {
   void addMessage(String message, {ToastMessageType type: ToastMessageType.INFO}) => _toastMessage$ctrl.add(new _ToastMessage(message, type, new Duration(milliseconds: messageDuration)));
 
   void _initStreams() {
-    _toastMessageSubscription = rx.observable(_toastMessage$ctrl.stream)
+    _toastMessageSubscription = new rx.Observable<_ToastMessage>(_toastMessage$ctrl.stream)
       .flatMap((_ToastMessage message) => new Stream<num>.fromFuture(window.animationFrame)
         .map((_) => message))
       .flatMap((_ToastMessage message) => message.appear)
-      .call(onData: messageQueue.add)
-      .call(onData: (_) => changeDetector.markForCheck())
+      .doOnData(messageQueue.add)
+      .doOnData((_) => changeDetector.markForCheck())
       .flatMap((_ToastMessage message) => message.disappear)
-      .call(onData: messageQueue.remove)
-      .call(onData: (_ToastMessage message) => message.close())
+      .doOnData(messageQueue.remove)
+      .doOnData((_ToastMessage message) => message.close())
       .listen((_) => changeDetector.markForCheck());
   }
 

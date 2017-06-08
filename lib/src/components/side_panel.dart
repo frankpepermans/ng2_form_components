@@ -106,9 +106,9 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   void _initStreams() {
-    _toggleStateSubscription = rx.observable(_isOpen$ctrl.stream.distinct())
+    _toggleStateSubscription = new rx.Observable<bool>(_isOpen$ctrl.stream.distinct())
       .startWith(false)
-      .flatMapLatest((bool isOpen) => rx.observable(_toggle$ctrl.stream)
+      .flatMapLatest((bool isOpen) => new rx.Observable<bool>(_toggle$ctrl.stream)
         .debounce(const Duration(milliseconds: 100))
         .map((_) => isOpen)
         .take(1))

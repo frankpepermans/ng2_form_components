@@ -149,9 +149,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   //-----------------------------
 
   @override Stream<Entity> provideState() => rx.Observable.combineLatest2(
-      rx.observable(_selectedItems$ctrl.stream)
+      new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
           .startWith(selectedItems),
-      rx.observable(_openClose$ctrl.stream)
+      new rx.Observable<bool>(_openClose$ctrl.stream)
           .startWith(isOpen)
           .distinct((bool vA, bool vB) => vA == vB)
       , (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
@@ -239,8 +239,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
 
   void _initStreams() {
     _currentHeaderLabelSubscription = rx.Observable.combineLatest2(
-      rx.observable(_headerLabel$ctrl.stream).startWith(''),
-      rx.observable(_selectedItems$ctrl.stream).startWith(const [])
+        new rx.Observable<String>(_headerLabel$ctrl.stream).startWith(''),
+        new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream).startWith(const [])
     , (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
     .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
       Stream<String> returnValue;
@@ -255,7 +255,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
             returnValue = resolvedLabel;
           }
         } else {
-          returnValue = rx.observable(new Stream<ListItem<T>>.fromIterable(tuple.item2))
+          returnValue = new rx.Observable<ListItem<T>>(new Stream<ListItem<T>>.fromIterable(tuple.item2))
             .flatMap((ListItem<T> listItem) {
               final dynamic resolvedLabel = labelHandler(listItem.data);
 
@@ -275,7 +275,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
       if (currentHeaderLabel != headerLabel) setState(() => currentHeaderLabel = headerLabel);
     });
 
-    _openCloseSubscription = rx.observable(_openClose$ctrl.stream)
+    _openCloseSubscription = new rx.Observable<bool>(_openClose$ctrl.stream)
       .distinct((bool vA, bool vB) => vA == vB)
       .flatMapLatest(_awaitCloseAnimation)
       .listen((bool isOpen) {
@@ -291,11 +291,11 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
       });
 
     _selectedItemsSubscription = rx.Observable.combineLatest2(
-      rx.observable(_openClose$ctrl.stream)
+        new rx.Observable<bool>(_openClose$ctrl.stream)
         .startWith(isOpen)
         .distinct((bool vA, bool vB) => vA == vB)
         .flatMapLatest(_awaitCloseAnimation),
-      rx.observable(_selectedItems$ctrl.stream).startWith(const [])
+        new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream).startWith(const [])
     , (bool isOpen, Iterable<ListItem<T>> selectedItems) {
       if (!isOpen) return selectedItems;
 

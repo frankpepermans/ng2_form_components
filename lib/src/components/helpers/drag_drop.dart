@@ -90,7 +90,7 @@ class DragDrop implements OnDestroy {
     _initSubscription = rx.Observable.combineLatest3(
       _listItem$ctrl.stream.take(1),
       _handler$ctrl.stream.take(1),
-      rx.observable(_removeAllStyles$ctrl.stream)
+      new rx.Observable<bool>(_removeAllStyles$ctrl.stream)
         .startWith(false)
     , _updateStyles)
       .listen(null);
@@ -126,8 +126,8 @@ class DragDrop implements OnDestroy {
     _areStreamsSet = true;
 
     dragDetection$ = new rx.Observable<int>.merge(<Stream<int>>[
-      rx.observable(element.onDragEnter)
-        .call(onData:(_) {
+      new rx.Observable<MouseEvent>(element.onDragEnter)
+        .doOnData((_) {
           heightOnDragEnter = element.client.height;
         })
         .map((_) => 1),

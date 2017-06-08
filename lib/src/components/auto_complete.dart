@@ -130,7 +130,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
 
     return rx.Observable.combineLatest2(
         superProvider,
-        rx.observable(_input$ctrl.stream)
+        new rx.Observable<String>(_input$ctrl.stream)
             .startWith('')
             .distinct((String vA, String vB) => vA.compareTo(vB) == 0)
         , (SerializableTuple2<bool, Iterable<ListItem<T>>> tuple, String input) =>
@@ -231,7 +231,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = rx.observable(selectedItemsChanged).startWith(const [])
+    _currentHeaderLabelSubscription = new rx.Observable<Iterable<ListItem<T>>>(selectedItemsChanged).startWith(const [])
       .map((Iterable<ListItem<T>> selectedItems) {
         if (selectedItems != null && selectedItems.isNotEmpty) {
           return (selectedItems.length == 1) ?
@@ -244,26 +244,26 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
         setState(() => currentHeaderLabel = headerLabel);
       });
 
-    _inputChanged$ = rx.observable(_input$ctrl.stream)
+    _inputChanged$ = new rx.Observable<String>(_input$ctrl.stream)
       .debounce(const Duration(milliseconds: 50))
       .where((String input) => input.length >= minCharsRequired);
 
     final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedDataProviderChanged$ = rx.Observable.combineLatest3(
-        rx.observable(_focus$ctrl.stream)
+        new rx.Observable<bool>(_focus$ctrl.stream)
             .distinct((bool bA, bool bB) => bA == bB)
             .startWith(false),
-        rx.observable(_dataProviderChanged$ctrl.stream),
-        rx.observable(selectedItemsChanged)
+        new rx.Observable<Iterable<ListItem<T>>>(_dataProviderChanged$ctrl.stream),
+        new rx.Observable<Iterable<ListItem<T>>>(selectedItemsChanged)
             .startWith(const [])
         , (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, dataProvider, selectedItems, true)).asBroadcastStream();
 
     final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>> mergedSelectedItemsChangedChanged$ = rx.Observable.combineLatest3(
-        rx.observable(_focus$ctrl.stream)
+        new rx.Observable<bool>(_focus$ctrl.stream)
             .distinct((bool bA, bool bB) => bA == bB)
             .startWith(false),
-        rx.observable(_input$ctrl.stream)
+        new rx.Observable<String>(_input$ctrl.stream)
             .startWith(null),
-        rx.observable(selectedItemsChanged)
+        new rx.Observable<Iterable<ListItem<T>>>(selectedItemsChanged)
             .startWith(null)
         , (bool hasBeenFocused, _, Iterable<ListItem<T>> selectedItems) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(hasBeenFocused, null, selectedItems, false)).asBroadcastStream();
 
@@ -272,14 +272,14 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T> implements
       mergedSelectedItemsChangedChanged$
     ]).asBroadcastStream();
 
-    _mergedDataProviderChangedSubscription = rx.observable(_inputCriteriaMet$ctrl.stream)
+    _mergedDataProviderChangedSubscription = new rx.Observable<bool>(_inputCriteriaMet$ctrl.stream)
       .distinct((bool bA, bool bB) => bA == bB)
       .flatMapLatest((bool isCriteriaMet) =>
         merged$
           .where((Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) => tuple.item4 == isCriteriaMet)
           .map((Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) => new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(tuple.item1, tuple.item2, tuple.item3, isCriteriaMet)))
       .map(_rebuildMergedDataProvider)
-      .call(onData:(Tuple2<bool, List<ListItem<T>>> tuple) {
+      .doOnData((Tuple2<bool, List<ListItem<T>>> tuple) {
         mergedDataProvider = tuple.item2;
 
         showLoading = false;

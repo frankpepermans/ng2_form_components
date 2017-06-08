@@ -1,6 +1,5 @@
 library orm_init;
 
-import 'package:angular2/angular2.dart';
 import 'package:ng2_state/ng2_state.dart';
 import 'package:dorm/dorm.dart';
 

@@ -321,7 +321,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     _domChangeSubscription = null;
 
-    if (_pendingScrollTop > 0 && scrollPane != null) _domChangeSubscription = rx.observable(_domChange$ctrl.stream)
+    if (_pendingScrollTop > 0 && scrollPane != null) _domChangeSubscription = new rx.Observable<bool>(_domChange$ctrl.stream)
       .timeout(const Duration(seconds: 3), onTimeout: (_) {
         _domChangeSubscription?.cancel();
         observer.disconnect();
@@ -343,12 +343,14 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     if (scrollPane != null) {
       if (_scrollPositionSubscription != null) _scrollPositionSubscription.cancel();
 
-      _scrollPositionSubscription = rx.observable(scrollPane.nativeElement.onScroll)
-        .map((_) => (scrollPane.nativeElement as Element).scrollTop)
-        .call(onData:(int scrollTop) {
+      final Element scrollPaneElement = scrollPane.nativeElement;
+
+      _scrollPositionSubscription = new rx.Observable<Event>(scrollPaneElement.onScroll)
+        .map((_) => scrollPaneElement.scrollTop)
+        .doOnData((int scrollTop) {
           if (!_scroll$ctrl.isClosed) _scroll$ctrl.add(scrollTop);
         })
-        .map((int scrollTop) => new Tuple2<int, bool>(scrollPane.nativeElement.scrollHeight, scrollTop >= scrollPane.nativeElement.scrollHeight - scrollPane.nativeElement.clientHeight - 20))
+        .map((int scrollTop) => new Tuple2<int, bool>(scrollPaneElement.scrollHeight, scrollTop >= scrollPaneElement.scrollHeight - scrollPaneElement.clientHeight - 20))
         .where((Tuple2<int, bool> tuple) => tuple.item2)
         .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) => (tA.item1 > tB.item1) ? 1 : -1)
         .asStream()
@@ -382,7 +384,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
     _selectedItems$ = rx.Observable.zip2(
       _incomingSelection$ctrl.stream,
-      rx.observable(_selectedItems$ctrl.stream)
+        new rx.Observable<List<ListItem<T>>>(_selectedItems$ctrl.stream)
         .startWith(internalSelectedItems as List<ListItem<T>>)
     , (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
       if (incoming == null) return new List<ListItem<T>>.unmodifiable(const []);
@@ -417,7 +419,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _rendererEventSubscription = listRendererService.event$
       .listen(_itemRendererEvent$ctrl.add);
 
-    _scrollAfterDataProviderSubscription = rx.observable(_scroll$ctrl.stream)
+    _scrollAfterDataProviderSubscription = new rx.Observable<int>(_scroll$ctrl.stream)
       .flatMapLatest((int scrollTop) => _dataProvider$ctrl.stream.map((_) => scrollTop))
       .listen((int scrollTop) {
         scrollPane.nativeElement.scrollTop = scrollTop;

@@ -1,7 +1,5 @@
 library ng2_form_components.common.common_directives;
 
-import 'package:ng2_form_components/ng2_form_components.dart';
-
 export 'package:ng2_form_components/src/components/list_renderer.dart';
 export 'package:ng2_form_components/src/components/hierarchy.dart';
 export 'package:ng2_form_components/src/components/drop_down.dart';

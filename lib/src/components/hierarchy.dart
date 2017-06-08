@@ -3,7 +3,7 @@ library ng2_form_components.components.hierarchy;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:rxdart/rxdart.dart' as rx show Observable, observable;
+import 'package:rxdart/rxdart.dart' as rx show Observable;
 import 'package:dorm/dorm.dart' show Entity;
 import 'package:tuple/tuple.dart' show Tuple2;
 import 'package:angular2/angular2.dart';
@@ -161,7 +161,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
   // output
   //-----------------------------
 
-  @override @Output() rx.Observable<List<ListItem<T>>> get selectedItemsChanged => rx.observable(_selection$) as rx.Observable<List<ListItem<T>>>;
+  @override @Output() rx.Observable<List<ListItem<T>>> get selectedItemsChanged => new rx.Observable<List<ListItem<T>>>(_selection$);
   @override @Output() Stream<bool> get requestClose => super.requestClose;
   @override @Output() Stream<bool> get scrolledToBottom => super.scrolledToBottom;
   @override @Output() Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get itemRendererEvent => super.itemRendererEvent;
@@ -216,10 +216,10 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
   @override Stream<Entity> provideState() {
     return rx.Observable.combineLatest3(
-      rx.observable(super.provideState())
+        new rx.Observable<Entity>(super.provideState())
           .startWith(new SerializableTuple1<int>()..item1 = 0),
       internalSelectedItemsChanged.startWith(const []),
-      rx.observable(_openListItems$Ctrl.stream)
+        new rx.Observable<List<ListItem<T>>>(_openListItems$Ctrl.stream)
         .where((_) => !autoOpenChildren)
     , (Entity scrollPosition, List<ListItem<T>> selectedItems, List<ListItem<T>> openItems) =>
       new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
@@ -311,7 +311,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       .asyncMap((_) => window.animationFrame)
       .listen(_handleDomChange);
 
-    _eventSubscription = rx.observable(_listRendererService$ctrl.stream)
+    _eventSubscription = new rx.Observable<ListRendererService>(_listRendererService$ctrl.stream)
       .flatMapLatest((ListRendererService service) => service.event$)
       .listen(_handleItemRendererEvent);
 
@@ -332,15 +332,15 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
       return new Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>>(childHierarchy, new List<Hierarchy<Comparable<dynamic>>>.unmodifiable(clone));
     })
-      .call(onData:(Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
+      .doOnData((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => _childHierarchyList$ctrl.add(tuple.item2))
       .where((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => tuple.item1.item2)
       .map((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) => new Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>(tuple.item1.item1, tuple.item2))
       .flatMap((Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>> tuple) => tuple.item1.onDestroy.take(1).map((_) => tuple))
       .listen((Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy<Comparable<dynamic>>, bool>(tuple.item1, false)));
 
     _selectionBuilderSubscription = rx.Observable.zip2(
-      rx.observable(_selection$Ctrl.stream).startWith(<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>{}),
-      rx.observable(_childHierarchyList$ctrl.stream)
+        new rx.Observable<Map<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>>(_selection$Ctrl.stream).startWith(<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>{}),
+        new rx.Observable<List<Hierarchy<Comparable<dynamic>>>>(_childHierarchyList$ctrl.stream)
         .flatMapLatest((List<Hierarchy<Comparable<dynamic>>> hierarchies) => new rx.Observable<Tuple2<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>>
           .merge((new List<Hierarchy<Comparable<dynamic>>>.from(hierarchies)..add(this))
           .map((Hierarchy<Comparable<dynamic>> hierarchy) => hierarchy.internalSelectedItemsChanged
@@ -402,7 +402,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
       if (level == 0) selectedItems.forEach(handleSelection);
       else {
         new rx.Observable<dynamic>.amb(<Stream<dynamic>>[
-          rx.observable(_domModified$ctrl.stream)
+          new rx.Observable<bool>(_domModified$ctrl.stream)
             .asyncMap((_) => window.animationFrame)
             .debounce(const Duration(milliseconds: 50)),
           new Stream<dynamic>.periodic(const Duration(milliseconds: 200))
@@ -410,7 +410,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
           .take(1)
           .listen((_) {
             selectedItems.forEach((ListItem<Comparable<dynamic>> listItem) {
-              rx.observable(listRendererService.rendererSelection$)
+              new rx.Observable<ListItem<Comparable<dynamic>>>(listRendererService.rendererSelection$)
                   .take(1)
                   .map((_) => new ItemRendererEvent<bool, T>('selection', listItem, true))
                   .listen(handleRendererEvent);

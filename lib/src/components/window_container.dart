@@ -78,20 +78,20 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T> im
     final Element element = elementRef.nativeElement;
     final DivElement header = headerRef.nativeElement;
 
-    _dragSubscription = rx.observable(header.onMouseDown)
+    _dragSubscription = new rx.Observable<MouseEvent>(header.onMouseDown)
         .map((MouseEvent event) {
           event.preventDefault();
 
           return <String, int>{ 'left': event.client.x - element.offset.left, 'top': event.client.y - element.offset.top };
         })
-        .flatMapLatest((Map<String, int> event) => rx.observable(document.body.onMouseMove)
+        .flatMapLatest((Map<String, int> event) => new rx.Observable<MouseEvent>(document.body.onMouseMove)
         .map((MouseEvent pos) => new _DragPosition(pos.client.x - event['left'], pos.client.y - event['top']))
         .takeUntil(document.body.onMouseUp))
         .listen(_dragPosition$ctrl.add);
 
     _dragCommitSubscription = new rx.Observable<_DragPosition>.merge(<Stream<_DragPosition>>[
       _dragPosition$ctrl.stream,
-      rx.observable(windowListeners.windowResize).flatMapLatest((_) => _dragPosition$ctrl.stream)
+      new rx.Observable<bool>(windowListeners.windowResize).flatMapLatest((_) => _dragPosition$ctrl.stream)
     ]).listen((_DragPosition position) {
       final num lMax = window.document.documentElement.clientWidth - element.clientWidth;
       final num tMax = window.document.documentElement.clientHeight - element.clientHeight;
