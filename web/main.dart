@@ -25,7 +25,7 @@ void main() {
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: const <dynamic>[StateService, const Provider(DragDropService, useClass: NoDragDropService)/*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/],
-    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, HTMLTextTransformMenu, HTMLTextTransformComponent, SidePanel, DragDrop, Toaster, WindowContainer]
+    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, SidePanel, DragDrop, Toaster, WindowContainer]
 )
 class AppComponent {
 
@@ -70,16 +70,6 @@ class AppComponent {
   final ResolveRendererHandler personListItemRendererHandler = (_, [__]) => PersonListItemRenderer;
 
   final String model = 'Dart and Angular2 plus some reactive awesome sauce';
-
-  final List<List<HTMLTextTransformation>> buttons = <List<HTMLTextTransformation>>[
-    <HTMLTextTransformation>[
-      new HTMLTextTransformation('b', '<i class="fa fa-bold"></i>'),
-      new HTMLTextTransformation('i', '<i class="fa fa-italic"></i>'),
-      new HTMLTextTransformation('u', '<i class="fa fa-underline"></i>'),
-      new HTMLTextTransformation('li', '<i class="fa fa-list"></i>'),
-      new HTMLTextTransformation('font', '<i class="fa fa-paint-brush"></i>', style: <String, String>{'color': 'red'})
-    ]
-  ];
 
   AppComponent(@Inject(ChangeDetectorRef) this.changeDetector, @Inject(StateService) this.stateService) {
     stateService.stateName = 'ng2-form-components';

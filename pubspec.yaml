@@ -5,7 +5,7 @@ environment:
   sdk: '>=1.21.0 <2.0.0'
 dependencies:
   analyzer: ^0.29.1
-  angular2: ^3.0.0-alpha+1
+  angular2: 3.1.0
   browser: ^0.10.0
   dart_to_js_script_rewriter: ^0.1.0
   rxdart: 0.9.0
@@ -21,6 +21,7 @@ dependency_overrides:
   build: '^0.7.0'
 transformers:
   - angular2:
+      use_legacy_style_encapsulation: true
       platform_directives:
       - 'package:angular2/common.dart#COMMON_DIRECTIVES'
       platform_pipes:
