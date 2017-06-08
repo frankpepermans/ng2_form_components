@@ -1,9 +1,0 @@
-<div class="ng2-html-text-transform-menu">
-    <div class="ng2-html-text-transform-buttons" *ngFor='let buttonSet of buttons'>
-        <button *ngFor='let button of buttonSet'
-                class="ng2-html-text-transform-button"
-                [ngClass]="{'selected': button.doRemoveTag, 'disabled': !button.enabled || (!button.allowRemove && button.doRemoveTag)}"
-                (mousedown)="triggerButton(button, $event)"
-                [innerHtml]="button.label"></button>
-    </div>
-</div>

@@ -6,8 +6,6 @@ export 'package:ng2_form_components/src/components/list_renderer.dart';
 export 'package:ng2_form_components/src/components/hierarchy.dart';
 export 'package:ng2_form_components/src/components/drop_down.dart';
 export 'package:ng2_form_components/src/components/auto_complete.dart';
-export 'package:ng2_form_components/src/components/html_text_transform_component.dart';
-export 'package:ng2_form_components/src/components/html_text_transform_menu.dart';
 export 'package:ng2_form_components/src/components/toaster.dart';
 export 'package:ng2_form_components/src/components/text_input.dart';
 export 'package:ng2_form_components/src/components/side_panel.dart';

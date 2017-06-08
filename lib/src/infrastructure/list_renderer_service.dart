@@ -2,6 +2,8 @@ library ng2_form_components.infrastructure.list_renderer_service;
 
 import 'dart:async';
 
+import 'package:rxdart/rxdart.dart' as rx;
+
 import 'package:ng2_form_components/src/components/list_renderer.dart';
 
 import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
@@ -19,7 +21,7 @@ class ListRendererService {
 
   final StreamController<bool> _isOpenChange$ctrl = new StreamController<bool>.broadcast();
   final StreamController<ListItem<Comparable<dynamic>>> _rendererSelection$ctrl = new StreamController<ListItem<Comparable<dynamic>>>.broadcast();
-  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _event$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
+  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _event$ctrl = new rx.BehaviorSubject<ItemRendererEvent<dynamic, Comparable<dynamic>>>();
   final StreamController<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _responder$ctrl = new StreamController<List<ListRendererEvent<dynamic, Comparable<dynamic>>>>.broadcast();
 
   ListRendererService();
