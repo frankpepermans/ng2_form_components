@@ -381,7 +381,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   void updateSelectedItems(Iterable<ListItem<T>> items) {
     _selectedItems$ctrl.add(items);
 
-    if (resetAfterSelection) window.animationFrame.whenComplete(() => _selectedItems$ctrl.add(const []));
+    if (resetAfterSelection) window.animationFrame.whenComplete(() {
+      if (!_selectedItems$ctrl.isClosed) _selectedItems$ctrl.add(const []);
+    });
   }
 
   void handleItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => _itemRendererEvent$ctrl.add(event);

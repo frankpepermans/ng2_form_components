@@ -65,3 +65,6 @@ export 'src/utils/mutation_observer_stream.dart'
 
 export 'src/components/item_renderers/drop_effect_item_renderer.dart'
     show DropEffectItemRenderer;
+
+export 'src/utils/html_loader.dart'
+    show HtmlLoader;

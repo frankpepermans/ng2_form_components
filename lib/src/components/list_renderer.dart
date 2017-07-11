@@ -175,6 +175,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   @Output() Stream<bool> get requestClose => _requestClose$ctrl.stream;
   @Output() Stream<bool> get scrolledToBottom => _scrolledToBottom$ctrl.stream;
   @Output() Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
+  @Output() Stream<bool> get willUpdate => _willUpdateController.stream;
 
   Stream<bool> get domChange$ => _domChange$ctrl.stream;
 
@@ -192,12 +193,13 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
 
   final StreamController<List<ListItem<T>>> _selectedItems$ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<ListItem<T>> _incomingSelection$ctrl = new StreamController<ListItem<T>>();
-  final StreamController<bool> _requestClose$ctrl = new StreamController<bool>();
+  final StreamController<bool> _requestClose$ctrl = new StreamController<bool>(),
+      _willUpdateController = new StreamController<bool>.broadcast(),
+      _scrolledToBottom$ctrl = new StreamController<bool>.broadcast(),
+      _domChange$ctrl = new StreamController<bool>.broadcast();
   final StreamController<int> _scroll$ctrl = new StreamController<int>.broadcast();
-  final StreamController<bool> _scrolledToBottom$ctrl = new StreamController<bool>.broadcast();
   final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl = new StreamController<ClearSelectionWhereHandler>.broadcast();
-  final StreamController<bool> _domChange$ctrl = new StreamController<bool>.broadcast();
   final StreamController<List<ListItem<T>>> _dataProvider$ctrl = new StreamController<List<ListItem<T>>>.broadcast();
   final StreamController<ItemRendererEvent<int, Comparable<dynamic>>> _dropEffect$ctrl = new StreamController<ItemRendererEvent<int, Comparable<dynamic>>>.broadcast();
 
@@ -285,6 +287,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _domChange$ctrl.close();
     _dataProvider$ctrl.close();
     _dropEffect$ctrl.close();
+    _willUpdateController.close();
   }
 
   @override void ngAfterViewInit() {
@@ -365,7 +368,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
     _dataProviderSubscription = _dataProvider$ctrl.stream
       .listen((List<ListItem<T>> dataProvider) {
         if (dataProvider != _dataProvider) {
-          setState(() => _dataProvider = dataProvider);
+          setState(() {
+            _willUpdateController.add(true);
+
+            _dataProvider = dataProvider;
+          });
         }
       });
 
