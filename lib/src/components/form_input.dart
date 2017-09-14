@@ -36,6 +36,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _inputType$ctrl.add(value);
   }
 
+  String _placeHolder = 'Vrije text';
+  String get placeHolder => _placeHolder;
+  @Input() set placeHolder(String value) {
+    if (value != _placeHolder) setState(() => _placeHolder = value);
+  }
+
   @Input() set initialValue(String value) {
     if (value == null) return;
 
@@ -196,6 +202,12 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
   // template methods
   //-----------------------------
+
+  void clear() {
+    setState(() => startValue = null);
+
+    _inputValue$ctrl.add(null);
+  }
 
   void handleInput(Event event) {
     String valueToSet;

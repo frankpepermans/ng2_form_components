@@ -6,8 +6,14 @@ typedef bool Matcher(MutationRecord record);
 class MutationObserverStream extends Stream<bool> {
   final StreamController<bool> controller;
 
-  MutationObserverStream(Element element, {Matcher matcher: null})
-      : controller = _buildController(element, matcher);
+  MutationObserverStream(Element element,
+      {Matcher matcher: null,
+      bool subtree: true,
+      bool childList: true,
+      bool attributes: false,
+      bool characterData: true})
+      : controller = _buildController(
+            element, matcher, subtree, childList, attributes, characterData);
 
   @override
   StreamSubscription<bool> listen(void onData(bool event),
@@ -17,7 +23,12 @@ class MutationObserverStream extends Stream<bool> {
   }
 
   static StreamController<bool> _buildController(
-      Element element, Matcher matcher) {
+      Element element,
+      Matcher matcher,
+      bool subtree,
+      bool childList,
+      bool attributes,
+      bool characterData) {
     StreamController<bool> controller;
     MutationObserver observer;
 
@@ -36,10 +47,10 @@ class MutationObserverStream extends Stream<bool> {
 
           observer = new MutationObserver(onMutation)
             ..observe(element,
-                subtree: true,
-                childList: true,
-                attributes: false,
-                characterData: true);
+                subtree: subtree,
+                childList: childList,
+                attributes: attributes,
+                characterData: characterData);
         },
         onCancel: () => observer.disconnect());
 
