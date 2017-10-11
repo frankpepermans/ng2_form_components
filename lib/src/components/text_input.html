@@ -1,6 +1,6 @@
 <div class="ng2-form-components-text-input">
     <div drop-down-header class="container">
-        <input type="text" [placeholder]="placeHolder" (input)="handleInput($event)" [value]="inputValue">
+        <input #inputField type="text" [placeholder]="placeHolder" (input)="handleInput($event)" [value]="inputValue">
         <span *ngIf="action != null" [ngClass]="actionContainerClassMap" (click)="doAction()"><i [ngClass]="actionIconClassMap"></i></span>
     </div>
 </div>

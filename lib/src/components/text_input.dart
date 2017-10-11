@@ -24,6 +24,8 @@ typedef void TextInputAction(String inputValue);
 )
 class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy {
 
+  @ViewChild('inputField') ElementRef inputField;
+
   //-----------------------------
   // input
   //-----------------------------
@@ -35,8 +37,13 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
     _textInputAction$ctrl.add(value);
   }
 
+  String _inputValue;
+  String get inputValue => _inputValue;
+  @Input() set inputValue(String value) {
+    if (_inputValue != value) setState(() => _inputValue = value);
+  }
+
   @Input() String placeHolder;
-  @Input() String inputValue;
   @Input() String actionContainerClassName;
   @Input() String actionIconClassName;
 
@@ -120,11 +127,14 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   }
 
   void clear() {
+    final InputElement inputElement = inputField.nativeElement;
+
     _input$ctrl.add('');
 
     if (action != null) action('');
 
-    if (inputValue != '') setState(() => inputValue = '');
+    inputValue = '';
+    inputElement.value = '';
   }
 
   //-----------------------------
