@@ -240,19 +240,18 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
     if (hierarchySelectedItems != null) setState(() => hierarchySelectedItems = null);
   }
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple3<int, List<Entity>, List<Entity>> tuple = entity as SerializableTuple3<int, List<Entity>, List<Entity>>;
+  @override void receiveState(SerializableTuple3<int, List<Entity>, List<Entity>> entity, StatePhase phase) {
     final List<ListItem<T>> listCast = <ListItem<T>>[];
     final List<ListItem<T>> listCast2 = <ListItem<T>>[];
 
-    tuple.item2?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    entity.item2?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     super.receiveState(new SerializableTuple1<int>()
-      ..item1 = tuple.item1, phase);
+      ..item1 = entity.item1, phase);
 
     _receivedSelection = listCast;
 
-    tuple.item3?.forEach((Entity entity) {
+    entity.item3?.forEach((Entity entity) {
       final ListItem<T> listItem = entity as ListItem<T>;
       _isOpenMap[listItem] = true;
 
@@ -263,7 +262,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T> implement
 
     listRendererService.notifyIsOpenChange();
 
-    if (tuple.item3 != null && tuple.item3.isNotEmpty) deliverStateChanges();
+    if (entity.item3 != null && entity.item3.isNotEmpty) deliverStateChanges();
   }
 
   @override Stream<int> ngBeforeDestroyChild([List<dynamic> args]) {

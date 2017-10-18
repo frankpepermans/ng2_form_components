@@ -66,12 +66,10 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   @override Stream<Entity> provideState() => _isOpen$ctrl.stream
     .map((bool isOpen) => new SerializableTuple1<bool>()..item1 = isOpen);
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple1<bool> tuple = entity as SerializableTuple1<bool>;
+  @override void receiveState(SerializableTuple1<bool> entity, StatePhase phase) {
+    _isOpen$ctrl.add(entity.item1);
 
-    _isOpen$ctrl.add(tuple.item1);
-
-    if (isOpen != tuple.item1) setState(() => isOpen = tuple.item1);
+    if (isOpen != entity.item1) setState(() => isOpen = entity.item1);
   }
 
   @override void ngOnDestroy() {

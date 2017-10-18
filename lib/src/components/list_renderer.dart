@@ -237,7 +237,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T> imple
   @override Stream<Entity> provideState() => _scroll$ctrl.stream
     .map((int scrollTop) => new SerializableTuple1<int>()..item1 = scrollTop);
 
-  @override void receiveState(Entity entity, StatePhase phase) {
+  @override void receiveState(covariant Entity entity, StatePhase phase) {
     final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
 
     if (scrollPane != null) {

@@ -10,19 +10,22 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart'
+    show SerializableTuple1, StatePhase, StatefulComponent;
 
 @Component(
     selector: 'form-input',
     templateUrl: 'form_input.html',
     directives: const <Type>[],
-    providers: const <dynamic>[const Provider(StatefulComponent, useExisting: FormInput)],
+    providers: const <dynamic>[
+      const Provider(StatefulComponent, useExisting: FormInput)
+    ],
     changeDetection: ChangeDetectionStrategy.Stateful,
-    preserveWhitespace: false
-)
-class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnDestroy, AfterViewInit {
-
-  @ViewChild('textarea') ElementRef textarea;
+    preserveWhitespace: false)
+class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
+    implements OnDestroy, AfterViewInit {
+  @ViewChild('textarea')
+  ElementRef textarea;
 
   //-----------------------------
   // input
@@ -30,7 +33,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   String _inputType;
   String get inputType => _inputType;
-  @Input() set inputType(String value) {
+  @Input()
+  set inputType(String value) {
     _inputType = value;
 
     _inputType$ctrl.add(value);
@@ -38,50 +42,59 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   String _placeHolder = 'Vrije text';
   String get placeHolder => _placeHolder;
-  @Input() set placeHolder(String value) {
+  @Input()
+  set placeHolder(String value) {
     if (value != _placeHolder) setState(() => _placeHolder = value);
   }
 
-  @Input() set initialValue(String value) {
+  @Input()
+  set initialValue(String value) {
     if (value == null) return;
 
     _inputValue$ctrl.add(value);
   }
 
-  @Input() int heightCalcAdjustment = 0;
+  @Input()
+  int heightCalcAdjustment = 0;
 
   //-----------------------------
   // output
   //-----------------------------
 
-  @Output() Stream<String> get inputValue => _inputValue$ctrl.stream.distinct();
-  @Output() Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
-  @Output() Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
-  @Output() Stream<bool> get hasValue => rx.Observable.combineLatest2(
-      new rx.Observable<String>(_value$ctrl.stream)
-        .startWith(''),
-      new rx.Observable<String>(inputValue)
-        .startWith(null)
-    , (String a, String b) {
-      if (b == null) {
-        if (a != null) return a.trim().isNotEmpty;
+  @Output()
+  Stream<String> get inputValue => _inputValue$ctrl.stream.distinct();
+  @Output()
+  Stream<FocusEvent> get focus => _focusEvent$ctrl.stream;
+  @Output()
+  Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
+  @Output()
+  Stream<bool> get hasValue => rx.Observable.combineLatest2(
+          new rx.Observable<String>(_value$ctrl.stream).startWith(''),
+          new rx.Observable<String>(inputValue).startWith(null),
+          (String a, String b) {
+        if (b == null) {
+          if (a != null) return a.trim().isNotEmpty;
 
-        return false;
-      }
+          return false;
+        }
 
-      return b.trim().isNotEmpty;
-    })
-    .distinct();
+        return b.trim().isNotEmpty;
+      }).distinct();
 
   //-----------------------------
   // private properties
   //-----------------------------
 
-  StreamController<String> _value$ctrl = new StreamController<String>.broadcast();
-  StreamController<String> _inputValue$ctrl = new StreamController<String>.broadcast();
-  StreamController<String> _inputType$ctrl = new StreamController<String>.broadcast();
-  StreamController<FocusEvent> _focusEvent$ctrl = new StreamController<FocusEvent>.broadcast();
-  StreamController<FocusEvent> _blurEvent$ctrl = new StreamController<FocusEvent>.broadcast();
+  StreamController<String> _value$ctrl =
+      new StreamController<String>.broadcast();
+  StreamController<String> _inputValue$ctrl =
+      new StreamController<String>.broadcast();
+  StreamController<String> _inputType$ctrl =
+      new StreamController<String>.broadcast();
+  StreamController<FocusEvent> _focusEvent$ctrl =
+      new StreamController<FocusEvent>.broadcast();
+  StreamController<FocusEvent> _blurEvent$ctrl =
+      new StreamController<FocusEvent>.broadcast();
 
   StreamSubscription<String> _inputTypeSubscription;
   StreamSubscription<String> _valueSubscription;
@@ -99,45 +112,48 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // constructor
   //-----------------------------
 
-  FormInput(
-    @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
-      final Element element = elementRef.nativeElement;
+  FormInput(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
+    final Element element = elementRef.nativeElement;
 
-      element.style.display = 'flex';
-      element.style.flexDirection = 'column';
-      element.style.flexGrow = '1';
+    element.style.display = 'flex';
+    element.style.flexDirection = 'column';
+    element.style.flexGrow = '1';
 
-      _initStreams();
-    }
+    _initStreams();
+  }
 
   //-----------------------------
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => _inputValue$ctrl.stream.distinct()
-    .map((String inputValue) => new SerializableTuple1<String>()..item1 = inputValue);
+  @override
+  Stream<Entity> provideState() =>
+      _inputValue$ctrl.stream.distinct().map((String inputValue) =>
+          new SerializableTuple1<String>()..item1 = inputValue);
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple1<String> tuple = entity as SerializableTuple1<String>;
+  @override
+  void receiveState(SerializableTuple1<String> entity, StatePhase phase) =>
+      _inputValue$ctrl.add(entity.item1);
 
-    _inputValue$ctrl.add(tuple.item1);
-  }
-
-  @override void ngAfterViewInit() {
+  @override
+  void ngAfterViewInit() {
     if (inputType == 'text') {
       final TextAreaElement target = textarea.nativeElement;
 
       window.animationFrame.whenComplete(() {
-        final String newValue = '${target.scrollHeight - heightCalcAdjustment}px';
+        final String newValue =
+            '${target.scrollHeight - heightCalcAdjustment}px';
 
-        if (textareaHeight != newValue) setState(() => textareaHeight = newValue);
+        if (textareaHeight != newValue)
+          setState(() => textareaHeight = newValue);
       });
     }
 
     if (_setFocusRequested) setFocus();
   }
 
-  @override void ngOnDestroy() {
+  @override
+  void ngOnDestroy() {
     super.ngOnDestroy();
 
     _inputTypeSubscription?.cancel();
@@ -157,8 +173,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       element.children.first.focus();
 
       _setFocusRequested = false;
-    }
-    else _setFocusRequested = true;
+    } else
+      _setFocusRequested = true;
   }
 
   //-----------------------------
@@ -167,29 +183,30 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   void _initStreams() {
     _valueSubscription = _value$ctrl.stream
-      .listen((String value) => setState(() => startValue = value));
+        .listen((String value) => setState(() => startValue = value));
 
-    _inputTypeSubscription = rx.Observable.combineLatest2(
-      _inputType$ctrl.stream,
-      _inputValue$ctrl.stream
-      , (String inputType, String inputValue) {
-        if (inputType == 'text' || inputType == 'amount' || inputType == 'numeric') return inputValue;
-        else if (inputType == 'date') {
-          if (_isValidDateFormat(inputValue)) return inputValue;
+    _inputTypeSubscription = rx.Observable
+        .combineLatest2(_inputType$ctrl.stream, _inputValue$ctrl.stream,
+            (String inputType, String inputValue) {
+      if (inputType == 'text' ||
+          inputType == 'amount' ||
+          inputType == 'numeric')
+        return inputValue;
+      else if (inputType == 'date') {
+        if (_isValidDateFormat(inputValue)) return inputValue;
 
-          if (inputValue != null) {
-            final List<String> parts = inputValue.split('/');
+        if (inputValue != null) {
+          final List<String> parts = inputValue.split('/');
 
-            if (parts.length == 3) return '${parts[2]}-${parts[1]}-${parts[0]}';
-          }
+          if (parts.length == 3) return '${parts[2]}-${parts[1]}-${parts[0]}';
         }
-      })
-        .listen((String value) {
-          _value$ctrl.add(value);
+      }
+    }).listen((String value) {
+      _value$ctrl.add(value);
 
-          deliverStateChanges();
-        });
-    }
+      deliverStateChanges();
+    });
+  }
 
   bool _isValidDateFormat(String value) {
     if (value == null || value.isEmpty) return false;
@@ -228,8 +245,10 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       final InputElement target = event.target;
       final List<String> parts = target.value.split('-');
 
-      if (parts.length == 3) valueToSet = '${parts[2]}/${parts[1]}/${parts[0]}';
-      else valueToSet = null;
+      if (parts.length == 3)
+        valueToSet = '${parts[2]}/${parts[1]}/${parts[0]}';
+      else
+        valueToSet = null;
     }
 
     _inputValue$ctrl.add(valueToSet);

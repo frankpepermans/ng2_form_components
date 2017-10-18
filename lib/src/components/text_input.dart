@@ -10,7 +10,8 @@ import 'package:angular2/angular2.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart'
+    show SerializableTuple2, StatePhase, StateService, StatefulComponent;
 
 typedef void TextInputAction(String inputValue);
 
@@ -18,20 +19,24 @@ typedef void TextInputAction(String inputValue);
     selector: 'text-input',
     templateUrl: 'text_input.html',
     directives: const <Type>[NgClass, NgIf],
-    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: TextInput)],
+    providers: const <dynamic>[
+      StateService,
+      const Provider(StatefulComponent, useExisting: TextInput)
+    ],
     changeDetection: ChangeDetectionStrategy.Stateful,
-    preserveWhitespace: false
-)
-class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy {
-
-  @ViewChild('inputField') ElementRef inputField;
+    preserveWhitespace: false)
+class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
+    implements OnChanges, OnDestroy {
+  @ViewChild('inputField')
+  ElementRef inputField;
 
   //-----------------------------
   // input
   //-----------------------------
   TextInputAction _action;
   TextInputAction get action => _action;
-  @Input() set action(TextInputAction value) {
+  @Input()
+  set action(TextInputAction value) {
     _action = value;
 
     _textInputAction$ctrl.add(value);
@@ -39,31 +44,40 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
 
   String _inputValue;
   String get inputValue => _inputValue;
-  @Input() set inputValue(String value) {
+  @Input()
+  set inputValue(String value) {
     if (_inputValue != value) setState(() => _inputValue = value);
   }
 
-  @Input() String placeHolder;
-  @Input() String actionContainerClassName;
-  @Input() String actionIconClassName;
+  @Input()
+  String placeHolder;
+  @Input()
+  String actionContainerClassName;
+  @Input()
+  String actionIconClassName;
 
   //-----------------------------
   // output
   //-----------------------------
 
-  @Output() Stream<String> get valueChanged => _input$ctrl.stream;
+  @Output()
+  Stream<String> get valueChanged => _input$ctrl.stream;
 
   //-----------------------------
   // private properties
   //-----------------------------
 
-  final StreamController<String> _input$ctrl = new StreamController<String>.broadcast(), _action$ctrl = new StreamController<String>.broadcast();
-  final StreamController<TextInputAction> _textInputAction$ctrl = new StreamController<TextInputAction>.broadcast();
+  final StreamController<String> _input$ctrl =
+          new StreamController<String>.broadcast(),
+      _action$ctrl = new StreamController<String>.broadcast();
+  final StreamController<TextInputAction> _textInputAction$ctrl =
+      new StreamController<TextInputAction>.broadcast();
 
   StreamSubscription<String> _inputSubscription;
   StreamSubscription<KeyboardEvent> _enterKeySubscription;
 
-  Map<String, bool> actionContainerClassMap = const <String, bool>{}, actionIconClassMap = const <String, bool>{};
+  Map<String, bool> actionContainerClassMap = const <String, bool>{},
+      actionIconClassMap = const <String, bool>{};
 
   String _internalValue;
 
@@ -75,43 +89,53 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   // constructor
   //-----------------------------
 
-  TextInput(
-    @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
-      _initStreams();
-    }
+  TextInput(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
+    _initStreams();
+  }
 
   //-----------------------------
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() {
-    return new rx.Observable<SerializableTuple2<String, bool>>.merge(<Stream<SerializableTuple2<String, bool>>>[
-      _input$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = false),
-      _action$ctrl.stream.map((String inputValue) => new SerializableTuple2<String, bool>()..item1 = inputValue..item2 = true)
+  @override
+  Stream<Entity> provideState() {
+    return new rx.Observable<SerializableTuple2<String, bool>>.merge(<
+        Stream<SerializableTuple2<String, bool>>>[
+      _input$ctrl.stream
+          .map((String inputValue) => new SerializableTuple2<String, bool>()
+            ..item1 = inputValue
+            ..item2 = false),
+      _action$ctrl.stream
+          .map((String inputValue) => new SerializableTuple2<String, bool>()
+            ..item1 = inputValue
+            ..item2 = true)
     ]);
   }
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple2<String, bool> tuple = entity as SerializableTuple2<String, bool>;
+  @override
+  void receiveState(SerializableTuple2<String, bool> entity, StatePhase phase) {
+    inputValue = _internalValue = entity.item1;
 
-    inputValue = _internalValue = tuple.item1;
-
-    if (tuple.item2 && _internalValue != null && _internalValue.isNotEmpty) {
-      if (action != null) action(_internalValue);
+    if (entity.item2 && _internalValue != null && _internalValue.isNotEmpty) {
+      if (action != null)
+        action(_internalValue);
       else {
         _textInputAction$ctrl.stream
-          .take(1)
-          .listen((TextInputAction action) => action(_internalValue));
+            .take(1)
+            .listen((TextInputAction action) => action(_internalValue));
       }
     }
 
     deliverStateChanges();
   }
 
-  @override void ngOnChanges(Map<String, SimpleChange> changes) {
-    if (changes.containsKey('actionContainerClassName')) actionContainerClassMap = <String, bool>{actionContainerClassName: true};
+  @override
+  void ngOnChanges(Map<String, SimpleChange> changes) {
+    if (changes.containsKey('actionContainerClassName'))
+      actionContainerClassMap = <String, bool>{actionContainerClassName: true};
 
-    if (changes.containsKey('actionIconClassName')) actionIconClassMap = <String, bool>{actionIconClassName: true};
+    if (changes.containsKey('actionIconClassName'))
+      actionIconClassMap = <String, bool>{actionIconClassName: true};
   }
 
   @override
@@ -144,15 +168,14 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   void _initStreams() {
     final Element element = elementRef.nativeElement;
 
-    _inputSubscription = _input$ctrl.stream
-      .listen((String inputValue) {
-        _internalValue = inputValue;
-      });
+    _inputSubscription = _input$ctrl.stream.listen((String inputValue) {
+      _internalValue = inputValue;
+    });
 
     _enterKeySubscription = element.onKeyDown
-      .where((_) => action != null)
-      .where((KeyboardEvent event) => event.keyCode == KeyCode.ENTER)
-      .listen((_) => action(_internalValue));
+        .where((_) => action != null)
+        .where((KeyboardEvent event) => event.keyCode == KeyCode.ENTER)
+        .listen((_) => action(_internalValue));
   }
 
   //-----------------------------
@@ -172,5 +195,4 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T> implemen
       action(_internalValue);
     }
   }
-
 }

@@ -18,108 +18,135 @@ import 'package:ng2_form_components/src/components/interfaces/before_destroy_chi
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart';
 
-import 'package:ng2_state/ng2_state.dart' show SerializableTuple2, StatePhase, StateService, StatefulComponent;
+import 'package:ng2_state/ng2_state.dart'
+    show SerializableTuple2, StatePhase, StateService, StatefulComponent;
 
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
     directives: const <Type>[ListRenderer, Tween],
-    providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: DropDown)],
+    providers: const <dynamic>[
+      StateService,
+      const Provider(StatefulComponent, useExisting: DropDown)
+    ],
     changeDetection: ChangeDetectionStrategy.Stateful,
-    preserveWhitespace: false
-)
-class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
-
+    preserveWhitespace: false)
+class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
+    implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
   //-----------------------------
   // input
   //-----------------------------
 
   LabelHandler _labelHandler;
   LabelHandler get labelHandler => _labelHandler;
-  @Input() set labelHandler(LabelHandler value) {
+  @Input()
+  set labelHandler(LabelHandler value) {
     setState(() => _labelHandler = value);
   }
 
   Iterable<ListItem<T>> _dataProvider;
   Iterable<ListItem<T>> get dataProvider => _dataProvider;
-  @Input() set dataProvider(Iterable<ListItem<T>> value) {
+  @Input()
+  set dataProvider(Iterable<ListItem<T>> value) {
     setState(() => _dataProvider = value);
   }
 
   bool _updateHeaderLabelWithSelection = true;
   bool get updateHeaderLabelWithSelection => _updateHeaderLabelWithSelection;
-  @Input() set updateHeaderLabelWithSelection(bool value) {
+  @Input()
+  set updateHeaderLabelWithSelection(bool value) {
     setState(() => _updateHeaderLabelWithSelection = value);
   }
 
   Iterable<ListItem<T>> _selectedItems = <ListItem<T>>[];
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
-  @Input() set selectedItems(Iterable<ListItem<T>> value) {
+  @Input()
+  set selectedItems(Iterable<ListItem<T>> value) {
     setState(() => _selectedItems = value);
   }
 
   String _headerLabel;
   String get headerLabel => _headerLabel;
-  @Input() set headerLabel(String value) {
+  @Input()
+  set headerLabel(String value) {
     setState(() => _headerLabel = value);
   }
 
   String _className = 'ng2-form-components-drop-down';
   String get className => _className;
-  @Input() set className(String value) {
+  @Input()
+  set className(String value) {
     _className = value;
 
     cssMap = <String, bool>{value: true};
   }
 
-  Map<String, bool> cssMap = const <String, bool>{'ng2-form-components-drop-down': true};
+  Map<String, bool> cssMap = const <String, bool>{
+    'ng2-form-components-drop-down': true
+  };
 
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
-  @Input() set allowMultiSelection(bool value) {
+  @Input()
+  set allowMultiSelection(bool value) {
     setState(() => _allowMultiSelection = value);
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
-  @Input() set childOffset(int value) {
+  @Input()
+  set childOffset(int value) {
     setState(() => _childOffset = value);
   }
 
-  ResolveRendererHandler _resolveRendererHandler = (_, [__]) => DefaultListItemRenderer;
+  ResolveRendererHandler _resolveRendererHandler =
+      (_, [__]) => DefaultListItemRenderer;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
-  @Input() set resolveRendererHandler(ResolveRendererHandler value) {
+  @Input()
+  set resolveRendererHandler(ResolveRendererHandler value) {
     setState(() => _resolveRendererHandler = value);
   }
 
   Function _defaultHandler;
   Function get defaultHandler => _defaultHandler;
-  @Input() set defaultHandler(Function value) {
+  @Input()
+  set defaultHandler(Function value) {
     setState(() => _defaultHandler = value);
   }
 
-  @Input() bool resetAfterSelection = false;
+  @Input()
+  bool resetAfterSelection = false;
 
   //-----------------------------
   // output
   //-----------------------------
 
-  @Output() Stream<Iterable<ListItem<T>>> get selectedItemsChanged => _selectedItems$ctrl.stream
-    .distinct(_distinctSelectedItems);
+  @Output()
+  Stream<Iterable<ListItem<T>>> get selectedItemsChanged =>
+      _selectedItems$ctrl.stream.distinct(_distinctSelectedItems);
 
-  @override StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
+  @override
+  StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
-  @Output() Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get itemRendererEvent => _itemRendererEvent$ctrl.stream;
+  @Output()
+  Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>>
+      get itemRendererEvent => _itemRendererEvent$ctrl.stream;
 
   //-----------------------------
   // private properties
   //-----------------------------
 
-  final StreamController<Iterable<ListItem<T>>> _selectedItems$ctrl = new StreamController<Iterable<ListItem<T>>>.broadcast();
-  final StreamController<String> _headerLabel$ctrl = new StreamController<String>();
-  final StreamController<bool> _openClose$ctrl = new StreamController<bool>.broadcast();
-  final StreamController<bool> _beforeDestroyChild$ctrl = new StreamController<bool>.broadcast();
-  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEvent$ctrl = new StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
+  final StreamController<Iterable<ListItem<T>>> _selectedItems$ctrl =
+      new StreamController<Iterable<ListItem<T>>>.broadcast();
+  final StreamController<String> _headerLabel$ctrl =
+      new StreamController<String>();
+  final StreamController<bool> _openClose$ctrl =
+      new StreamController<bool>.broadcast();
+  final StreamController<bool> _beforeDestroyChild$ctrl =
+      new StreamController<bool>.broadcast();
+  final StreamController<ItemRendererEvent<dynamic, Comparable<dynamic>>>
+      _itemRendererEvent$ctrl = new StreamController<
+          ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
 
   StreamSubscription<String> _currentHeaderLabelSubscription;
   StreamSubscription<bool> _openCloseSubscription;
@@ -139,8 +166,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // constructor
   //-----------------------------
 
-  DropDown(
-    @Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
+  DropDown(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
     _initStreams();
   }
 
@@ -148,23 +174,30 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // ng2 life cycle
   //-----------------------------
 
-  @override Stream<Entity> provideState() => rx.Observable.combineLatest2(
+  @override
+  Stream<Entity> provideState() => rx.Observable.combineLatest2(
       new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
           .startWith(selectedItems),
       new rx.Observable<bool>(_openClose$ctrl.stream)
           .startWith(isOpen)
-          .distinct((bool vA, bool vB) => vA == vB)
-      , (Iterable<ListItem<T>> items, bool isOpen) => new SerializableTuple2<bool, Iterable<ListItem<T>>>()
-    ..item1 = isOpen
-    ..item2 = items);
+          .distinct((bool vA, bool vB) => vA == vB),
+      (Iterable<ListItem<T>> items, bool isOpen) =>
+          new SerializableTuple2<bool, Iterable<ListItem<T>>>()
+            ..item1 = isOpen
+            ..item2 = items);
 
-  @override void receiveState(Entity entity, StatePhase phase) {
-    final SerializableTuple2<bool, Iterable<Entity>> tuple = entity as SerializableTuple2<bool, Iterable<Entity>>;
+  @override
+  void receiveState(covariant Entity entity, StatePhase phase) {
+    final SerializableTuple2<bool, Iterable<Entity>> tuple =
+        entity as SerializableTuple2<bool, Iterable<Entity>>;
     final List<ListItem<T>> listCast = <ListItem<T>>[];
 
-    if (phase == StatePhase.REPLAY) scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
+    if (phase == StatePhase.REPLAY)
+      scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
 
-    if (tuple.item2 != null) tuple.item2.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    if (tuple.item2 != null)
+      tuple.item2
+          .forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     scheduleMicrotask(() {
       _selectedItems$ctrl.add(listCast);
@@ -173,28 +206,29 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
     });
   }
 
-  @override void ngOnChanges(Map<String, SimpleChange> changes) {
+  @override
+  void ngOnChanges(Map<String, SimpleChange> changes) {
     if (changes.containsKey('headerLabel')) {
       _headerLabel$ctrl.add(headerLabel);
       _selectedItems$ctrl.add(selectedItems);
     }
 
-    if (changes.containsKey('selectedItems')) _selectedItems$ctrl.add(selectedItems);
+    if (changes.containsKey('selectedItems'))
+      _selectedItems$ctrl.add(selectedItems);
   }
 
-  @override void ngAfterViewInit() => FormComponent.openFormComponents.add(this);
+  @override
+  void ngAfterViewInit() => FormComponent.openFormComponents.add(this);
 
-  @override Stream<bool> ngBeforeDestroyChild([List<dynamic> args]) async* {
+  @override
+  Stream<bool> ngBeforeDestroyChild([List<dynamic> args]) async* {
     final Completer<bool> completer = new Completer<bool>();
 
-    _beforeDestroyChildSubscription = new rx.Observable<bool>.amb(<Stream<bool>>[
-      beforeDestroyChild.stream
-        .where((bool isDone) => isDone),
-      onDestroy
-        .map((_) => true)
-    ])
-      .take(1)
-      .listen((bool value) => completer.complete(value));
+    _beforeDestroyChildSubscription =
+        new rx.Observable<bool>.amb(<Stream<bool>>[
+      beforeDestroyChild.stream.where((bool isDone) => isDone),
+      onDestroy.map((_) => true)
+    ]).take(1).listen((bool value) => completer.complete(value));
 
     beforeDestroyChild.add(false);
 
@@ -231,21 +265,27 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   // private methods
   //-----------------------------
 
-  void setSelectedItems(Iterable<ListItem<T>> value) => setState(() => selectedItems = value);
+  void setSelectedItems(Iterable<ListItem<T>> value) =>
+      setState(() => selectedItems = value);
 
   void setOpenOrClosed(bool value) {
     if (isOpen != value) setState(() => isOpen = value);
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = rx.Observable.combineLatest2(
-        new rx.Observable<String>(_headerLabel$ctrl.stream).startWith(''),
-        new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream).startWith(const [])
-    , (String label, Iterable<ListItem<T>> selectedItems) => new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
-    .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
+    _currentHeaderLabelSubscription = rx.Observable
+        .combineLatest2(
+            new rx.Observable<String>(_headerLabel$ctrl.stream).startWith(''),
+            new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
+                .startWith(const []),
+            (String label, Iterable<ListItem<T>> selectedItems) =>
+                new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
+        .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
       Stream<String> returnValue;
 
-      if (updateHeaderLabelWithSelection && tuple.item2 != null && tuple.item2.isNotEmpty) {
+      if (updateHeaderLabelWithSelection &&
+          tuple.item2 != null &&
+          tuple.item2.isNotEmpty) {
         if (tuple.item2.length == 1) {
           final dynamic resolvedLabel = labelHandler(tuple.item2.first.data);
 
@@ -255,54 +295,64 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
             returnValue = resolvedLabel;
           }
         } else {
-          returnValue = new rx.Observable<ListItem<T>>(new Stream<ListItem<T>>.fromIterable(tuple.item2))
-            .flatMap((ListItem<T> listItem) {
-              final dynamic resolvedLabel = labelHandler(listItem.data);
+          returnValue = new rx.Observable<ListItem<T>>(
+                  new Stream<ListItem<T>>.fromIterable(tuple.item2))
+              .flatMap((ListItem<T> listItem) {
+                final dynamic resolvedLabel = labelHandler(listItem.data);
 
-              if (resolvedLabel is String) return new Stream<String>.fromIterable(<String>[resolvedLabel]);
-              else return resolvedLabel as Stream<String>;
-            })
-            .bufferWithCount(tuple.item2.length)
-            .map((Iterable<String> list) => list.join(', '));
+                if (resolvedLabel is String)
+                  return new Stream<String>.fromIterable(
+                      <String>[resolvedLabel]);
+                else
+                  return resolvedLabel as Stream<String>;
+              })
+              .bufferWithCount(tuple.item2.length)
+              .map((Iterable<String> list) => list.join(', '));
         }
       }
 
       returnValue ??= new rx.Observable<String>.just(tuple.item1);
 
       return returnValue;
-    })
-    .listen((String headerLabel) {
-      if (currentHeaderLabel != headerLabel) setState(() => currentHeaderLabel = headerLabel);
+    }).listen((String headerLabel) {
+      if (currentHeaderLabel != headerLabel)
+        setState(() => currentHeaderLabel = headerLabel);
     });
 
     _openCloseSubscription = new rx.Observable<bool>(_openClose$ctrl.stream)
-      .distinct((bool vA, bool vB) => vA == vB)
-      .flatMapLatest(_awaitCloseAnimation)
-      .listen((bool isOpen) {
-        setOpenOrClosed(isOpen);
-
-        if (isOpen) {
-          FormComponent.openFormComponents
-            .where((FormComponent<Comparable<dynamic>> component) => (component != this && component is DropDown))
-            .map((FormComponent<Comparable<dynamic>> component) => component as DropDown<Comparable<dynamic>>)
-            .where((DropDown<Comparable<dynamic>> component) => component.isOpen)
-            .forEach((FormComponent<Comparable<dynamic>> component) => (component as DropDown<Comparable<dynamic>>).openOrClose());
-        }
-      });
-
-    _selectedItemsSubscription = rx.Observable.combineLatest2(
-        new rx.Observable<bool>(_openClose$ctrl.stream)
-        .startWith(isOpen)
         .distinct((bool vA, bool vB) => vA == vB)
-        .flatMapLatest(_awaitCloseAnimation),
-        new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream).startWith(const [])
-    , (bool isOpen, Iterable<ListItem<T>> selectedItems) {
-      if (!isOpen) return selectedItems;
+        .flatMapLatest(_awaitCloseAnimation)
+        .listen((bool isOpen) {
+      setOpenOrClosed(isOpen);
 
-      return null;
-    })
-      .where((Iterable<ListItem<T>> selectedItems) => selectedItems != null)
-      .listen(setSelectedItems);
+      if (isOpen) {
+        FormComponent.openFormComponents
+            .where((FormComponent<Comparable<dynamic>> component) =>
+                (component != this && component is DropDown))
+            .map((FormComponent<Comparable<dynamic>> component) =>
+                component as DropDown<Comparable<dynamic>>)
+            .where(
+                (DropDown<Comparable<dynamic>> component) => component.isOpen)
+            .forEach((FormComponent<Comparable<dynamic>> component) =>
+                (component as DropDown<Comparable<dynamic>>).openOrClose());
+      }
+    });
+
+    _selectedItemsSubscription = rx.Observable
+        .combineLatest2(
+            new rx.Observable<bool>(_openClose$ctrl.stream)
+                .startWith(isOpen)
+                .distinct((bool vA, bool vB) => vA == vB)
+                .flatMapLatest(_awaitCloseAnimation),
+            new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
+                .startWith(const []),
+            (bool isOpen, Iterable<ListItem<T>> selectedItems) {
+          if (!isOpen) return selectedItems;
+
+          return null;
+        })
+        .where((Iterable<ListItem<T>> selectedItems) => selectedItems != null)
+        .listen(setSelectedItems);
   }
 
   Stream<bool> _awaitCloseAnimation(bool isOpen) {
@@ -321,14 +371,15 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
     return ngBeforeDestroyChild().map((_) => isOpen);
   }
 
-  bool _distinctSelectedItems(Iterable<ListItem<T>> sA, Iterable<ListItem<T>> sB) {
+  bool _distinctSelectedItems(
+      Iterable<ListItem<T>> sA, Iterable<ListItem<T>> sB) {
     if (sA == null && sB == null) return true;
 
     if (sA == null || sB == null) return false;
 
     if (sA.length != sB.length) return false;
 
-    for (int i=0, len = sA.length; i<len; i++) {
+    for (int i = 0, len = sA.length; i < len; i++) {
       final ListItem<T> iA = sA.elementAt(i), iB = sB.elementAt(i);
 
       if (iA.data.compareTo(iB.data) != 0) return false;
@@ -348,11 +399,14 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   void openOrClose() => _openClose$ctrl.add(!isOpen);
 
   void openOrCloseFromHeader(MouseEvent event) {
-    if (defaultHandler != null && event.offset.x < (event.target as Element).client.width - 40) {
+    if (defaultHandler != null &&
+        event.offset.x < (event.target as Element).client.width - 40) {
       defaultHandler();
     } else {
-      if (_isClosedFromList) _isClosedFromList = false;
-      else openOrClose();
+      if (_isClosedFromList)
+        _isClosedFromList = false;
+      else
+        openOrClose();
     }
   }
 
@@ -381,11 +435,13 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T> implement
   void updateSelectedItems(Iterable<ListItem<T>> items) {
     _selectedItems$ctrl.add(items);
 
-    if (resetAfterSelection) window.animationFrame.whenComplete(() {
-      if (!_selectedItems$ctrl.isClosed) _selectedItems$ctrl.add(const []);
-    });
+    if (resetAfterSelection)
+      window.animationFrame.whenComplete(() {
+        if (!_selectedItems$ctrl.isClosed) _selectedItems$ctrl.add(const []);
+      });
   }
 
-  void handleItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => _itemRendererEvent$ctrl.add(event);
-
+  void handleItemRendererEvent(
+          ItemRendererEvent<dynamic, Comparable<dynamic>> event) =>
+      _itemRendererEvent$ctrl.add(event);
 }
