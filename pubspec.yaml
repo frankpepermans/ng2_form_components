@@ -1,24 +1,25 @@
 name: ng2_form_components
 description: Angular 2 stateful form components
-version: 0.0.98
+version: 0.1.0
 environment:
   sdk: '>=1.21.0 <2.0.0'
 dependencies:
-  analyzer: ^0.29.1
   angular2: 3.1.0
   browser: ^0.10.0
   dart_to_js_script_rewriter: ^0.1.0
-  rxdart: 0.12.0
-  tuple: any
-  dorm: any
+  rxdart: ^0.14.0
+  tuple: ^1.0.0
+  dorm: ^1.0.37
   ng2_state:
     git: git@github.com:frankpepermans/ng2_state.git
 dev_dependencies:
-  build_runner: '>=0.1.0'
-  source_gen: '>=0.5.0'
-  faker: any
+  build_runner: '>=0.3.4 <0.4.0'
+  build: ^0.9.0
+  source_gen: '>=0.5.0 <0.6.0'
+  faker: ^0.0.5
 dependency_overrides:
-  build: '^0.7.0'
+  build: ^0.9.0
+  source_gen: '>=0.5.0 <0.6.0'
 transformers:
   - angular2:
       use_legacy_style_encapsulation: true
