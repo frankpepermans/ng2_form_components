@@ -2,7 +2,7 @@ library ng2_form_components.components.animation.side_panel_animation;
 
 import 'dart:async';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 

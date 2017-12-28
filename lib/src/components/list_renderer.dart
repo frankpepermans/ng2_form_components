@@ -7,7 +7,7 @@ import 'dart:math' as math;
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
 import 'package:tuple/tuple.dart';
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart';
@@ -53,7 +53,7 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>> implements PipeTransfor
 @Component(
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
-    directives: const <Type>[ListItemRenderer, DragDropListItemRenderer],
+    directives: const <dynamic>[CORE_DIRECTIVES, ListItemRenderer, DragDropListItemRenderer],
     providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: ListRenderer)],
     pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.Stateful,

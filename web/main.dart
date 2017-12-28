@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:angular2/platform/browser.dart';
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 import 'package:ng2_state/ng2_state.dart';
 
 import 'package:ng2_form_components/ng2_form_components.dart';
@@ -25,7 +24,7 @@ void main() {
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: const <dynamic>[StateService, const Provider(DragDropService, useClass: NoDragDropService)/*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/],
-    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, SidePanel, DragDrop, Toaster, WindowContainer]
+    directives: const <dynamic>[CORE_DIRECTIVES, State, TextInput, DropDown, AutoComplete, Hierarchy, SidePanel, DragDrop, Toaster, WindowContainer]
 )
 class AppComponent {
 

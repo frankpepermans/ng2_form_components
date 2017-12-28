@@ -3,7 +3,7 @@ library ng2_form_components.components.helpers.drag_drop;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
 import 'package:dorm/dorm.dart';

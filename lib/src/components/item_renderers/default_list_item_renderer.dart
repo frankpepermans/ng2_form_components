@@ -2,7 +2,7 @@ library ng2_form_components.components.default_list_item_renderer;
 
 import 'dart:async';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_item_renderer.dart' show DynamicListItemRenderer;
 
@@ -14,6 +14,8 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
 
 @Component(
     selector: 'default-list-item-renderer',
+    directives: const <dynamic>[CORE_DIRECTIVES],
+    pipes: const <dynamic>[COMMON_PIPES],
     template: '''
       <div class="instance" (click)="triggerSelection()" style="padding:5px">
         <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelStream | async}}</label>

@@ -1,6 +1,6 @@
 library ng2_form_components.components.list_item_renderer;
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
 import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
@@ -88,7 +88,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState imp
   // public properties
   //-----------------------------
 
-  final DynamicComponentLoader dynamicComponentLoader;
+  final SlowComponentLoader dynamicComponentLoader;
   final Injector injector;
   final DragDropService dragDropService;
 
@@ -98,7 +98,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState imp
 
   ListItemRenderer(
     @Inject(Injector) this.injector,
-    @Inject(DynamicComponentLoader) this.dynamicComponentLoader,
+    @Inject(SlowComponentLoader) this.dynamicComponentLoader,
     @Inject(DragDropService) this.dragDropService);
 
   //-----------------------------
@@ -110,14 +110,14 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState imp
 
     if (resolvedRendererType == null) throw new ArgumentError('Unable to resolve renderer for list item: ${listItem.runtimeType}');
 
-    dynamicComponentLoader.loadNextToLocation(resolvedRendererType, renderTypeTarget, ReflectiveInjector.fromResolvedProviders(ReflectiveInjector.resolve(<Provider>[
+    dynamicComponentLoader.loadNextToLocation(resolvedRendererType, renderTypeTarget, ReflectiveInjector.resolveAndCreate(<Provider>[
       new Provider(ListRendererService, useValue: listRendererService),
       new Provider(ListItem, useValue: listItem),
       new Provider(IsSelectedHandler, useValue: isSelected),
       new Provider(GetHierarchyOffsetHandler, useValue: getHierarchyOffset),
       new Provider(LabelHandler, useValue: labelHandler),
       new Provider('list-item-index', useValue: index)
-    ]), injector)).then(ngOnComponentLoaded);
+    ], injector)).then(ngOnComponentLoaded);
   }
 
   void ngOnComponentLoaded(ComponentRef ref) {

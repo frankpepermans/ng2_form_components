@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
 import 'package:tuple/tuple.dart';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/list_renderer.dart';
@@ -24,7 +24,7 @@ import 'package:ng2_state/ng2_state.dart'
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
-    directives: const <Type>[ListRenderer, Tween],
+    directives: const <dynamic>[CORE_DIRECTIVES, ListRenderer, Tween],
     providers: const <dynamic>[
       StateService,
       const Provider(StatefulComponent, useExisting: DropDown)

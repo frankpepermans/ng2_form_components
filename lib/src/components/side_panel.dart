@@ -4,7 +4,7 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart' show BeforeDestroyChild;
 
@@ -17,7 +17,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
 @Component(
     selector: 'side-panel',
     templateUrl: 'side_panel.html',
-    directives: const <Type>[SidePanelAnimation],
+    directives: const <dynamic>[CORE_DIRECTIVES, SidePanelAnimation],
     providers: const <dynamic>[StateService, const Provider(StatefulComponent, useExisting: SidePanel)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false

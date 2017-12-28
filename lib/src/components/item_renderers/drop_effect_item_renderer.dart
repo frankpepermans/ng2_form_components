@@ -2,7 +2,7 @@ library ng2_form_components.components.drop_effect_item_renderer;
 
 import 'dart:async';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent;
