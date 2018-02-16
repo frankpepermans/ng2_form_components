@@ -225,7 +225,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   rx.Observable<List<ListItem<T>>> get internalSelectedItemsChanged =>
       _selectedItems$;
   Iterable<ListItem<T>> internalSelectedItems =
-      new List<ListItem<T>>.unmodifiable(const <ListItem<T>>[]);
+      new List<ListItem<T>>.unmodifiable(const <ListItem<Comparable<dynamic>>>[]);
 
   final ElementRef element;
 
@@ -466,7 +466,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
             .startWith(internalSelectedItems as List<ListItem<T>>),
         (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
       if (incoming == null)
-        return new List<ListItem<T>>.unmodifiable(const <ListItem<T>>[]);
+        return new List<ListItem<T>>.unmodifiable(const <ListItem<Comparable<dynamic>>>[]);
 
       List<ListItem<T>> newList = currentList.toList(growable: true);
 
