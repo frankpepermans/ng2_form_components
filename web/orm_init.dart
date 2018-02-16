@@ -15,10 +15,10 @@ void ormInitialize() {
     domain.Person.DO_SCAN();
     HierarchyLevel.DO_SCAN();
     StateContainer.DO_SCAN();
-    SerializableTuple1.DO_SCAN();
-    SerializableTuple2.DO_SCAN();
-    SerializableTuple3.DO_SCAN();
-    SerializableTuple4.DO_SCAN();
+    SerializableTuple1.DO_SCAN<Null>();
+    SerializableTuple2.DO_SCAN<Null, Null>();
+    SerializableTuple3.DO_SCAN<Null, Null, Null>();
+    SerializableTuple4.DO_SCAN<Null, Null, Null, Null>();
   } catch (error) {
     print('orm failed...');
   }

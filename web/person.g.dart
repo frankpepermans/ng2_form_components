@@ -77,7 +77,7 @@ class Person extends Entity with sup.Person implements Comparable<dynamic> {
   /// Duplicates the [Person] and any recusrive entities to a new [Person]
   @override
   Person duplicate({List<Symbol> ignoredSymbols: null}) =>
-      super.duplicate(ignoredSymbols: ignoredSymbols);
+      super.duplicate(ignoredSymbols: ignoredSymbols) as Person;
 
   /// toString implementation for debugging purposes
   @override

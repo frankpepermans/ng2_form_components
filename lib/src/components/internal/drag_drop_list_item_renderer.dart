@@ -4,10 +4,13 @@ import 'dart:html';
 
 import 'package:angular2/angular2.dart';
 
-import 'package:ng2_form_components/src/components/internal/form_component.dart' show LabelHandler;
-import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
+import 'package:ng2_form_components/src/components/internal/form_component.dart'
+    show LabelHandler;
+import 'package:ng2_form_components/src/components/list_item.g.dart'
+    show ListItem;
 
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart'
+    show ListRendererService, ItemRendererEvent;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
@@ -29,11 +32,12 @@ import 'package:ng2_form_components/src/utils/html_helpers.dart';
     directives: const <Type>[DragDrop],
     providers: const <Type>[HtmlHelpers],
     changeDetection: ChangeDetectionStrategy.Stateful,
-    preserveWhitespace: false
-)
-class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRenderer<T> implements OnInit {
-
-  @override @ViewChild('renderType', read: ViewContainerRef) set renderTypeTarget(ViewContainerRef value) {
+    preserveWhitespace: false)
+class DragDropListItemRenderer<T extends Comparable<dynamic>>
+    extends ListItemRenderer<T> implements OnInit {
+  @override
+  @ViewChild('renderType', read: ViewContainerRef)
+  set renderTypeTarget(ViewContainerRef value) {
     super.renderTypeTarget = value;
   }
 
@@ -43,35 +47,50 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRe
   // input
   //-----------------------------
 
-  @override @Input() set listRendererService(ListRendererService value) {
+  @override
+  @Input()
+  set listRendererService(ListRendererService value) {
     super.listRendererService = value;
   }
 
-  @override @Input() set index(int value) {
+  @override
+  @Input()
+  set index(int value) {
     super.index = value;
   }
 
-  @override @Input() set labelHandler(LabelHandler value) {
+  @override
+  @Input()
+  set labelHandler(LabelHandler value) {
     super.labelHandler = value;
   }
 
-  @override @Input() set listItem(ListItem<T> value) {
+  @override
+  @Input()
+  set listItem(ListItem<T> value) {
     super.listItem = value;
   }
 
-  @override @Input() set isSelected(IsSelectedHandler value) {
+  @override
+  @Input()
+  set isSelected(IsSelectedHandler value) {
     super.isSelected = value;
   }
 
-  @override @Input() set getHierarchyOffset(GetHierarchyOffsetHandler value) {
+  @override
+  @Input()
+  set getHierarchyOffset(GetHierarchyOffsetHandler value) {
     super.getHierarchyOffset = value;
   }
 
-  @override @Input() set resolveRendererHandler(ResolveRendererHandler value) {
+  @override
+  @Input()
+  set resolveRendererHandler(ResolveRendererHandler value) {
     super.resolveRendererHandler = value;
   }
 
-  @Input() ListDragDropHandler dragDropHandler;
+  @Input()
+  ListDragDropHandler dragDropHandler;
 
   //-----------------------------
   // public properties
@@ -82,25 +101,35 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>> extends ListItemRe
   //-----------------------------
 
   DragDropListItemRenderer(
-    @Inject(Injector) Injector injector,
-    @Inject(HtmlHelpers) this.helpers,
-    @Inject(DynamicComponentLoader) DynamicComponentLoader dynamicComponentLoader,
-    @Inject(DragDropService) DragDropService dragDropService) : super(injector, dynamicComponentLoader, dragDropService);
+      @Inject(Injector)
+          Injector injector,
+      @Inject(HtmlHelpers)
+          this.helpers,
+      @Inject(DynamicComponentLoader)
+          DynamicComponentLoader dynamicComponentLoader,
+      @Inject(DragDropService)
+          DragDropService dragDropService)
+      : super(injector, dynamicComponentLoader, dragDropService);
 
   //-----------------------------
   // ng2 life cycle
   //-----------------------------
 
   void handleDrop(DropResult dropResult) {
-    listRendererService.triggerEvent(new ItemRendererEvent<int, Comparable<dynamic>>('dropEffectRequest', dropResult.listItem, dropResult.type));
+    listRendererService.triggerEvent(
+        new ItemRendererEvent<int, Comparable<dynamic>>(
+            'dropEffectRequest', dropResult.listItem, dropResult.type));
   }
 
-  @override void ngOnComponentLoaded(ComponentRef ref) {
+  @override
+  void ngOnComponentLoaded(ComponentRef ref) {
     if (dragDropHandler != null) {
-      final ListDragDropHandlerType dragDropType = dragDropService.typeHandler(listItem);
+      final ListDragDropHandlerType dragDropType =
+          dragDropService.typeHandler(listItem);
 
       if (dragDropType != ListDragDropHandlerType.NONE) {
-        helpers.updateElementClasses(ref.location.nativeElement, 'ngDragDrop--target', true);
+        helpers.updateElementClasses(
+            ref.location.nativeElement as Element, 'ngDragDrop--target', true);
 
         (ref.location.nativeElement as Element).style.order = '1';
       }

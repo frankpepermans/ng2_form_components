@@ -5,44 +5,48 @@ import 'dart:html';
 
 import 'package:angular2/angular2.dart';
 
-@Directive(
-    selector: '[tween]'
-)
+@Directive(selector: '[tween]')
 class Tween implements OnInit, OnDestroy {
-
   int _duration = 300;
   int get duration => _duration;
-  @Input() set duration(int value) {
+  @Input()
+  set duration(int value) {
     _duration = value;
   }
 
   String _tweenStyleProperty = 'top';
   String get tweenStyleProperty => _tweenStyleProperty;
-  @Input() set tweenStyleProperty(String value) {
+  @Input()
+  set tweenStyleProperty(String value) {
     _tweenStyleProperty = value;
   }
 
   StreamController<dynamic> _beforeDestroyChildTrigger;
-  StreamController<dynamic> get beforeDestroyChildTrigger => _beforeDestroyChildTrigger;
-  @Input() set beforeDestroyChildTrigger(StreamController<dynamic> value) {
+  StreamController<dynamic> get beforeDestroyChildTrigger =>
+      _beforeDestroyChildTrigger;
+  @Input()
+  set beforeDestroyChildTrigger(StreamController<dynamic> value) {
     _beforeDestroyChildTrigger = value;
   }
 
   int _startValue = -1;
   int get startValue => _startValue;
-  @Input() set startValue(int value) {
+  @Input()
+  set startValue(int value) {
     _startValue = value;
   }
 
   int _endValue = -1;
   int get endValue => _endValue;
-  @Input() set endValue(int value) {
+  @Input()
+  set endValue(int value) {
     _endValue = value;
   }
 
   bool _hasCloseAnimation = true;
   bool get hasCloseAnimation => _hasCloseAnimation;
-  @Input() set hasCloseAnimation(bool value) {
+  @Input()
+  set hasCloseAnimation(bool value) {
     _hasCloseAnimation = value;
   }
 
@@ -57,15 +61,19 @@ class Tween implements OnInit, OnDestroy {
     nativeElement = element.nativeElement as Element;
   }
 
-  @override void ngOnInit() {
+  @override
+  void ngOnInit() {
     nativeElement.style.visibility = 'hidden';
 
     window.animationFrame.whenComplete(tweenOpen);
 
-    if (hasCloseAnimation && beforeDestroyChildTrigger != null) _beforeDestroyChildTriggerSubscription = beforeDestroyChildTrigger.stream.take(1).listen(tweenClose);
+    if (hasCloseAnimation && beforeDestroyChildTrigger != null)
+      _beforeDestroyChildTriggerSubscription =
+          beforeDestroyChildTrigger.stream.take(1).listen(tweenClose);
   }
 
-  @override void ngOnDestroy() {
+  @override
+  void ngOnDestroy() {
     _beforeDestroyChildTriggerSubscription?.cancel();
   }
 
@@ -75,13 +83,12 @@ class Tween implements OnInit, OnDestroy {
 
     nativeElement.style.setProperty(tweenStyleProperty, '${t0}px');
     nativeElement.style.visibility = 'visible';
-    nativeElement.style.transition = '$tweenStyleProperty ${duration / 1000}s ease-out';
+    nativeElement.style.transition =
+        '$tweenStyleProperty ${duration / 1000}s ease-out';
 
-    animationFrame$()
-      .take(1)
-      .listen((_) {
-        nativeElement.style.setProperty(tweenStyleProperty, '${t1}px');
-      });
+    animationFrame$().take(1).listen((_) {
+      nativeElement.style.setProperty(tweenStyleProperty, '${t1}px');
+    });
 
     _openTimer?.cancel();
 
@@ -97,25 +104,24 @@ class Tween implements OnInit, OnDestroy {
     }
   }
 
-  void tweenClose(_) {
+  void tweenClose(dynamic _) {
     final int t0 = startValue == -1 ? 0 : startValue;
     final int t1 = endValue == -1 ? -nativeElement.clientHeight : endValue;
 
     nativeElement.style.setProperty(tweenStyleProperty, '${t0}px');
 
-    animationFrame$()
-      .take(1)
-      .listen((_) {
-        nativeElement.style.setProperty(tweenStyleProperty, '${t1}px');
+    animationFrame$().take(1).listen((_) {
+      nativeElement.style.setProperty(tweenStyleProperty, '${t1}px');
 
-        _openTimer?.cancel();
+      _openTimer?.cancel();
 
-        new Timer(new Duration(milliseconds: duration), () {
-          nativeElement.style.removeProperty(tweenStyleProperty);
+      new Timer(new Duration(milliseconds: duration), () {
+        nativeElement.style.removeProperty(tweenStyleProperty);
 
-          if (!beforeDestroyChildTrigger.isClosed) beforeDestroyChildTrigger.add(true);
-        });
+        if (!beforeDestroyChildTrigger.isClosed)
+          beforeDestroyChildTrigger.add(true);
       });
+    });
   }
 
   Stream<num> animationFrame$() async* {

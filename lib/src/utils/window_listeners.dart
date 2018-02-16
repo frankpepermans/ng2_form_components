@@ -26,7 +26,7 @@ class WindowListeners {
 
   WindowListeners._internal();
 
-  void _onWindowResize(_) => _windowResize.add(true);
+  void _onWindowResize(dynamic _) => _windowResize.add(true);
 
   Stream<bool> _maybeConstructResizeListener() {
     if (!_hasResizeListener) {

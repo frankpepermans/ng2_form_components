@@ -24,17 +24,32 @@ void main() {
     selector: 'my-app',
     templateUrl: 'app_component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: const <dynamic>[StateService, const Provider(DragDropService, useClass: NoDragDropService)/*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/],
-    directives: const <Type>[State, TextInput, DropDown, AutoComplete, Hierarchy, SidePanel, DragDrop, Toaster, WindowContainer]
-)
+    providers: const <dynamic>[
+      StateService,
+      const Provider(DragDropService,
+          useClass:
+              NoDragDropService) /*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/
+    ],
+    directives: const <Type>[
+      State,
+      TextInput,
+      DropDown,
+      AutoComplete,
+      Hierarchy,
+      SidePanel,
+      DragDrop,
+      Toaster,
+      WindowContainer
+    ])
 class AppComponent {
-
-  @ViewChild('toaster') Toaster toaster;
+  @ViewChild('toaster')
+  Toaster toaster;
 
   final ChangeDetectorRef changeDetector;
   final StateService stateService;
   final Random random = new Random();
-  final TextInputAction notifyInputAction = (String inputValue) => print(inputValue);
+  final TextInputAction notifyInputAction =
+      (String inputValue) => print(inputValue);
 
   Type listItemRenderer = DefaultListItemRenderer;
 
@@ -48,30 +63,37 @@ class AppComponent {
   List<ListItem<HierarchyLevel>> dataProviderC = <ListItem<HierarchyLevel>>[];
   List<ListItem<String>> selectedItem;
   List<ListItem<String>> selectedItems;
-  List<ListItem<domain.Person>> mockResultDataProviderA, mockResultDataProviderB;
+  List<ListItem<domain.Person>> mockResultDataProviderA,
+      mockResultDataProviderB;
 
   StateRecordingSession recordingSession;
   bool isReplaying = false;
 
-  ResolveChildrenHandler resolveChildrenHandler = (int level, ListItem<Comparable<dynamic>> listItem) {
+  ResolveChildrenHandler resolveChildrenHandler =
+      (int level, ListItem<Comparable<dynamic>> listItem) {
     final ListItem<HierarchyLevel> cast = listItem as ListItem<HierarchyLevel>;
     List<ListItem<HierarchyLevel>> result;
 
     if (cast.data.children != null) {
-      result = (cast.data.children.map((HierarchyLevel item) => new ListItem<HierarchyLevel>()
-        ..data = item
-        ..container = ''
-        ..selectable = true)).toList(growable: false);
-    } else result = <ListItem<HierarchyLevel>>[];
+      result = (cast.data.children
+              .map((HierarchyLevel item) => new ListItem<HierarchyLevel>()
+                ..data = item
+                ..container = ''
+                ..selectable = true))
+          .toList(growable: false);
+    } else
+      result = <ListItem<HierarchyLevel>>[];
 
     return result;
   };
 
-  final ResolveRendererHandler personListItemRendererHandler = (_, [__]) => PersonListItemRenderer;
+  final ResolveRendererHandler personListItemRendererHandler =
+      (_, [__]) => PersonListItemRenderer;
 
   final String model = 'Dart and Angular2 plus some reactive awesome sauce';
 
-  AppComponent(@Inject(ChangeDetectorRef) this.changeDetector, @Inject(StateService) this.stateService) {
+  AppComponent(@Inject(ChangeDetectorRef) this.changeDetector,
+      @Inject(StateService) this.stateService) {
     stateService.stateName = 'ng2-form-components';
     fakeData = _generateRandomServiceData().toList(growable: false);
 
@@ -114,43 +136,41 @@ class AppComponent {
     dataProviderA = new List<ListItem<String>>.unmodifiable(<ListItem<String>>[
       rootA,
       level1A,
-      level2A, level2B,
+      level2A,
+      level2B,
       level1B,
-      rootB, rootC
+      rootB,
+      rootC
     ]);
 
     dataProviderB = new List<ListItem<String>>.unmodifiable(<ListItem<String>>[
       rootA,
       level1A,
-      level2A, level2B,
+      level2A,
+      level2B,
       level1B,
-      rootB, rootC
+      rootB,
+      rootC
     ]);
 
     ListItem<HierarchyLevel> h_rootA = new ListItem<HierarchyLevel>()
       ..data = (new HierarchyLevel()
         ..label = 'Question 1'
         ..children = <HierarchyLevel>[
-          new HierarchyLevel()
-            ..label = 'Answer 1',
+          new HierarchyLevel()..label = 'Answer 1',
           new HierarchyLevel()
             ..label = 'Answer 2'
             ..children = <HierarchyLevel>[
-              new HierarchyLevel()
-                ..label = 'Answer 1',
+              new HierarchyLevel()..label = 'Answer 1',
               new HierarchyLevel()
                 ..label = 'Answer 2'
                 ..children = <HierarchyLevel>[
-                  new HierarchyLevel()
-                    ..label = 'Answer 1',
-                  new HierarchyLevel()
-                    ..label = 'Answer 2',
-                  new HierarchyLevel()
-                    ..label = 'Answer 3'
+                  new HierarchyLevel()..label = 'Answer 1',
+                  new HierarchyLevel()..label = 'Answer 2',
+                  new HierarchyLevel()..label = 'Answer 3'
                 ]
             ],
-          new HierarchyLevel()
-            ..label = 'Answer 3'
+          new HierarchyLevel()..label = 'Answer 3'
         ])
       ..container = ''
       ..selectable = true;
@@ -159,43 +179,40 @@ class AppComponent {
       ..data = (new HierarchyLevel()
         ..label = 'Question 2'
         ..children = <HierarchyLevel>[
-          new HierarchyLevel()
-            ..label = 'Answer 1',
-          new HierarchyLevel()
-            ..label = 'Answer 2',
-          new HierarchyLevel()
-            ..label = 'Answer 3'
+          new HierarchyLevel()..label = 'Answer 1',
+          new HierarchyLevel()..label = 'Answer 2',
+          new HierarchyLevel()..label = 'Answer 3'
         ])
       ..container = ''
       ..selectable = true;
 
-    dataProviderC = new List<ListItem<HierarchyLevel>>.unmodifiable(<ListItem<HierarchyLevel>>[
-      h_rootA,
-      h_rootB
-    ]);
+    dataProviderC = new List<ListItem<HierarchyLevel>>.unmodifiable(
+        <ListItem<HierarchyLevel>>[h_rootA, h_rootB]);
 
-    selectedItem = new List<ListItem<String>>.unmodifiable(<ListItem<String>>[
-      level2A
-    ]);
+    selectedItem =
+        new List<ListItem<String>>.unmodifiable(<ListItem<String>>[level2A]);
 
-    selectedItems = new List<ListItem<String>>.unmodifiable(<ListItem<String>>[
-      level2A, level2B
-    ]);
+    selectedItems = new List<ListItem<String>>.unmodifiable(
+        <ListItem<String>>[level2A, level2B]);
 
-    new Timer.periodic(const Duration(seconds: 5), (_) => _addRandomToastMessage());
+    new Timer.periodic(
+        const Duration(seconds: 5), (_) => _addRandomToastMessage());
 
     startRecording();
   }
 
   void startRecording() {
-    if (recordingSession == null) recordingSession = stateService.startRecordingSession();
+    if (recordingSession == null)
+      recordingSession = stateService.startRecordingSession();
   }
 
   void replayRecording() {
     if (recordingSession != null) {
       isReplaying = true;
 
-      stateService.replayRecordingSession(recordingSession).whenComplete(() => isReplaying = false);
+      stateService
+          .replayRecordingSession(recordingSession)
+          .whenComplete(() => isReplaying = false);
     }
 
     recordingSession = null;
@@ -214,9 +231,10 @@ class AppComponent {
 
     new Timer(new Duration(milliseconds: random.nextInt(2000)), () {
       mockResultDataProviderA = fakeData
-        .where((ListItem<domain.Person> listItem) => listItem.data.name.contains(autoFillText))
-        .take(50)
-        .toList(growable: false);
+          .where((ListItem<domain.Person> listItem) =>
+              listItem.data.name.contains(autoFillText))
+          .take(50)
+          .toList(growable: false);
 
       changeDetector.markForCheck();
     });
@@ -229,7 +247,8 @@ class AppComponent {
 
     new Timer(new Duration(milliseconds: random.nextInt(2000)), () {
       mockResultDataProviderB = fakeData
-          .where((ListItem<domain.Person> listItem) => listItem.data.name.contains(autoFillText))
+          .where((ListItem<domain.Person> listItem) =>
+              listItem.data.name.contains(autoFillText))
           .take(50)
           .toList(growable: false);
 
@@ -238,19 +257,27 @@ class AppComponent {
   }
 
   Iterable<ListItem<domain.Person>> _generateRandomServiceData() sync* {
-    for (int i=0; i<5000; i++) yield new ListItem<domain.Person>()
-      ..data = (new domain.Person()
-        ..name = '${faker.person.firstName()} ${faker.person.lastName()}'
-        ..image = 'images/img_${random.nextInt(40) + 1}.png')
-      ..container = ''
-      ..selectable = true;
+    for (int i = 0; i < 5000; i++)
+      yield new ListItem<domain.Person>()
+        ..data = (new domain.Person()
+          ..name = '${faker.person.firstName()} ${faker.person.lastName()}'
+          ..image = 'images/img_${random.nextInt(40) + 1}.png')
+        ..container = ''
+        ..selectable = true;
   }
 
-  void notifyItemRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) => print(event.type);
+  void notifyItemRendererEvent(
+          ItemRendererEvent<dynamic, Comparable<dynamic>> event) =>
+      print(event.type);
 
-  String listItemsAToString(List<ListItem<String>> items) => items.map((ListItem<String> item) => labelHandler(item.data)).join(', ');
+  String listItemsAToString(List<ListItem<String>> items) => items
+      .map((ListItem<String> item) => labelHandler(item.data) as String)
+      .join(', ');
 
-  String listItemsBToString(List<ListItem<domain.Person>> items) => items.map((ListItem<domain.Person> item) => personLabelHandler(item.data)).join(', ');
+  String listItemsBToString(List<ListItem<domain.Person>> items) => items
+      .map((ListItem<domain.Person> item) =>
+          personLabelHandler(item.data) as String)
+      .join(', ');
 
   void handleRange(bool hasRange) {
     print(hasRange);
@@ -258,9 +285,11 @@ class AppComponent {
 }
 
 class NoDragDropService extends DragDropService {
+  @override
+  ListDragDropHandlerType typeHandler(ListItem<Comparable<dynamic>> listItem) =>
+      ListDragDropHandlerType.NONE;
 
-  @override ListDragDropHandlerType typeHandler(ListItem<Comparable<dynamic>> listItem) => ListDragDropHandlerType.NONE;
-
-  @override String resolveDropClassName(ListItem<Comparable<dynamic>> dropListItem) => 'ngDragDrop--drop-inside';
-
+  @override
+  String resolveDropClassName(ListItem<Comparable<dynamic>> dropListItem) =>
+      'ngDragDrop--drop-inside';
 }

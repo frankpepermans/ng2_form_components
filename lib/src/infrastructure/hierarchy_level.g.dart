@@ -88,7 +88,7 @@ class HierarchyLevel extends Entity
   /// Duplicates the [HierarchyLevel] and any recusrive entities to a new [HierarchyLevel]
   @override
   HierarchyLevel duplicate({List<Symbol> ignoredSymbols: null}) =>
-      super.duplicate(ignoredSymbols: ignoredSymbols);
+      super.duplicate(ignoredSymbols: ignoredSymbols) as HierarchyLevel;
 
   /// toString implementation for debugging purposes
   @override

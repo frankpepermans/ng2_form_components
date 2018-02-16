@@ -113,7 +113,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   FormInput(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
-    final Element element = elementRef.nativeElement;
+    final Element element = elementRef.nativeElement as Element;
 
     element.style.display = 'flex';
     element.style.flexDirection = 'column';
@@ -138,7 +138,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   @override
   void ngAfterViewInit() {
     if (inputType == 'text') {
-      final TextAreaElement target = textarea.nativeElement;
+      final TextAreaElement target = textarea.nativeElement as TextAreaElement;
 
       window.animationFrame.whenComplete(() {
         final String newValue =
@@ -167,7 +167,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   void setFocus() {
-    final Element element = elementRef.nativeElement;
+    final Element element = elementRef.nativeElement as Element;
 
     if (element.children.isNotEmpty) {
       element.children.first.focus();
@@ -230,7 +230,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
     String valueToSet;
 
     if (inputType == 'text') {
-      final TextAreaElement target = event.target;
+      final TextAreaElement target = event.target as TextAreaElement;
 
       valueToSet = target.value;
 
@@ -238,11 +238,11 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
 
       if (textareaHeight != newValue) setState(() => textareaHeight = newValue);
     } else if (inputType == 'amount' || inputType == 'numeric') {
-      final InputElement target = event.target;
+      final InputElement target = event.target as InputElement;
 
       valueToSet = target.value;
     } else if (inputType == 'date') {
-      final InputElement target = event.target;
+      final InputElement target = event.target as InputElement;
       final List<String> parts = target.value.split('-');
 
       if (parts.length == 3)

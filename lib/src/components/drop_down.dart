@@ -291,7 +291,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
           if (resolvedLabel is String) {
             returnValue = new rx.Observable<String>.just(resolvedLabel);
-          } else {
+          } else if (resolvedLabel is Stream<String>) {
             returnValue = resolvedLabel;
           }
         } else {

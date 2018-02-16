@@ -86,16 +86,16 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
 
   @override
   void ngAfterViewInit() {
-    final Element element = elementRef.nativeElement;
-    final DivElement header = headerRef.nativeElement;
+    final Element element = elementRef.nativeElement as Element;
+    final DivElement header = headerRef.nativeElement as DivElement;
 
     _dragSubscription = new rx.Observable<MouseEvent>(header.onMouseDown)
         .map((MouseEvent event) {
           event.preventDefault();
 
           return <String, int>{
-            'left': event.client.x - element.offset.left,
-            'top': event.client.y - element.offset.top
+            'left': event.client.x.toInt() - element.offset.left.toInt(),
+            'top': event.client.y.toInt() - element.offset.top.toInt()
           };
         })
         .flatMapLatest((Map<String, int> event) =>

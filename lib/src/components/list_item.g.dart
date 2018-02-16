@@ -165,7 +165,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   /// Duplicates the [ListItem] and any recusrive entities to a new [ListItem]
   @override
   ListItem<T> duplicate({List<Symbol> ignoredSymbols: null}) =>
-      super.duplicate(ignoredSymbols: ignoredSymbols);
+      super.duplicate(ignoredSymbols: ignoredSymbols) as ListItem<T>;
 
   /// toString implementation for debugging purposes
   @override

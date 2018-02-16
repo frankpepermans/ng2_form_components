@@ -151,7 +151,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   void clear() {
-    final InputElement inputElement = inputField.nativeElement;
+    final InputElement inputElement = inputField.nativeElement as InputElement;
 
     _input$ctrl.add('');
 
@@ -166,7 +166,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   void _initStreams() {
-    final Element element = elementRef.nativeElement;
+    final Element element = elementRef.nativeElement as Element;
 
     _inputSubscription = _input$ctrl.stream.listen((String inputValue) {
       _internalValue = inputValue;
@@ -183,7 +183,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   void handleInput(Event event) {
-    final TextInputElement element = event.target;
+    final TextInputElement element = event.target as TextInputElement;
 
     _input$ctrl.add(element.value);
   }
