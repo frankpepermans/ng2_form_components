@@ -6,7 +6,7 @@ import 'dart:collection';
 
 import 'package:rxdart/rxdart.dart' as rx;
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 import 'package:ng2_form_components/src/utils/html_loader.dart' show HtmlLoader;

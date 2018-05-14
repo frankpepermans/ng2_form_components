@@ -13,7 +13,7 @@ An Angular2 component to edit HTML tags.
 A simple usage example:
 
     import 'package:angular2/bootstrap.dart';
-    import 'package:angular2/angular2.dart';
+    import 'package:angular/angular.dart';
     
     import 'package:ng2_form_components/ng2_form_components.dart';
     

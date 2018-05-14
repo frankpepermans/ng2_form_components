@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart' as rx;
 import 'package:tuple/tuple.dart';
 import 'package:dorm/dorm.dart';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/drop_down.dart';
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
@@ -29,7 +29,7 @@ import 'package:ng2_state/ng2_state.dart'
     directives: const <Type>[ListRenderer, Tween, NgClass, NgIf],
     providers: const <dynamic>[
       StateService,
-      const Provider(StatefulComponent, useExisting: AutoComplete)
+      const Provider<Type>(StatefulComponent, useExisting: AutoComplete)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)

@@ -2,7 +2,7 @@ library ng2_form_components.components.form_component;
 
 import 'dart:async';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_state/ng2_state.dart';
 

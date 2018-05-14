@@ -3,7 +3,7 @@ library ng2_form_components.components.window_container;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 import 'package:ng2_form_components/ng2_form_components.dart'
     show WindowListeners;
 import 'package:ng2_state/ng2_state.dart';
@@ -30,7 +30,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
     }'''
     ],
     providers: const <Provider>[
-      const Provider(StatefulComponent, useExisting: WindowContainer)
+      const Provider<Type>(StatefulComponent, useExisting: WindowContainer)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)

@@ -2,7 +2,7 @@ library ng2_form_components.components.drag_drop_list_item_renderer;
 
 import 'dart:html';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart'
     show LabelHandler;
@@ -101,14 +101,10 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>>
   //-----------------------------
 
   DragDropListItemRenderer(
-      @Inject(Injector)
-          Injector injector,
-      @Inject(HtmlHelpers)
-          this.helpers,
-      @Inject(DynamicComponentLoader)
-          DynamicComponentLoader dynamicComponentLoader,
-      @Inject(DragDropService)
-          DragDropService dragDropService)
+      @Inject(Injector) Injector injector,
+      @Inject(HtmlHelpers) this.helpers,
+      @Inject(SlowComponentLoader) SlowComponentLoader dynamicComponentLoader,
+      @Inject(DragDropService) DragDropService dragDropService)
       : super(injector, dynamicComponentLoader, dragDropService);
 
   //-----------------------------
@@ -128,10 +124,9 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>>
           dragDropService.typeHandler(listItem);
 
       if (dragDropType != ListDragDropHandlerType.NONE) {
-        helpers.updateElementClasses(
-            ref.location.nativeElement as Element, 'ngDragDrop--target', true);
+        helpers.updateElementClasses(ref.location, 'ngDragDrop--target', true);
 
-        (ref.location.nativeElement as Element).style.order = '1';
+        ref.location.style.order = '1';
       }
     }
 

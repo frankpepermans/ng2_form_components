@@ -6,7 +6,7 @@ import 'dart:html';
 import 'package:dorm/dorm.dart';
 import 'package:rxdart/rxdart.dart' as rx;
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
@@ -18,7 +18,7 @@ import 'package:ng2_state/ng2_state.dart'
     templateUrl: 'form_input.html',
     directives: const <Type>[],
     providers: const <dynamic>[
-      const Provider(StatefulComponent, useExisting: FormInput)
+      const Provider<Type>(StatefulComponent, useExisting: FormInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)

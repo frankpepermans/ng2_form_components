@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:angular2/platform/browser.dart';
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 import 'package:ng2_state/ng2_state.dart';
 
 import 'package:ng2_form_components/ng2_form_components.dart';
@@ -26,7 +25,7 @@ void main() {
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: const <dynamic>[
       StateService,
-      const Provider(DragDropService,
+      const Provider<Type>(DragDropService,
           useClass:
               NoDragDropService) /*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/
     ],
@@ -53,9 +52,11 @@ class AppComponent {
 
   Type listItemRenderer = DefaultListItemRenderer;
 
-  LabelHandler labelHandler = (String value) => value;
-  LabelHandler personLabelHandler = (domain.Person value) => value.name;
-  LabelHandler hierarchyLabelHandler = (HierarchyLevel value) => value.label;
+  LabelHandler<String, String> labelHandler = (String value) => value;
+  LabelHandler<domain.Person, String> personLabelHandler =
+      (domain.Person value) => value.name;
+  LabelHandler<HierarchyLevel, String> hierarchyLabelHandler =
+      (HierarchyLevel value) => value.label;
 
   List<ListItem<domain.Person>> fakeData;
 

@@ -2,7 +2,7 @@ library ng2_form_components.utils.html_helpers;
 
 import 'dart:html';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 @Injectable()
 class HtmlHelpers {

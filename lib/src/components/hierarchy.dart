@@ -6,7 +6,7 @@ import 'dart:html';
 import 'package:rxdart/rxdart.dart' as rx show Observable;
 import 'package:dorm/dorm.dart' show Entity;
 import 'package:tuple/tuple.dart' show Tuple2;
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart'
     show BeforeDestroyChild;
@@ -59,7 +59,7 @@ typedef bool ShouldOpenDiffer(
     ],
     providers: const <dynamic>[
       StateService,
-      const Provider(StatefulComponent, useExisting: Hierarchy)
+      const Provider<Type>(StatefulComponent, useExisting: Hierarchy)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)

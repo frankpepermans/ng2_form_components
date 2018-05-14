@@ -6,7 +6,7 @@ import 'dart:html';
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 
@@ -21,7 +21,7 @@ typedef void TextInputAction(String inputValue);
     directives: const <Type>[NgClass, NgIf],
     providers: const <dynamic>[
       StateService,
-      const Provider(StatefulComponent, useExisting: TextInput)
+      const Provider<Type>(StatefulComponent, useExisting: TextInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)

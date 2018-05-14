@@ -3,7 +3,7 @@ library ng2_form_components.components.animation.tween;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:angular2/angular2.dart';
+import 'package:angular/angular.dart';
 
 @Directive(selector: '[tween]')
 class Tween implements OnInit, OnDestroy {
