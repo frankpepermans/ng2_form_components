@@ -1,6 +1,8 @@
 library ng2_form_components.components.list_item_renderer;
 
 import 'package:angular/angular.dart';
+import 'package:angular/src/di/injector/hierarchical.dart'
+    show HierarchicalInjector;
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart'
     show LabelHandler;
@@ -135,7 +137,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
               new Provider<OpaqueToken<String>>(
                   const OpaqueToken<String>('list-item-index'),
                   useValue: index)
-            ], injector))
+            ], injector as HierarchicalInjector))
         .then(ngOnComponentLoaded);
   }
 

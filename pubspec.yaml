@@ -20,6 +20,8 @@ dev_dependencies:
 dependency_overrides:
   ng2_state:
     path: ../ng2_state
+  dorm:
+    path: ../dorm
 web:
   compiler:
     debug: dartdevc

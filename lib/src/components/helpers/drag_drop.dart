@@ -15,8 +15,8 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
 import 'package:ng2_form_components/src/utils/html_helpers.dart';
 
-final SerializerJson<String, Map<String, dynamic>> _serializer =
-    new SerializerJson<String, Map<String, dynamic>>()
+final SerializerJson<String> _serializer =
+    new SerializerJson<String>()
       ..outgoing(const <dynamic>[])
       ..addRule(
           DateTime,
