@@ -39,7 +39,7 @@ class DragDrop implements OnDestroy {
   @Output()
   Stream<DropResult> get onDrop => _onDrop$ctrl.stream;
 
-  final ElementRef elementRef;
+  final Element elementRef;
   final ChangeDetectorRef changeDetector;
   final DragDropService dragDropService;
   final HtmlHelpers helpers;
@@ -71,7 +71,7 @@ class DragDrop implements OnDestroy {
   num heightOnDragEnter = 0;
 
   DragDrop(
-      @Inject(ElementRef) this.elementRef,
+      @Inject(Element) this.elementRef,
       @Inject(ChangeDetectorRef) this.changeDetector,
       @Inject(DragDropService) this.dragDropService,
       @Inject(HtmlHelpers) this.helpers) {

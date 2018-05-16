@@ -18,7 +18,8 @@ typedef void TextInputAction(String inputValue);
 @Component(
     selector: 'text-input',
     templateUrl: 'text_input.html',
-    directives: const <Type>[NgClass, NgIf],
+    directives: const <dynamic>[coreDirectives],
+    pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
       const Provider<Type>(StatefulComponent, useExisting: TextInput)
@@ -28,7 +29,7 @@ typedef void TextInputAction(String inputValue);
 class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
     implements OnChanges, OnDestroy {
   @ViewChild('inputField')
-  ElementRef inputField;
+  Element inputField;
 
   //-----------------------------
   // input
@@ -89,7 +90,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   // constructor
   //-----------------------------
 
-  TextInput(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
+  TextInput(@Inject(Element) Element elementRef) : super(elementRef) {
     _initStreams();
   }
 
@@ -166,7 +167,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   void _initStreams() {
-    final Element element = elementRef.nativeElement as Element;
+    final Element element = elementRef;
 
     _inputSubscription = _input$ctrl.stream.listen((String inputValue) {
       _internalValue = inputValue;

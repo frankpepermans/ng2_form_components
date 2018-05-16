@@ -37,7 +37,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
 class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
     implements StatefulComponent, OnDestroy, AfterViewInit {
   @ViewChild('header')
-  ElementRef headerRef;
+  Element headerRef;
 
   final WindowListeners windowListeners = new WindowListeners();
 
@@ -58,7 +58,7 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
 
   StreamSubscription<_DragPosition> _dragSubscription, _dragCommitSubscription;
 
-  WindowContainer(@Inject(ElementRef) ElementRef elementRef)
+  WindowContainer(@Inject(Element) Element elementRef)
       : super(elementRef);
 
   @override
@@ -86,8 +86,8 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
 
   @override
   void ngAfterViewInit() {
-    final Element element = elementRef.nativeElement as Element;
-    final DivElement header = headerRef.nativeElement as DivElement;
+    final Element element = elementRef;
+    final DivElement header = headerRef as DivElement;
 
     _dragSubscription = new rx.Observable<MouseEvent>(header.onMouseDown)
         .map((MouseEvent event) {
@@ -98,7 +98,7 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
             'top': event.client.y.toInt() - element.offset.top.toInt()
           };
         })
-        .flatMapLatest((Map<String, int> event) =>
+        .switchMap((Map<String, int> event) =>
             new rx.Observable<MouseEvent>(document.body.onMouseMove)
                 .map((MouseEvent pos) => new _DragPosition(
                     pos.client.x - event['left'], pos.client.y - event['top']))
@@ -109,7 +109,7 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
         new rx.Observable<_DragPosition>.merge(<Stream<_DragPosition>>[
       _dragPosition$ctrl.stream,
       new rx.Observable<bool>(windowListeners.windowResize)
-          .flatMapLatest((_) => _dragPosition$ctrl.stream)
+          .switchMap((_) => _dragPosition$ctrl.stream)
     ]).listen((_DragPosition position) {
       final num lMax =
           window.document.documentElement.clientWidth - element.clientWidth;

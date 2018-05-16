@@ -61,7 +61,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   bool _animationBegan = false;
   Timer _openTimer;
 
-  HierarchyAnimation(@Inject(ElementRef) ElementRef element) : super(element);
+  HierarchyAnimation(@Inject(Element) Element element) : super(element);
 
   @override
   void ngOnInit() {

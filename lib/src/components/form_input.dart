@@ -16,7 +16,8 @@ import 'package:ng2_state/ng2_state.dart'
 @Component(
     selector: 'form-input',
     templateUrl: 'form_input.html',
-    directives: const <Type>[],
+    directives: const <dynamic>[coreDirectives],
+    pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       const Provider<Type>(StatefulComponent, useExisting: FormInput)
     ],
@@ -25,7 +26,7 @@ import 'package:ng2_state/ng2_state.dart'
 class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
     implements OnDestroy, AfterViewInit {
   @ViewChild('textarea')
-  ElementRef textarea;
+  Element textarea;
 
   //-----------------------------
   // input
@@ -112,8 +113,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   // constructor
   //-----------------------------
 
-  FormInput(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
-    final Element element = elementRef.nativeElement as Element;
+  FormInput(@Inject(Element) Element elementRef) : super(elementRef) {
+    final Element element = elementRef;
 
     element.style.display = 'flex';
     element.style.flexDirection = 'column';
@@ -138,7 +139,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   @override
   void ngAfterViewInit() {
     if (inputType == 'text') {
-      final TextAreaElement target = textarea.nativeElement as TextAreaElement;
+      final TextAreaElement target = textarea as TextAreaElement;
 
       window.animationFrame.whenComplete(() {
         final String newValue =
@@ -167,7 +168,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   void setFocus() {
-    final Element element = elementRef.nativeElement as Element;
+    final Element element = elementRef;
 
     if (element.children.isNotEmpty) {
       element.children.first.focus();

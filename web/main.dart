@@ -29,7 +29,8 @@ void main() {
           useClass:
               NoDragDropService) /*, const Provider(ShouldOpenDiffer, useValue: _Const.defaultDiffer)*/
     ],
-    directives: const <Type>[
+    directives: const <dynamic>[
+      coreDirectives,
       State,
       TextInput,
       DropDown,
@@ -272,12 +273,12 @@ class AppComponent {
       print(event.type);
 
   String listItemsAToString(List<ListItem<String>> items) => items
-      .map((ListItem<String> item) => labelHandler(item.data) as String)
+      .map((ListItem<String> item) => labelHandler(item.data))
       .join(', ');
 
   String listItemsBToString(List<ListItem<domain.Person>> items) => items
       .map((ListItem<domain.Person> item) =>
-          personLabelHandler(item.data) as String)
+          personLabelHandler(item.data))
       .join(', ');
 
   void handleRange(bool hasRange) {

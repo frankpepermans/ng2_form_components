@@ -1,5 +1,7 @@
 library person_list_item_renderer;
 
+import 'dart:html';
+
 import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_item_renderer.dart' show DynamicListItemRenderer;
@@ -43,7 +45,7 @@ class PersonListItemRenderer<T extends Person> implements DynamicListItemRendere
       @Inject(IsSelectedHandler) this.isSelected,
       @Inject(GetHierarchyOffsetHandler) this.getHierarchyOffset,
       @Inject(LabelHandler) this.labelHandler,
-      @Inject(ElementRef) ElementRef elementRef);
+      @Inject(Element) Element elementRef);
 
   void triggerSelection() => listRendererService.triggerSelection(listItem);
 

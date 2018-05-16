@@ -1,6 +1,7 @@
 library ng2_form_components.components.animation.side_panel_animation;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'package:angular/angular.dart';
 
@@ -26,7 +27,7 @@ class SidePanelAnimation extends Tween implements OnInit {
     super.beforeDestroyChildTrigger = value as StreamController<bool>;
   }
 
-  SidePanelAnimation(@Inject(ElementRef) ElementRef element) : super(element) {
+  SidePanelAnimation(@Inject(Element) Element element) : super(element) {
     tweenStyleProperty = 'width';
   }
 

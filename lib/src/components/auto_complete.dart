@@ -26,7 +26,8 @@ import 'package:ng2_state/ng2_state.dart'
 @Component(
     selector: 'auto-complete',
     templateUrl: 'auto_complete.html',
-    directives: const <Type>[ListRenderer, Tween, NgClass, NgIf],
+    directives: const <dynamic>[ListRenderer, Tween, coreDirectives],
+    pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
       const Provider<Type>(StatefulComponent, useExisting: AutoComplete)
@@ -36,7 +37,7 @@ import 'package:ng2_state/ng2_state.dart'
 class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
     implements OnChanges, OnDestroy, AfterViewInit {
   @ViewChild('searchInput')
-  ElementRef searchInput;
+  Element searchInput;
 
   //-----------------------------
   // input
@@ -149,7 +150,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   // constructor
   //-----------------------------
 
-  AutoComplete(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
+  AutoComplete(@Inject(Element) Element elementRef) : super(elementRef) {
     super.className = 'ng2-form-components-auto-complete';
 
     _initStreams();
@@ -223,7 +224,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   void setInputValue(String value) {
     if (searchInput != null)
-      (searchInput.nativeElement as InputElement).value = value;
+      (searchInput as InputElement).value = value;
 
     _inputCriteriaMet$ctrl.add(value.length >= minCharsRequired);
 
@@ -354,7 +355,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
     _mergedDataProviderChangedSubscription = new rx.Observable<bool>(
             _inputCriteriaMet$ctrl.stream)
         .distinct((bool bA, bool bB) => bA == bB)
-        .flatMapLatest((bool isCriteriaMet) => merged$
+        .switchMap((bool isCriteriaMet) => merged$
             .where(
                 (Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) =>
                     tuple.item4 == isCriteriaMet)

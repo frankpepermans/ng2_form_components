@@ -1,6 +1,7 @@
 library ng2_form_components.components.form_component;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'package:angular/angular.dart';
 
@@ -15,7 +16,7 @@ typedef Type ResolveRendererHandler(int level, [ListItem<Comparable<dynamic>> li
 
 abstract class FormComponent<T extends Comparable<dynamic>> extends ComponentState implements StatefulComponent, OnDestroy {
 
-  final ElementRef elementRef;
+  final Element elementRef;
   final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
 
   @override Stream<bool> get onDestroy => _onDestroy$ctrl.stream;

@@ -50,13 +50,15 @@ typedef bool ShouldOpenDiffer(
 @Component(
     selector: 'hierarchy',
     templateUrl: 'hierarchy.html',
-    directives: const <Type>[
+    directives: const <dynamic>[
+      coreDirectives,
       State,
       Hierarchy,
       HierarchyAnimation,
       ListItemRenderer,
       DragDropListItemRenderer
     ],
+    pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
       const Provider<Type>(StatefulComponent, useExisting: Hierarchy)
@@ -70,7 +72,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
   @override
   @ViewChild('scrollPane')
-  set scrollPane(ElementRef value) {
+  set scrollPane(Element value) {
     super.scrollPane = value;
   }
 
@@ -308,7 +310,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   // constructor
   //-----------------------------
 
-  Hierarchy(@Inject(ElementRef) ElementRef element) : super(element) {
+  Hierarchy(@Inject(Element) Element element) : super(element) {
     super.resolveRendererHandler =
         (int level, [_]) => DefaultHierarchyListItemRenderer;
 
@@ -388,7 +390,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
     beforeDestroyChild.add(argsCast.first);
 
-    return new rx.Observable<int>.amb(<Stream<int>>[
+    return new rx.Observable<int>.race(<Stream<int>>[
       beforeDestroyChild.stream.where((int index) => index == argsCast.first),
       onDestroy.map((_) => 0)
     ]).take(1).map((_) => argsCast.first);
@@ -427,7 +429,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
     _eventSubscription =
         new rx.Observable<ListRendererService>(_listRendererService$ctrl.stream)
-            .flatMapLatest((ListRendererService service) => service.event$)
+            .switchMap((ListRendererService service) => service.event$)
             .listen(_handleItemRendererEvent);
 
     _clearChildHierarchiesSubscription = rx.Observable
@@ -478,7 +480,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
             new rx.Observable<Map<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>>(_selection$Ctrl.stream).startWith(
                 <Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>{}),
             new rx.Observable<List<Hierarchy<Comparable<dynamic>>>>(_childHierarchyList$ctrl.stream)
-                .flatMapLatest((List<Hierarchy<Comparable<dynamic>>> hierarchies) =>
+                .switchMap((List<Hierarchy<Comparable<dynamic>>> hierarchies) =>
                     new rx.Observable<Tuple2<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>>.merge(
                         (new List<Hierarchy<Comparable<dynamic>>>.from(hierarchies)..add(this))
                             .map((Hierarchy<Comparable<dynamic>> hierarchy) => hierarchy.internalSelectedItemsChanged.map((List<ListItem<Comparable<dynamic>>> selectedItems) => new Tuple2<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>(hierarchy, selectedItems))))),
@@ -551,7 +553,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
       if (level == 0)
         selectedItems.forEach(handleSelection);
       else {
-        new rx.Observable<dynamic>.amb(<Stream<dynamic>>[
+        new rx.Observable<dynamic>.race(<Stream<dynamic>>[
           new rx.Observable<bool>(_domModified$ctrl.stream)
               .asyncMap((_) => window.animationFrame)
               .debounce(const Duration(milliseconds: 50)),
@@ -620,8 +622,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     });
   }
 
-  Future<Null> forEachAsync/*<T>*/(
-      Iterable/*<T>*/ list, Future<dynamic> asyncOperation(/*=T*/ current)) {
+  Future<Null> forEachAsync<T>(
+      Iterable<T> list, Future<dynamic> asyncOperation(T current)) {
     if (list == null) return new Future<Null>.value();
 
     final Completer<Null> completer = new Completer<Null>();

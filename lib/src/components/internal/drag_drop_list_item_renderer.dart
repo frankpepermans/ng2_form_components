@@ -1,7 +1,5 @@
 library ng2_form_components.components.drag_drop_list_item_renderer;
 
-import 'dart:html';
-
 import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart'

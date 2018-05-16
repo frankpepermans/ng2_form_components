@@ -1,6 +1,7 @@
 library ng2_form_components.components.default_list_item_renderer;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'package:angular/angular.dart';
 
@@ -14,6 +15,7 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
 
 @Component(
     selector: 'default-list-item-renderer',
+    directives: const <dynamic>[coreDirectives],
     template: '''
       <div class="instance" (click)="triggerSelection()" style="padding:5px">
         <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelStream | async}}</label>
@@ -50,7 +52,7 @@ class DefaultListItemRenderer<T extends Comparable<dynamic>> implements DynamicL
     @Inject(IsSelectedHandler) this.isSelected,
     @Inject(GetHierarchyOffsetHandler) this.getHierarchyOffset,
     @Inject(LabelHandler) LabelHandler labelHandler,
-    @Inject(ElementRef) ElementRef elementRef) :
+    @Inject(Element) Element elementRef) :
       this.listItem = listItem,
       this.labelHandler = labelHandler,
       this.labelStream = (_resolveLabel(labelHandler(listItem.data)))

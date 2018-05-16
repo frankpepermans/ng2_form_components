@@ -20,7 +20,8 @@ enum ToastMessageType {
 @Component(
     selector: 'toaster',
     templateUrl: 'toaster.html',
-    directives: const <Type>[Tween, HtmlLoader],
+    directives: const <dynamic>[coreDirectives, Tween, HtmlLoader],
+    pipes: const <dynamic>[commonPipes],
     changeDetection: ChangeDetectionStrategy.OnPush,
     preserveWhitespace: false
 )

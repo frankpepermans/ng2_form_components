@@ -64,20 +64,20 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>>
 @Component(
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
-    directives: const <Type>[ListItemRenderer, DragDropListItemRenderer],
+    directives: const <dynamic>[coreDirectives, ListItemRenderer, DragDropListItemRenderer],
     providers: const <dynamic>[
       StateService,
       const Provider<Type>(StatefulComponent, useExisting: ListRenderer)
     ],
-    pipes: const <Type>[SelectedItemsPipe, UnselectedItemsPipe],
+    pipes: const <dynamic>[commonPipes, SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
     implements OnDestroy, AfterViewInit {
-  ElementRef _scrollPane;
-  ElementRef get scrollPane => _scrollPane;
+  Element _scrollPane;
+  Element get scrollPane => _scrollPane;
   @ViewChild('scrollPane')
-  set scrollPane(ElementRef value) {
+  set scrollPane(Element value) {
     _scrollPane = value;
   }
 
@@ -170,7 +170,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
     setState(() => _pageOffset = value);
 
     if (value == 0) {
-      scrollPane?.nativeElement?.scrollTop = 0;
+      scrollPane?.scrollTop = 0;
 
       _initScrollPositionStream();
     }
@@ -227,7 +227,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   Iterable<ListItem<T>> internalSelectedItems =
       new List<ListItem<T>>.unmodifiable(const <ListItem<Comparable<dynamic>>>[]);
 
-  final ElementRef element;
+  final Element element;
 
   rx.Observable<List<ListItem<T>>> _selectedItems$;
 
@@ -277,7 +277,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   // constructor
   //-----------------------------
 
-  ListRenderer(@Inject(ElementRef) ElementRef elementRef)
+  ListRenderer(@Inject(Element) Element elementRef)
       : this.element = elementRef,
         super(elementRef) {
     _initStreams();
@@ -297,9 +297,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
 
     if (scrollPane != null) {
       if (tuple.item1 > 0) {
-        scrollPane.nativeElement.scrollTop = tuple.item1;
+        scrollPane.scrollTop = tuple.item1;
 
-        if (scrollPane.nativeElement.scrollTop != tuple.item1) {
+        if (scrollPane.scrollTop != tuple.item1) {
           _pendingScrollTop = tuple.item1;
 
           _initDomChangeListener();
@@ -350,14 +350,14 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
     listRendererService.addRenderer(this);
 
     observer = new MutationObserver(notifyDomChanged)
-      ..observe(element.nativeElement as Node,
+      ..observe(element,
           subtree: true, childList: true, attributes: false);
 
     _domClickSubscription = window.onMouseDown.listen((MouseEvent event) {
       Node target = event.target as Node;
 
       while (target != null && target.parentNode != window) {
-        if (target is Element && target == element.nativeElement) return;
+        if (target is Element && target == element) return;
 
         target = target.parentNode;
       }
@@ -366,7 +366,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
     });
 
     if (_pendingScrollTop > 0)
-      scrollPane.nativeElement.scrollTop = _pendingScrollTop;
+      scrollPane.scrollTop = _pendingScrollTop;
 
     if (scrollPane != null) _initDomChangeListener();
 
@@ -512,12 +512,12 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
 
     _scrollAfterDataProviderSubscription =
         new rx.Observable<int>(_scroll$ctrl.stream)
-            .flatMapLatest((int scrollTop) =>
+            .switchMap((int scrollTop) =>
                 _dataProvider$ctrl.stream.map((_) => scrollTop))
             .listen((int scrollTop) {
-      scrollPane.nativeElement.scrollTop = scrollTop;
+      scrollPane.scrollTop = scrollTop;
 
-      if (scrollPane.nativeElement.scrollTop != scrollTop) {
+      if (scrollPane.scrollTop != scrollTop) {
         _pendingScrollTop = scrollTop;
 
         _initDomChangeListener();

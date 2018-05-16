@@ -24,7 +24,8 @@ import 'package:ng2_state/ng2_state.dart'
 @Component(
     selector: 'drop-down',
     templateUrl: 'drop_down.html',
-    directives: const <Type>[ListRenderer, Tween],
+    directives: const <dynamic>[ListRenderer, Tween, coreDirectives],
+    pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
       const Provider<Type>(StatefulComponent, useExisting: DropDown)
@@ -166,7 +167,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   // constructor
   //-----------------------------
 
-  DropDown(@Inject(ElementRef) ElementRef elementRef) : super(elementRef) {
+  DropDown(@Inject(Element) Element elementRef) : super(elementRef) {
     _initStreams();
   }
 
@@ -225,7 +226,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     final Completer<bool> completer = new Completer<bool>();
 
     _beforeDestroyChildSubscription =
-        new rx.Observable<bool>.amb(<Stream<bool>>[
+        new rx.Observable<bool>.race(<Stream<bool>>[
       beforeDestroyChild.stream.where((bool isDone) => isDone),
       onDestroy.map((_) => true)
     ]).take(1).listen((bool value) => completer.complete(value));
@@ -280,7 +281,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
                 .startWith(const []),
             (String label, Iterable<ListItem<T>> selectedItems) =>
                 new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
-        .flatMapLatest((Tuple2<String, Iterable<ListItem<T>>> tuple) {
+        .switchMap((Tuple2<String, Iterable<ListItem<T>>> tuple) {
       Stream<String> returnValue;
 
       if (updateHeaderLabelWithSelection &&
@@ -306,7 +307,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
                 else
                   return resolvedLabel as Stream<String>;
               })
-              .bufferWithCount(tuple.item2.length)
+              .bufferCount(tuple.item2.length)
               .map((Iterable<String> list) => list.join(', '));
         }
       }
@@ -321,7 +322,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
     _openCloseSubscription = new rx.Observable<bool>(_openClose$ctrl.stream)
         .distinct((bool vA, bool vB) => vA == vB)
-        .flatMapLatest(_awaitCloseAnimation)
+        .switchMap(_awaitCloseAnimation)
         .listen((bool isOpen) {
       setOpenOrClosed(isOpen);
 
@@ -343,7 +344,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
             new rx.Observable<bool>(_openClose$ctrl.stream)
                 .startWith(isOpen)
                 .distinct((bool vA, bool vB) => vA == vB)
-                .flatMapLatest(_awaitCloseAnimation),
+                .switchMap(_awaitCloseAnimation),
             new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
                 .startWith(const []),
             (bool isOpen, Iterable<ListItem<T>> selectedItems) {

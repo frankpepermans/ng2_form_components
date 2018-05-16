@@ -50,15 +50,15 @@ class Tween implements OnInit, OnDestroy {
     _hasCloseAnimation = value;
   }
 
-  final ElementRef element;
+  final Element element;
 
   Timer _openTimer;
   Element nativeElement;
 
   StreamSubscription<dynamic> _beforeDestroyChildTriggerSubscription;
 
-  Tween(@Inject(ElementRef) this.element) {
-    nativeElement = element.nativeElement as Element;
+  Tween(@Inject(Element) this.element) {
+    nativeElement = element;
   }
 
   @override

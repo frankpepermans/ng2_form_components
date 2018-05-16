@@ -1,6 +1,7 @@
 library ng2_form_components.components.side_panel;
 
 import 'dart:async';
+import 'dart:html';
 
 import 'package:rxdart/rxdart.dart' as rx;
 import 'package:dorm/dorm.dart';
@@ -17,7 +18,8 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
 @Component(
     selector: 'side-panel',
     templateUrl: 'side_panel.html',
-    directives: const <Type>[SidePanelAnimation],
+    directives: const <dynamic>[coreDirectives, SidePanelAnimation],
+    pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[StateService, const Provider<Type>(StatefulComponent, useExisting: SidePanel)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
@@ -54,7 +56,7 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   //-----------------------------
 
   SidePanel(
-    @Inject(ElementRef) ElementRef elementRef) :
+    @Inject(Element) Element elementRef) :
       super(elementRef) {
         _initStreams();
       }
@@ -106,7 +108,7 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   void _initStreams() {
     _toggleStateSubscription = new rx.Observable<bool>(_isOpen$ctrl.stream.distinct())
       .startWith(false)
-      .flatMapLatest((bool isOpen) => new rx.Observable<bool>(_toggle$ctrl.stream)
+      .switchMap((bool isOpen) => new rx.Observable<bool>(_toggle$ctrl.stream)
         .debounce(const Duration(milliseconds: 100))
         .map((_) => isOpen)
         .take(1))
