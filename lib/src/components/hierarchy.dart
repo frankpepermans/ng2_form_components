@@ -61,14 +61,18 @@ typedef bool ShouldOpenDiffer(
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
-      const Provider<Type>(StatefulComponent, useExisting: Hierarchy)
+      const Provider(StatefulComponent, useExisting: Hierarchy)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     implements OnDestroy, AfterViewInit, BeforeDestroyChild {
+  Hierarchy<T> _subHierarchy;
+  Hierarchy<T> get subHierarchy => _subHierarchy;
   @ViewChild('subHierarchy')
-  Hierarchy<Comparable<dynamic>> subHierarchy;
+  set subHierarchy(Hierarchy value) {
+    _subHierarchy = value as Hierarchy<T>;
+  }
 
   @override
   @ViewChild('scrollPane')
