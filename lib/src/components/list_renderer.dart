@@ -405,7 +405,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
       if (_scrollPositionSubscription != null)
         _scrollPositionSubscription.cancel();
 
-      final Element scrollPaneElement = scrollPane.nativeElement as Element;
+      final Element scrollPaneElement = scrollPane;
 
       _scrollPositionSubscription =
           new rx.Observable<Event>(scrollPaneElement.onScroll)
@@ -551,12 +551,12 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   void _attemptRequiredScrollPosition(dynamic _) {
-    final Element scrollPaneElement = scrollPane.nativeElement as Element;
+    final Element scrollPaneElement = scrollPane;
     final num targetPosition = math.min(
         scrollPaneElement.scrollHeight - scrollPaneElement.clientHeight,
         _pendingScrollTop);
 
-    scrollPane.nativeElement.scrollTop = targetPosition;
+    scrollPane.scrollTop = targetPosition;
 
     if (targetPosition >= _pendingScrollTop) {
       _domChangeSubscription?.cancel();

@@ -110,7 +110,7 @@ class DragDrop implements OnDestroy {
       ListDragDropHandler handler, bool removeAllStyles) {
     if (listItem != null && handler != null) {
       if (removeAllStyles) {
-        final Element element = elementRef.nativeElement as Element;
+        final Element element = elementRef;
 
         helpers.updateElementClasses(
             element, dragDropService.resolveDropClassName(listItem), false);
@@ -140,7 +140,7 @@ class DragDrop implements OnDestroy {
   void _setupAsDragDrop(ListItem<Comparable<dynamic>> listItem) {
     if (_areStreamsSet) return;
 
-    final Element element = elementRef.nativeElement as Element;
+    final Element element = elementRef;
 
     _areStreamsSet = true;
 
@@ -177,7 +177,7 @@ class DragDrop implements OnDestroy {
 
   void _createDropHandler(
       ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
-    final Element element = elementRef.nativeElement as Element;
+    final Element element = elementRef;
 
     element.setAttribute('draggable', 'true');
 
@@ -207,7 +207,7 @@ class DragDrop implements OnDestroy {
 
   void _createSortHandlers(
       ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
-    final Element element = elementRef.nativeElement as Element;
+    final Element element = elementRef;
 
     element.setAttribute('draggable', 'true');
 
@@ -264,17 +264,17 @@ class DragDrop implements OnDestroy {
 
   bool _isWithinDropBounds(num clientY) {
     final num y =
-        _getActualOffsetY(elementRef.nativeElement as Element, clientY);
+        _getActualOffsetY(elementRef, clientY);
 
     return (y > _OFFSET && y < heightOnDragEnter - _OFFSET);
   }
 
   bool _isSortAbove(num clientY) =>
-      _getActualOffsetY(elementRef.nativeElement as Element, clientY) <=
+      _getActualOffsetY(elementRef, clientY) <=
       _OFFSET;
 
   bool _isSortBelow(num clientY) =>
-      _getActualOffsetY(elementRef.nativeElement as Element, clientY) >=
+      _getActualOffsetY(elementRef, clientY) >=
       heightOnDragEnter - _OFFSET;
 }
 

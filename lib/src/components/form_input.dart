@@ -262,5 +262,9 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
     event.stopImmediatePropagation();
   }
 
-  void handleBlur(FocusEvent event) => _blurEvent$ctrl.add(event);
+  void handleBlur(FocusEvent event, [bool handleInput= false]) {
+    _blurEvent$ctrl.add(event);
+
+    if (handleInput) this.handleInput(event);
+  }
 }

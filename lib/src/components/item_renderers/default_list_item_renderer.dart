@@ -16,6 +16,7 @@ import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dar
 @Component(
     selector: 'default-list-item-renderer',
     directives: const <dynamic>[coreDirectives],
+    pipes: const <dynamic>[commonPipes],
     template: '''
       <div class="instance" (click)="triggerSelection()" style="padding:5px">
         <label [ngStyle]="{'margin-left': getHierarchyOffset(listItem), 'word-wrap': 'break-word', 'width': '100%'}">{{labelStream | async}}</label>

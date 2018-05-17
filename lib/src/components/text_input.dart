@@ -152,7 +152,7 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   void clear() {
-    final InputElement inputElement = inputField.nativeElement as InputElement;
+    final InputElement inputElement = inputField;
 
     _input$ctrl.add('');
 
