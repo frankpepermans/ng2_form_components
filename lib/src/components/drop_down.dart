@@ -45,6 +45,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     setState(() => _labelHandler = value);
   }
 
+  List<ListItem<Comparable<dynamic>>> get dataProviderCast =>
+      dataProvider?.toList()?.cast<ListItem<Comparable<dynamic>>>();
+
   Iterable<ListItem<T>> _dataProvider;
   Iterable<ListItem<T>> get dataProvider => _dataProvider;
   @Input()
@@ -58,6 +61,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   set updateHeaderLabelWithSelection(bool value) {
     setState(() => _updateHeaderLabelWithSelection = value);
   }
+
+  List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
+      selectedItems?.toList()?.cast<ListItem<Comparable<dynamic>>>();
 
   Iterable<ListItem<T>> _selectedItems = <ListItem<T>>[];
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
@@ -265,6 +271,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
   // private methods
   //-----------------------------
+
+  void updateSelectedItemsCast(List<ListItem<Comparable<dynamic>>> items) =>
+      updateSelectedItems(items?.cast<ListItem<T>>());
 
   void setSelectedItems(Iterable<ListItem<T>> value) =>
       setState(() => selectedItems = value);

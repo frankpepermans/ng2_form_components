@@ -13,9 +13,9 @@
                     [allowMultiSelection]="allowMultiSelection"
                     [moveSelectionOnTop]="moveSelectionOnTop"
                     [dataProvider]="mergedDataProvider"
-                    [selectedItems]="selectedItems"
+                    [selectedItems]="selectedItemsCast"
                     [childOffset]="childOffset"
-                    (selectedItemsChanged)="updateSelectedItems($event)"
+                    (selectedItemsChanged)="updateSelectedItemsCast($event)"
                     (requestClose)="openOrClose()">
             </list-renderer>
         </div>

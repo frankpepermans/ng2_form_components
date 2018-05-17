@@ -12,10 +12,10 @@
                     [resolveRendererHandler]="resolveRendererHandler"
                     [labelHandler]="labelHandler"
                     [allowMultiSelection]="allowMultiSelection"
-                    [dataProvider]="dataProvider"
-                    [selectedItems]="selectedItems"
+                    [dataProvider]="dataProviderCast"
+                    [selectedItems]="selectedItemsCast"
                     [childOffset]="childOffset"
-                    (selectedItemsChanged)="updateSelectedItems($event)"
+                    (selectedItemsChanged)="updateSelectedItemsCast($event)"
                     (itemRendererEvent)="handleItemRendererEvent($event)"
                     (requestClose)="closeFromList()">
             </list-renderer>

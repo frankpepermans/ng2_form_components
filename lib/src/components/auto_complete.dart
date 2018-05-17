@@ -55,6 +55,9 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
     super.dataProvider = value;
   }
 
+  List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
+      selectedItems?.toList()?.cast<ListItem<Comparable<dynamic>>>();
+
   @override
   @Input()
   set selectedItems(Iterable<ListItem<T>> value) {
@@ -429,4 +432,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
     //setSelectedItems(const []);
   }
+
+  void updateSelectedItemsCast(List<ListItem<Comparable<dynamic>>> items) =>
+      super.updateSelectedItems(items?.cast<ListItem<T>>());
 }
