@@ -32,15 +32,16 @@ class MutationObserverStream extends Stream<bool> {
     StreamController<bool> controller;
     MutationObserver observer;
 
-    matcher ??= (_) => true;
+    matcher ??= (MutationRecord record) => true;
 
     controller = new StreamController<bool>(
         sync: true,
         onListen: () {
-          void onMutation(
-              List<MutationRecord> mutations, MutationObserver observer) {
+          void onMutation(List<dynamic> mutations, MutationObserver observer) {
+            final List<MutationRecord> list = mutations.cast<MutationRecord>();
+
             final MutationRecord match =
-                mutations.firstWhere(matcher, orElse: () => null);
+                list.firstWhere(matcher, orElse: () => null);
 
             if (match != null) controller.add(true);
           }
