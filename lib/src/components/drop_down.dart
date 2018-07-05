@@ -11,7 +11,8 @@ import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/list_renderer.dart';
-import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.dart';
+import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.template.dart'
+    as lr;
 import 'package:ng2_form_components/src/components/list_item.g.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart';
@@ -28,7 +29,7 @@ import 'package:ng2_state/ng2_state.dart'
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
-      const Provider<Type>(StatefulComponent, useExisting: DropDown)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), DropDown)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -38,10 +39,10 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   // input
   //-----------------------------
 
-  LabelHandler _labelHandler;
-  LabelHandler get labelHandler => _labelHandler;
+  LabelHandler<T> _labelHandler;
+  LabelHandler<T> get labelHandler => _labelHandler;
   @Input()
-  set labelHandler(LabelHandler value) {
+  set labelHandler(LabelHandler<T> value) {
     setState(() => _labelHandler = value);
   }
 
@@ -107,7 +108,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   ResolveRendererHandler _resolveRendererHandler =
-      (_, [__]) => DefaultListItemRenderer;
+      (_, [__]) => lr.DefaultListItemRendererNgFactory;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
@@ -235,7 +236,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
         new rx.Observable<bool>.race(<Stream<bool>>[
       beforeDestroyChild.stream.where((bool isDone) => isDone),
       onDestroy.map((_) => true)
-    ]).take(1).listen((bool value) => completer.complete(value));
+    ]).take(1).listen(completer.complete);
 
     beforeDestroyChild.add(false);
 
@@ -297,33 +298,27 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
           tuple.item2 != null &&
           tuple.item2.isNotEmpty) {
         if (tuple.item2.length == 1) {
-          final dynamic resolvedLabel = labelHandler(tuple.item2.first.data);
+          if (labelHandler != null)
+            return new rx.Observable<String>.just(
+                labelHandler(tuple.item2.first.data));
 
-          if (resolvedLabel is String) {
-            returnValue = new rx.Observable<String>.just(resolvedLabel);
-          } else if (resolvedLabel is Stream<String>) {
-            returnValue = resolvedLabel;
-          }
+          return new rx.Observable<String>.just(null);
         } else {
           returnValue = new rx.Observable<ListItem<T>>(
                   new Stream<ListItem<T>>.fromIterable(tuple.item2))
               .flatMap((ListItem<T> listItem) {
-                final dynamic resolvedLabel = labelHandler(listItem.data);
+                if (labelHandler != null)
+                  return rx.Observable<String>.just(
+                      labelHandler(listItem.data));
 
-                if (resolvedLabel is String)
-                  return new Stream<String>.fromIterable(
-                      <String>[resolvedLabel]);
-                else
-                  return resolvedLabel as Stream<String>;
+                return new rx.Observable<String>.just(null);
               })
               .bufferCount(tuple.item2.length)
               .map((Iterable<String> list) => list.join(', '));
         }
       }
 
-      returnValue ??= new rx.Observable<String>.just(tuple.item1);
-
-      return returnValue;
+      return returnValue ??= new rx.Observable<String>.just(tuple.item1);
     }).listen((String headerLabel) {
       if (currentHeaderLabel != headerLabel)
         setState(() => currentHeaderLabel = headerLabel);
@@ -338,7 +333,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
       if (isOpen) {
         FormComponent.openFormComponents
             .where((FormComponent<Comparable<dynamic>> component) =>
-                (component != this && component is DropDown))
+                component != this && component is DropDown)
             .map((FormComponent<Comparable<dynamic>> component) =>
                 component as DropDown<Comparable<dynamic>>)
             .where(
@@ -432,9 +427,10 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
   String getHierarchyOffset(ListItem<T> listItem) {
     int offset = 0;
+    ListItem<Comparable<dynamic>> current = listItem;
 
-    while (listItem.parent != null) {
-      listItem = listItem.parent;
+    while (current.parent != null) {
+      current = current.parent;
 
       offset += childOffset;
     }

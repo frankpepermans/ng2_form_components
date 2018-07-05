@@ -9,10 +9,10 @@ import 'package:ng2_state/ng2_state.dart';
 
 import 'package:ng2_form_components/src/components/list_item.g.dart';
 
-typedef S LabelHandler<T, S>(T data);
+typedef String LabelHandler<T>(T data);
 
 typedef List<ListItem<Comparable<dynamic>>> ResolveChildrenHandler(int level, ListItem<Comparable<dynamic>> listItem);
-typedef Type ResolveRendererHandler(int level, [ListItem<Comparable<dynamic>> listItem]);
+typedef ComponentFactory ResolveRendererHandler(int level, [ListItem<Comparable<dynamic>> listItem]);
 
 abstract class FormComponent<T extends Comparable<dynamic>> extends ComponentState implements StatefulComponent, OnDestroy {
 

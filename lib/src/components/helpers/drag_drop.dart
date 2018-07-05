@@ -258,15 +258,13 @@ class DragDrop implements OnDestroy {
 
   void _removeAllStyles(dynamic _) => _removeAllStyles$ctrl.add(true);
 
-  num _getActualOffsetY(Element element, num clientY) {
-    return clientY - element.getBoundingClientRect().top;
-  }
+  num _getActualOffsetY(Element element, num clientY) => clientY - element.getBoundingClientRect().top;
 
   bool _isWithinDropBounds(num clientY) {
     final num y =
         _getActualOffsetY(elementRef, clientY);
 
-    return (y > _OFFSET && y < heightOnDragEnter - _OFFSET);
+    return y > _OFFSET && y < heightOnDragEnter - _OFFSET;
   }
 
   bool _isSortAbove(num clientY) =>

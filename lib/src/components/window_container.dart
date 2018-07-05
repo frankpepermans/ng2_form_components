@@ -30,7 +30,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
     }'''
     ],
     providers: const <Provider>[
-      const Provider<Type>(StatefulComponent, useExisting: WindowContainer)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), WindowContainer)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)

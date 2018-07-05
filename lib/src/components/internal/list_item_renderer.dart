@@ -58,10 +58,10 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
     _index = value;
   }
 
-  LabelHandler _labelHandler;
-  LabelHandler get labelHandler => _labelHandler;
+  LabelHandler<T> _labelHandler;
+  LabelHandler<T> get labelHandler => _labelHandler;
   @Input()
-  set labelHandler(LabelHandler value) {
+  set labelHandler(LabelHandler<T> value) {
     _labelHandler = value;
   }
 
@@ -97,7 +97,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
   // public properties
   //-----------------------------
 
-  final SlowComponentLoader dynamicComponentLoader;
+  final ComponentLoader dynamicComponentLoader;
   final Injector injector;
   final DragDropService dragDropService;
 
@@ -107,7 +107,7 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
 
   ListItemRenderer(
       @Inject(Injector) this.injector,
-      @Inject(SlowComponentLoader) this.dynamicComponentLoader,
+      @Inject(ComponentLoader) this.dynamicComponentLoader,
       @Inject(DragDropService) this.dragDropService);
 
   //-----------------------------
@@ -116,29 +116,27 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
 
   @override
   void ngOnInit() {
-    final Type resolvedRendererType = resolveRendererHandler(0, listItem);
+    final ComponentFactory resolvedRendererType =
+        resolveRendererHandler(0, listItem);
 
     if (resolvedRendererType == null)
       throw new ArgumentError(
           'Unable to resolve renderer for list item: ${listItem.runtimeType}');
 
-    dynamicComponentLoader
-        .loadNextToLocation<dynamic>(
-            resolvedRendererType,
-            renderTypeTarget,
-            ReflectiveInjector.resolveAndCreate(<Provider>[
-              new Provider<Type>(ListRendererService,
-                  useValue: listRendererService),
-              new Provider<Type>(ListItem, useValue: listItem),
-              new Provider<Type>(IsSelectedHandler, useValue: isSelected),
-              new Provider<Type>(GetHierarchyOffsetHandler,
-                  useValue: getHierarchyOffset),
-              new Provider<Type>(LabelHandler, useValue: labelHandler),
-              new Provider<OpaqueToken<String>>(
-                  const OpaqueToken<String>('list-item-index'),
-                  useValue: index)
-            ], injector as HierarchicalInjector))
-        .then(ngOnComponentLoaded);
+    ngOnComponentLoaded(dynamicComponentLoader.loadNextToLocation<dynamic>(
+        resolvedRendererType, renderTypeTarget,
+        injector: ReflectiveInjector.resolveAndCreate(<Provider>[
+          new Provider<Type>(ListRendererService,
+              useValue: listRendererService),
+          new Provider<Type>(ListItem, useValue: listItem),
+          new Provider<Type>(IsSelectedHandler, useValue: isSelected),
+          new Provider<Type>(GetHierarchyOffsetHandler,
+              useValue: getHierarchyOffset),
+          new Provider<Type>(LabelHandler, useValue: labelHandler),
+          new Provider<OpaqueToken<String>>(
+              const OpaqueToken<String>('list-item-index'),
+              useValue: index)
+        ], injector as HierarchicalInjector)));
   }
 
   void ngOnComponentLoaded(ComponentRef ref) {

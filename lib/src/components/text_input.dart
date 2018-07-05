@@ -1,5 +1,3 @@
-library ng2_form_components.components.text_input;
-
 import 'dart:async';
 import 'dart:html';
 
@@ -22,7 +20,7 @@ typedef void TextInputAction(String inputValue);
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
-      const Provider<Type>(StatefulComponent, useExisting: TextInput)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), TextInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -99,19 +97,17 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   @override
-  Stream<Entity> provideState() {
-    return new rx.Observable<SerializableTuple2<String, bool>>.merge(<
-        Stream<SerializableTuple2<String, bool>>>[
-      _input$ctrl.stream
-          .map((String inputValue) => new SerializableTuple2<String, bool>()
-            ..item1 = inputValue
-            ..item2 = false),
-      _action$ctrl.stream
-          .map((String inputValue) => new SerializableTuple2<String, bool>()
-            ..item1 = inputValue
-            ..item2 = true)
-    ]);
-  }
+  Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<String, bool>>.merge(<
+      Stream<SerializableTuple2<String, bool>>>[
+    _input$ctrl.stream
+        .map((String inputValue) => new SerializableTuple2<String, bool>()
+      ..item1 = inputValue
+      ..item2 = false),
+    _action$ctrl.stream
+        .map((String inputValue) => new SerializableTuple2<String, bool>()
+      ..item1 = inputValue
+      ..item2 = true)
+  ]);
 
   @override
   void receiveState(SerializableTuple2<String, bool> entity, StatePhase phase) {

@@ -8,7 +8,7 @@ import 'package:ng2_form_components/ng2_form_components.dart';
 
 import 'package:faker/faker.dart';
 
-import 'person_list_item_renderer.dart';
+import 'person_list_item_renderer.template.dart' as ir;
 import 'person.g.dart' as domain;
 
 import 'orm_init.dart' show ormInitialize;
@@ -53,10 +53,10 @@ class AppComponent {
 
   Type listItemRenderer = DefaultListItemRenderer;
 
-  LabelHandler<String, String> labelHandler = (String value) => value;
-  LabelHandler<domain.Person, String> personLabelHandler =
+  LabelHandler<String> labelHandler = (String value) => value;
+  LabelHandler<domain.Person> personLabelHandler =
       (domain.Person value) => value.name;
-  LabelHandler<HierarchyLevel, String> hierarchyLabelHandler =
+  LabelHandler<HierarchyLevel> hierarchyLabelHandler =
       (HierarchyLevel value) => value.label;
 
   List<ListItem<domain.Person>> fakeData;
@@ -90,7 +90,7 @@ class AppComponent {
   };
 
   final ResolveRendererHandler personListItemRendererHandler =
-      (_, [__]) => PersonListItemRenderer;
+      (_, [__]) => ir.PersonListItemRendererNgFactory;
 
   final String model = 'Dart and Angular2 plus some reactive awesome sauce';
 

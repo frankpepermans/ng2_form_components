@@ -1,5 +1,3 @@
-library ng2_form_components.components.drop_effect_item_renderer;
-
 import 'dart:async';
 
 import 'package:angular/angular.dart';

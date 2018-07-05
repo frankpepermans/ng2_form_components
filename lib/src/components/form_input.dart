@@ -19,7 +19,7 @@ import 'package:ng2_state/ng2_state.dart'
     directives: const <dynamic>[coreDirectives],
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
-      const Provider<Type>(StatefulComponent, useExisting: FormInput)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), FormInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -86,15 +86,15 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   // private properties
   //-----------------------------
 
-  StreamController<String> _value$ctrl =
+  final StreamController<String> _value$ctrl =
       new StreamController<String>.broadcast();
-  StreamController<String> _inputValue$ctrl =
+  final StreamController<String> _inputValue$ctrl =
       new StreamController<String>.broadcast();
-  StreamController<String> _inputType$ctrl =
+  final StreamController<String> _inputType$ctrl =
       new StreamController<String>.broadcast();
-  StreamController<FocusEvent> _focusEvent$ctrl =
+  final StreamController<FocusEvent> _focusEvent$ctrl =
       new StreamController<FocusEvent>.broadcast();
-  StreamController<FocusEvent> _blurEvent$ctrl =
+  final StreamController<FocusEvent> _blurEvent$ctrl =
       new StreamController<FocusEvent>.broadcast();
 
   StreamSubscription<String> _inputTypeSubscription;

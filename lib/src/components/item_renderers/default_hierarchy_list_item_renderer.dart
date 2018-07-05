@@ -1,7 +1,4 @@
-library ng2_form_components.components.default_hierarchy_list_item_renderer;
-
 import 'dart:async';
-import 'dart:html';
 
 import 'package:angular/angular.dart';
 
@@ -49,8 +46,7 @@ class DefaultHierarchyListItemRenderer<T extends Comparable<dynamic>> implements
       @Inject(ListItem) this.listItem,
       @Inject(IsSelectedHandler) this.isSelected,
       @Inject(GetHierarchyOffsetHandler) this.getHierarchyOffset,
-      @Inject(LabelHandler) this.labelHandler,
-      @Inject(Element) Element elementRef) {
+      @Inject(LabelHandler) this.labelHandler) {
     _initStreams();
   }
 

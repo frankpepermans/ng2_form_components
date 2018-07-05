@@ -15,8 +15,8 @@ import 'package:ng2_form_components/src/components/internal/drag_drop_list_item_
     show DragDropListItemRenderer;
 import 'package:ng2_form_components/src/components/list_item.g.dart';
 
-import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.dart'
-    show DefaultListItemRenderer;
+import 'package:ng2_form_components/src/components/item_renderers/default_list_item_renderer.template.dart'
+    as ir;
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart'
     show ListRendererService, ItemRendererEvent, ListRendererEvent;
@@ -67,7 +67,7 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>>
     directives: const <dynamic>[coreDirectives, ListItemRenderer, DragDropListItemRenderer],
     providers: const <dynamic>[
       StateService,
-      const Provider<Type>(StatefulComponent, useExisting: ListRenderer)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), ListRenderer)
     ],
     pipes: const <dynamic>[commonPipes, SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.Stateful,
@@ -85,10 +85,10 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   // input
   //-----------------------------
 
-  LabelHandler _labelHandler;
-  LabelHandler get labelHandler => _labelHandler;
+  LabelHandler<T> _labelHandler;
+  LabelHandler<T> get labelHandler => _labelHandler;
   @Input()
-  set labelHandler(LabelHandler value) {
+  set labelHandler(LabelHandler<T> value) {
     setState(() => _labelHandler = value);
   }
 
@@ -107,7 +107,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   ResolveRendererHandler _resolveRendererHandler =
-      (_, [__]) => DefaultListItemRenderer;
+      (_, [__]) => ir.DefaultListItemRendererNgFactory;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
@@ -277,9 +277,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   // constructor
   //-----------------------------
 
-  ListRenderer(@Inject(Element) Element elementRef)
-      : this.element = elementRef,
-        super(elementRef) {
+  ListRenderer(@Inject(Element) this.element)
+      : super(element) {
     _initStreams();
   }
 
@@ -598,9 +597,10 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
 
   String getHierarchyOffset(ListItem<T> listItem) {
     int offset = 0;
+    ListItem<Comparable<dynamic>> current = listItem;
 
-    while (listItem.parent != null) {
-      listItem = listItem.parent;
+    while (current.parent != null) {
+      current = current.parent;
 
       offset += childOffset;
     }

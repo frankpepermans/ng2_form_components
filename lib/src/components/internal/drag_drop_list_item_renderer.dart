@@ -1,16 +1,7 @@
-library ng2_form_components.components.drag_drop_list_item_renderer;
-
 import 'package:angular/angular.dart';
 
-import 'package:ng2_form_components/src/components/internal/form_component.dart'
-    show LabelHandler;
-import 'package:ng2_form_components/src/components/list_item.g.dart'
-    show ListItem;
-
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart'
-    show ListRendererService, ItemRendererEvent;
-
-import 'package:ng2_form_components/src/components/internal/form_component.dart';
+    show ItemRendererEvent;
 
 import 'package:ng2_form_components/src/components/helpers/drag_drop.dart';
 
@@ -33,59 +24,11 @@ import 'package:ng2_form_components/src/utils/html_helpers.dart';
     preserveWhitespace: false)
 class DragDropListItemRenderer<T extends Comparable<dynamic>>
     extends ListItemRenderer<T> implements OnInit {
-  @override
-  @ViewChild('renderType', read: ViewContainerRef)
-  set renderTypeTarget(ViewContainerRef value) {
-    super.renderTypeTarget = value;
-  }
-
   final HtmlHelpers helpers;
 
   //-----------------------------
   // input
   //-----------------------------
-
-  @override
-  @Input()
-  set listRendererService(ListRendererService value) {
-    super.listRendererService = value;
-  }
-
-  @override
-  @Input()
-  set index(int value) {
-    super.index = value;
-  }
-
-  @override
-  @Input()
-  set labelHandler(LabelHandler value) {
-    super.labelHandler = value;
-  }
-
-  @override
-  @Input()
-  set listItem(ListItem<T> value) {
-    super.listItem = value;
-  }
-
-  @override
-  @Input()
-  set isSelected(IsSelectedHandler value) {
-    super.isSelected = value;
-  }
-
-  @override
-  @Input()
-  set getHierarchyOffset(GetHierarchyOffsetHandler value) {
-    super.getHierarchyOffset = value;
-  }
-
-  @override
-  @Input()
-  set resolveRendererHandler(ResolveRendererHandler value) {
-    super.resolveRendererHandler = value;
-  }
 
   @Input()
   ListDragDropHandler dragDropHandler;
@@ -101,7 +44,7 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>>
   DragDropListItemRenderer(
       @Inject(Injector) Injector injector,
       @Inject(HtmlHelpers) this.helpers,
-      @Inject(SlowComponentLoader) SlowComponentLoader dynamicComponentLoader,
+      @Inject(ComponentLoader) ComponentLoader dynamicComponentLoader,
       @Inject(DragDropService) DragDropService dragDropService)
       : super(injector, dynamicComponentLoader, dragDropService);
 

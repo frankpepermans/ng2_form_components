@@ -1,5 +1,3 @@
-library ng2_form_components.components.hierarchy;
-
 import 'dart:async';
 import 'dart:html';
 
@@ -11,10 +9,8 @@ import 'package:angular/angular.dart';
 import 'package:ng2_form_components/src/components/interfaces/before_destroy_child.dart'
     show BeforeDestroyChild;
 
-import 'package:ng2_form_components/src/components/internal/form_component.dart'
-    show LabelHandler;
 import 'package:ng2_form_components/src/components/internal/list_item_renderer.dart'
-    show ListItemRenderer, ListDragDropHandler;
+    show ListItemRenderer;
 import 'package:ng2_form_components/src/components/internal/drag_drop_list_item_renderer.dart'
     show DragDropListItemRenderer;
 
@@ -26,8 +22,7 @@ import 'package:ng2_form_components/src/components/list_item.g.dart'
 import 'package:ng2_form_components/src/components/animation/hierarchy_animation.dart'
     show HierarchyAnimation;
 
-import 'package:ng2_form_components/src/components/item_renderers/default_hierarchy_list_item_renderer.dart'
-    show DefaultHierarchyListItemRenderer;
+import 'package:ng2_form_components/src/components/item_renderers/default_hierarchy_list_item_renderer.template.dart' as ir;
 
 import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart'
     show ItemRendererEvent, ListRendererEvent, ListRendererService;
@@ -61,7 +56,7 @@ typedef bool ShouldOpenDiffer(
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
-      const Provider(StatefulComponent, useExisting: Hierarchy)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), Hierarchy)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -83,18 +78,6 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   //-----------------------------
   // input
   //-----------------------------
-
-  @override
-  @Input()
-  set labelHandler(LabelHandler value) {
-    super.labelHandler = value;
-  }
-
-  @override
-  @Input()
-  set dragDropHandler(ListDragDropHandler value) {
-    super.dragDropHandler = value;
-  }
 
   @override
   @Input()
@@ -316,7 +299,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
   Hierarchy(@Inject(Element) Element element) : super(element) {
     super.resolveRendererHandler =
-        (int level, [_]) => DefaultHierarchyListItemRenderer;
+        (int level, [_]) => ir.DefaultHierarchyListItemRendererNgFactory;
 
     _initStreams();
   }
@@ -326,28 +309,26 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   //-----------------------------
 
   @override
-  Stream<Entity> provideState() {
-    return rx.Observable
-        .combineLatest3(
-            new rx.Observable<Entity>(super.provideState())
-                .startWith(new SerializableTuple1<int>()..item1 = 0),
-            internalSelectedItemsChanged.startWith(const []),
-            new rx.Observable<List<ListItem<T>>>(_openListItems$Ctrl.stream)
-                .where((_) => !autoOpenChildren),
-            (Entity scrollPosition, List<ListItem<T>> selectedItems,
-                    List<ListItem<T>> openItems) =>
-                new SerializableTuple3<int, List<ListItem<T>>,
-                    List<ListItem<T>>>()
-                  ..item1 = (scrollPosition as SerializableTuple1<int>)?.item1
-                  ..item2 = selectedItems
-                  ..item3 = openItems)
-        .asBroadcastStream()
-        .startWith(
-            new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
-              ..item1 = 0
-              ..item2 = const []
-              ..item3 = const []);
-  }
+  Stream<Entity> provideState() => rx.Observable
+      .combineLatest3(
+      new rx.Observable<Entity>(super.provideState())
+          .startWith(new SerializableTuple1<int>()..item1 = 0),
+      internalSelectedItemsChanged.startWith(const []),
+      new rx.Observable<List<ListItem<T>>>(_openListItems$Ctrl.stream)
+          .where((_) => !autoOpenChildren),
+          (Entity scrollPosition, List<ListItem<T>> selectedItems,
+          List<ListItem<T>> openItems) =>
+      new SerializableTuple3<int, List<ListItem<T>>,
+          List<ListItem<T>>>()
+        ..item1 = (scrollPosition as SerializableTuple1<int>)?.item1
+        ..item2 = selectedItems
+        ..item3 = openItems)
+      .asBroadcastStream()
+      .startWith(
+      new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
+        ..item1 = 0
+        ..item2 = const []
+        ..item3 = const []);
 
   @override
   void ngAfterViewInit() {
@@ -707,7 +688,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
         orElse: () => null);
 
     if (listItemMatch == null)
-      clone[listItem] = (match == null);
+      clone[listItem] = match == null;
     else
       clone[listItem] = !clone[listItem];
 
@@ -749,7 +730,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
             deliverStateChanges();
           }
-        }, onDone: () => completer.complete());
+        }, onDone: completer.complete);
       }
     }
 
@@ -811,7 +792,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
           .add((ListItem<Comparable<dynamic>> listItem) => true);
   }
 
-  Type listItemRendererHandler(dynamic _,
+  ComponentFactory listItemRendererHandler(dynamic _,
           [ListItem<Comparable<dynamic>> listItem]) =>
       resolveRendererHandler(level, listItem);
 }

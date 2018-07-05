@@ -30,7 +30,7 @@ import 'package:ng2_state/ng2_state.dart'
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
-      const Provider<Type>(StatefulComponent, useExisting: AutoComplete)
+      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), AutoComplete)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -44,17 +44,6 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   //-----------------------------
 
   @override
-  @Input()
-  set labelHandler(LabelHandler value) {
-    super.labelHandler = value;
-  }
-
-  @override
-  @Input()
-  set dataProvider(Iterable<ListItem<T>> value) {
-    super.dataProvider = value;
-  }
-
   List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
       selectedItems?.toList()?.cast<ListItem<Comparable<dynamic>>>();
 
@@ -281,7 +270,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   void _updateHasDropDownValues() {
     hasDropDownValues =
-        (isOpen && mergedDataProvider != null && mergedDataProvider.isNotEmpty);
+        isOpen && mergedDataProvider != null && mergedDataProvider.isNotEmpty;
   }
 
   void _initStreams() {
@@ -290,10 +279,10 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
             .startWith(const []).map((Iterable<ListItem<T>> selectedItems) {
       if (selectedItems != null && selectedItems.isNotEmpty) {
         return (selectedItems.length == 1)
-            ? labelHandler(selectedItems.first.data) as String
+            ? labelHandler(selectedItems.first.data)
             : selectedItems
                 .map((ListItem<T> listItem) =>
-                    labelHandler(listItem.data) as String)
+                    labelHandler(listItem.data))
                 .join(', ');
       }
 
@@ -388,7 +377,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   Tuple2<bool, List<ListItem<T>>> _rebuildMergedDataProvider(
       Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) {
-    final List<ListItem<T>> list = new List<ListItem<T>>();
+    final List<ListItem<T>> list = <ListItem<T>>[];
 
     if (moveSelectionOnTop && tuple.item3 != null) {
       tuple.item3.forEach((ListItem<T> listItem) {
@@ -433,6 +422,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
     //setSelectedItems(const []);
   }
 
+  @override
   void updateSelectedItemsCast(List<ListItem<Comparable<dynamic>>> items) =>
       super.updateSelectedItems(items?.cast<ListItem<T>>());
 }

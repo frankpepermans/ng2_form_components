@@ -9,17 +9,6 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 
 @Directive(selector: '[panel-tween]')
 class SidePanelAnimation extends Tween implements OnInit {
-  @override
-  @Input()
-  set duration(int value) {
-    super.duration = value;
-  }
-
-  @override
-  @Input()
-  set tweenStyleProperty(String value) {
-    super.tweenStyleProperty = value;
-  }
 
   @override
   @Input()

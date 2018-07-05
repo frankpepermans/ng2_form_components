@@ -1,30 +1,29 @@
 import 'dart:async';
 import 'dart:html';
 
-typedef bool Matcher(MutationRecord record);
-
 class MutationObserverStream extends Stream<bool> {
   final StreamController<bool> controller;
 
+  static bool _defaultMatcher(MutationRecord record) => true;
+
   MutationObserverStream(Element element,
-      {Matcher matcher: null,
-      bool subtree: true,
-      bool childList: true,
-      bool attributes: false,
-      bool characterData: true})
+      {bool matcher(MutationRecord record) = _defaultMatcher,
+      bool subtree = true,
+      bool childList = true,
+      bool attributes = false,
+      bool characterData = true})
       : controller = _buildController(
             element, matcher, subtree, childList, attributes, characterData);
 
   @override
   StreamSubscription<bool> listen(void onData(bool event),
-      {Function onError, void onDone(), bool cancelOnError}) {
-    return controller.stream.listen(onData,
-        onError: onError, onDone: onDone, cancelOnError: cancelOnError);
-  }
+          {Function onError, void onDone(), bool cancelOnError}) =>
+      controller.stream.listen(onData,
+          onError: onError, onDone: onDone, cancelOnError: cancelOnError);
 
   static StreamController<bool> _buildController(
       Element element,
-      Matcher matcher,
+      bool matcher(MutationRecord record),
       bool subtree,
       bool childList,
       bool attributes,
@@ -32,9 +31,7 @@ class MutationObserverStream extends Stream<bool> {
     StreamController<bool> controller;
     MutationObserver observer;
 
-    matcher ??= (MutationRecord record) => true;
-
-    controller = new StreamController<bool>(
+    return controller = new StreamController<bool>(
         sync: true,
         onListen: () {
           void onMutation(List<dynamic> mutations, MutationObserver observer) {
@@ -54,7 +51,5 @@ class MutationObserverStream extends Stream<bool> {
                 characterData: characterData);
         },
         onCancel: () => observer.disconnect());
-
-    return controller;
   }
 }

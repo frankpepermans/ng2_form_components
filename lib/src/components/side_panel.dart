@@ -20,7 +20,7 @@ import 'package:ng2_state/ng2_state.dart' show SerializableTuple1, StatePhase, S
     templateUrl: 'side_panel.html',
     directives: const <dynamic>[coreDirectives, SidePanelAnimation],
     pipes: const <dynamic>[commonPipes],
-    providers: const <dynamic>[StateService, const Provider<Type>(StatefulComponent, useExisting: SidePanel)],
+    providers: const <dynamic>[StateService, const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), SidePanel)],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false
 )
