@@ -1,5 +1,3 @@
-library ng2_form_components.components.form_input;
-
 import 'dart:async';
 import 'dart:html';
 
@@ -19,7 +17,8 @@ import 'package:ng2_state/ng2_state.dart'
     directives: const <dynamic>[coreDirectives],
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
-      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), FormInput)
+      const ExistingProvider.forToken(
+          const OpaqueToken('statefulComponent'), FormInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -36,9 +35,11 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   String get inputType => _inputType;
   @Input()
   set inputType(String value) {
-    _inputType = value;
+    if (_inputType != value) {
+      _inputType = value;
 
-    _inputType$ctrl.add(value);
+      _inputType$ctrl.add(value);
+    }
   }
 
   String _placeHolder = 'Vrije text';
@@ -52,11 +53,16 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
   set initialValue(String value) {
     if (value == null) return;
 
-    _inputValue$ctrl.add(value);
+    if (value != _inputValue$ctrl.value) _inputValue$ctrl.add(value);
   }
 
+  int _heightCalcAdjustment = 0;
+  int get heightCalcAdjustment => _heightCalcAdjustment;
   @Input()
-  int heightCalcAdjustment = 0;
+  set heightCalcAdjustment(int value) {
+    if (value != _heightCalcAdjustment)
+      setState(() => _heightCalcAdjustment = value);
+  }
 
   //-----------------------------
   // output
@@ -88,8 +94,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
 
   final StreamController<String> _value$ctrl =
       new StreamController<String>.broadcast();
-  final StreamController<String> _inputValue$ctrl =
-      new StreamController<String>.broadcast();
+  final rx.BehaviorSubject<String> _inputValue$ctrl =
+      new rx.BehaviorSubject<String>();
   final StreamController<String> _inputType$ctrl =
       new StreamController<String>.broadcast();
   final StreamController<FocusEvent> _focusEvent$ctrl =
@@ -262,7 +268,7 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
     event.stopImmediatePropagation();
   }
 
-  void handleBlur(FocusEvent event, [bool handleInput= false]) {
+  void handleBlur(FocusEvent event, [bool handleInput = false]) {
     _blurEvent$ctrl.add(event);
 
     if (handleInput) this.handleInput(event);

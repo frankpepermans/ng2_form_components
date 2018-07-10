@@ -32,7 +32,7 @@ class DefaultHierarchyListItemRenderer<T extends Comparable<dynamic>> implements
   final ListItem<Comparable<dynamic>> listItem;
   final IsSelectedHandler isSelected;
   final GetHierarchyOffsetHandler getHierarchyOffset;
-  final LabelHandler labelHandler;
+  final LabelHandler<T> labelHandler;
 
   StreamSubscription<List<ListRendererEvent<dynamic, Comparable<dynamic>>>> _eventSubscription;
 

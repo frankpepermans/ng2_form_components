@@ -48,49 +48,49 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
   ListRendererService get listRendererService => _listRendererService;
   @Input()
   set listRendererService(ListRendererService value) {
-    _listRendererService = value;
+    if (_listRendererService != value) _listRendererService = value;
   }
 
   int _index;
   int get index => _index;
   @Input()
   set index(int value) {
-    _index = value;
+    if (_index != value) _index = value;
   }
 
   LabelHandler<T> _labelHandler;
   LabelHandler<T> get labelHandler => _labelHandler;
   @Input()
   set labelHandler(LabelHandler<T> value) {
-    _labelHandler = value;
+    if (_labelHandler != value) _labelHandler = value;
   }
 
   ListItem<T> _listItem;
   ListItem<T> get listItem => _listItem;
   @Input()
   set listItem(ListItem<T> value) {
-    _listItem = value;
+    if (_listItem != value) _listItem = value;
   }
 
   IsSelectedHandler _isSelected;
   IsSelectedHandler get isSelected => _isSelected;
   @Input()
   set isSelected(IsSelectedHandler value) {
-    _isSelected = value;
+    if (_isSelected != value) _isSelected = value;
   }
 
   GetHierarchyOffsetHandler _getHierarchyOffset;
   GetHierarchyOffsetHandler get getHierarchyOffset => _getHierarchyOffset;
   @Input()
   set getHierarchyOffset(GetHierarchyOffsetHandler value) {
-    _getHierarchyOffset = value;
+    if (_getHierarchyOffset != value) _getHierarchyOffset = value;
   }
 
   ResolveRendererHandler _resolveRendererHandler;
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
-    _resolveRendererHandler = value;
+    if (_resolveRendererHandler != value) _resolveRendererHandler = value;
   }
 
   //-----------------------------

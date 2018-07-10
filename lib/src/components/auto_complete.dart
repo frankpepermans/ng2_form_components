@@ -29,8 +29,7 @@ import 'package:ng2_state/ng2_state.dart'
     directives: const <dynamic>[ListRenderer, Tween, coreDirectives],
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
-      StateService,
-      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), AutoComplete)
+      StateService
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -47,54 +46,18 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
       selectedItems?.toList()?.cast<ListItem<Comparable<dynamic>>>();
 
-  @override
-  @Input()
-  set selectedItems(Iterable<ListItem<T>> value) {
-    super.selectedItems = value;
-  }
-
-  @override
-  @Input()
-  set headerLabel(String value) {
-    super.headerLabel = value;
-  }
-
-  @override
-  @Input()
-  set allowMultiSelection(bool value) {
-    super.allowMultiSelection = value;
-  }
-
-  @override
-  @Input()
-  set childOffset(int value) {
-    super.childOffset = value;
-  }
-
-  @override
-  @Input()
-  set resolveRendererHandler(ResolveRendererHandler value) {
-    super.resolveRendererHandler = value;
-  }
-
-  @override
-  @Input()
-  set className(String value) {
-    super.className = value;
-  }
-
   bool _moveSelectionOnTop = true;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
   @Input()
   set moveSelectionOnTop(bool value) {
-    setState(() => _moveSelectionOnTop = value);
+    if (_moveSelectionOnTop != value) setState(() => _moveSelectionOnTop = value);
   }
 
   int _minCharsRequired = 2;
   int get minCharsRequired => _minCharsRequired;
   @Input()
   set minCharsRequired(int value) {
-    setState(() => _minCharsRequired = value);
+    if (_minCharsRequired != value) setState(() => _minCharsRequired = value);
   }
 
   //-----------------------------

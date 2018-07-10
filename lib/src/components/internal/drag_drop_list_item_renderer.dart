@@ -30,8 +30,12 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>>
   // input
   //-----------------------------
 
+  ListDragDropHandler _dragDropHandler;
+  ListDragDropHandler get dragDropHandler => _dragDropHandler;
   @Input()
-  ListDragDropHandler dragDropHandler;
+  set dragDropHandler(ListDragDropHandler value) {
+    if (_dragDropHandler != value) setState(() => _dragDropHandler = value);
+  }
 
   //-----------------------------
   // public properties

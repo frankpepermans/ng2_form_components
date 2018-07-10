@@ -34,7 +34,7 @@
                  [level]="level + 1"
                  class="item-group" *ngIf="resolveOpenState(listItem, i) && isOpen(listItem) && resolveChildren(listItem).isNotEmpty">
                 <hierarchy #subHierarchy
-                           [state]="stateGroup" [stateId]="getStateId(i)"
+                           [state]="stateGroup" [stateId]="getStateId(i)" [statefulComponent]="subHierarchy"
                            [listRendererService]="listRendererService"
                            [labelHandler]="labelHandler"
                            [dragDropHandler]="dragDropHandler"

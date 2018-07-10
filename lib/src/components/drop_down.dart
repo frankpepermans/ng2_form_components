@@ -28,8 +28,7 @@ import 'package:ng2_state/ng2_state.dart'
     directives: const <dynamic>[ListRenderer, Tween, coreDirectives],
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
-      StateService,
-      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), DropDown)
+      StateService
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -43,7 +42,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   LabelHandler<T> get labelHandler => _labelHandler;
   @Input()
   set labelHandler(LabelHandler<T> value) {
-    setState(() => _labelHandler = value);
+    if (_labelHandler != value) setState(() => _labelHandler = value);
   }
 
   List<ListItem<Comparable<dynamic>>> get dataProviderCast =>
@@ -53,14 +52,14 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   Iterable<ListItem<T>> get dataProvider => _dataProvider;
   @Input()
   set dataProvider(Iterable<ListItem<T>> value) {
-    setState(() => _dataProvider = value);
+    if (_dataProvider != value) setState(() => _dataProvider = value);
   }
 
   bool _updateHeaderLabelWithSelection = true;
   bool get updateHeaderLabelWithSelection => _updateHeaderLabelWithSelection;
   @Input()
   set updateHeaderLabelWithSelection(bool value) {
-    setState(() => _updateHeaderLabelWithSelection = value);
+    if (_updateHeaderLabelWithSelection != value) setState(() => _updateHeaderLabelWithSelection = value);
   }
 
   List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
@@ -70,23 +69,25 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
   @Input()
   set selectedItems(Iterable<ListItem<T>> value) {
-    setState(() => _selectedItems = value);
+    if (_selectedItems != value) setState(() => _selectedItems = value);
   }
 
   String _headerLabel;
   String get headerLabel => _headerLabel;
   @Input()
   set headerLabel(String value) {
-    setState(() => _headerLabel = value);
+    if (_headerLabel != value) setState(() => _headerLabel = value);
   }
 
   String _className = 'ng2-form-components-drop-down';
   String get className => _className;
   @Input()
   set className(String value) {
-    _className = value;
+    if (_className != value) {
+      _className = value;
 
-    cssMap = <String, bool>{value: true};
+      cssMap = <String, bool>{value: true};
+    }
   }
 
   Map<String, bool> cssMap = const <String, bool>{
@@ -97,14 +98,14 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   bool get allowMultiSelection => _allowMultiSelection;
   @Input()
   set allowMultiSelection(bool value) {
-    setState(() => _allowMultiSelection = value);
+    if (_allowMultiSelection != value) setState(() => _allowMultiSelection = value);
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
   @Input()
   set childOffset(int value) {
-    setState(() => _childOffset = value);
+    if (_childOffset != value) setState(() => _childOffset = value);
   }
 
   ResolveRendererHandler _resolveRendererHandler =
@@ -112,18 +113,22 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
-    setState(() => _resolveRendererHandler = value);
+    if (_resolveRendererHandler != value) setState(() => _resolveRendererHandler = value);
   }
 
   Function _defaultHandler;
   Function get defaultHandler => _defaultHandler;
   @Input()
   set defaultHandler(Function value) {
-    setState(() => _defaultHandler = value);
+    if (_defaultHandler != value) setState(() => _defaultHandler = value);
   }
 
+  bool _resetAfterSelection = false;
+  bool get resetAfterSelection => _resetAfterSelection;
   @Input()
-  bool resetAfterSelection = false;
+  set resetAfterSelection(bool value) {
+    if (_resetAfterSelection != value) setState(() => _resetAfterSelection = value);
+  }
 
   //-----------------------------
   // output

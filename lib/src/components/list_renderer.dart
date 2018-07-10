@@ -1,5 +1,3 @@
-library ng2_form_components.components.list_renderer;
-
 import 'dart:async';
 import 'dart:html';
 import 'dart:math' as math;
@@ -89,21 +87,21 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   LabelHandler<T> get labelHandler => _labelHandler;
   @Input()
   set labelHandler(LabelHandler<T> value) {
-    setState(() => _labelHandler = value);
+    if (_labelHandler != value) setState(() => _labelHandler = value);
   }
 
   ListDragDropHandler _dragDropHandler;
   ListDragDropHandler get dragDropHandler => _dragDropHandler;
   @Input()
   set dragDropHandler(ListDragDropHandler value) {
-    setState(() => _dragDropHandler = value);
+    if (_dragDropHandler != value) setState(() => _dragDropHandler = value);
   }
 
   NgForTracker _ngForTracker;
   NgForTracker get ngForTracker => _ngForTracker;
   @Input()
   set ngForTracker(NgForTracker value) {
-    setState(() => _ngForTracker = value);
+    if (_ngForTracker != value) setState(() => _ngForTracker = value);
   }
 
   ResolveRendererHandler _resolveRendererHandler =
@@ -111,45 +109,49 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
-    setState(() => _resolveRendererHandler = value);
+    if (_resolveRendererHandler != value) setState(() => _resolveRendererHandler = value);
   }
 
   List<ListItem<T>> _dataProvider = <ListItem<T>>[];
   List<ListItem<T>> get dataProvider => _dataProvider;
   @Input()
   set dataProvider(List<ListItem<T>> value) {
-    _dataProvider$ctrl.add(value);
+    if (_distinctDataProvider(_dataProvider$ctrl.value, value)) {print(value.hashCode);
+      _dataProvider$ctrl.add(value);
+    }
   }
 
   List<ListItem<T>> _selectedItems = <ListItem<T>>[];
   List<ListItem<T>> get selectedItems => _selectedItems;
   @Input()
   set selectedItems(List<ListItem<T>> value) {
-    setState(() => _selectedItems = value);
+    if (_selectedItems != value) {
+      setState(() => _selectedItems = value);
 
-    internalSelectedItems?.forEach(handleSelection);
-    selectedItems?.forEach(handleSelection);
+      internalSelectedItems?.forEach(handleSelection);
+      selectedItems?.forEach(handleSelection);
+    }
   }
 
   bool _allowMultiSelection = false;
   bool get allowMultiSelection => _allowMultiSelection;
   @Input()
   set allowMultiSelection(bool value) {
-    setState(() => _allowMultiSelection = value);
+    if (_allowMultiSelection != value) setState(() => _allowMultiSelection = value);
   }
 
   bool _moveSelectionOnTop = false;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
   @Input()
   set moveSelectionOnTop(bool value) {
-    setState(() => _moveSelectionOnTop = value);
+    if (_moveSelectionOnTop != value) setState(() => _moveSelectionOnTop = value);
   }
 
   int _childOffset = 20;
   int get childOffset => _childOffset;
   @Input()
   set childOffset(int value) {
-    setState(() => _childOffset = value);
+    if (_childOffset != value) setState(() => _childOffset = value);
   }
 
   List<ListRendererEvent<dynamic, Comparable<dynamic>>> _rendererEvents;
@@ -158,21 +160,25 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   @Input()
   set rendererEvents(
       List<ListRendererEvent<dynamic, Comparable<dynamic>>> value) {
-    setState(() => _rendererEvents = value);
+    if (_rendererEvents != value) {
+      setState(() => _rendererEvents = value);
 
-    listRendererService?.respondEvents(rendererEvents);
+      listRendererService?.respondEvents(rendererEvents);
+    }
   }
 
   int _pageOffset = 0;
   int get pageOffset => _pageOffset;
   @Input()
   set pageOffset(int value) {
-    setState(() => _pageOffset = value);
+    if (_pageOffset != value) {
+      setState(() => _pageOffset = value);
 
-    if (value == 0) {
-      scrollPane?.scrollTop = 0;
+      if (value == 0) {
+        scrollPane?.scrollTop = 0;
 
-      _initScrollPositionStream();
+        _initScrollPositionStream();
+      }
     }
   }
 
@@ -180,9 +186,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   String get className => _className;
   @Input()
   set className(String value) {
-    _className = value;
+    if (_className != value) {
+      _className = value;
 
-    cssMap = <String, bool>{value: true};
+      cssMap = <String, bool>{value: true};
+    }
   }
 
   bool _closeListRendererService = true;
@@ -190,11 +198,13 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   ListRendererService get listRendererService => _listRendererService;
   @Input()
   set listRendererService(ListRendererService value) {
-    _listRendererService?.close();
+    if (_listRendererService != value) {
+      _listRendererService?.close();
 
-    if (value != null) _closeListRendererService = false;
+      if (value != null) _closeListRendererService = false;
 
-    setState(() => _listRendererService = value);
+      setState(() => _listRendererService = value);
+    }
   }
 
   //-----------------------------
@@ -247,8 +257,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
           ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl =
       new StreamController<ClearSelectionWhereHandler>.broadcast();
-  final StreamController<List<ListItem<T>>> _dataProvider$ctrl =
-      new StreamController<List<ListItem<T>>>.broadcast();
+  final rx.BehaviorSubject<List<ListItem<T>>> _dataProvider$ctrl =
+      new rx.BehaviorSubject<List<ListItem<T>>>();
   final StreamController<ItemRendererEvent<int, Comparable<dynamic>>>
       _dropEffect$ctrl = new StreamController<
           ItemRendererEvent<int, Comparable<dynamic>>>.broadcast();
@@ -375,6 +385,18 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
   // private methods
   //-----------------------------
+
+  bool _distinctDataProvider(List<ListItem<T>> current, List<ListItem<T>> next) {
+    if (current == null && next == null) return false;
+    if (current == null || next == null) return true;
+    if (current.length != next.length) return true;
+
+    for (int i=0, len=next.length; i<len; i++) {
+      if (current[i].data != next[i].data) return true;
+    }
+
+    return false;
+  }
 
   void _initDomChangeListener() {
     _domChangeSubscription?.cancel();
@@ -545,7 +567,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
           'dropEffect', event.listItem, event.data as int));
   }
 
-  void notifyDomChanged(List<MutationRecord> records, dynamic _) {
+  void notifyDomChanged(List<dynamic> records, dynamic _) {
     if (!_domChange$ctrl.isClosed) _domChange$ctrl.add(true);
   }
 
