@@ -1,5 +1,3 @@
-library ng2_form_components.utils.html_loader;
-
 import 'dart:html';
 
 import 'package:angular/angular.dart';

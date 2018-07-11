@@ -116,7 +116,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   List<ListItem<T>> get dataProvider => _dataProvider;
   @Input()
   set dataProvider(List<ListItem<T>> value) {
-    if (_distinctDataProvider(_dataProvider$ctrl.value, value)) {print(value.hashCode);
+    if (distinctDataProvider(_dataProvider$ctrl.value, value)) {
       _dataProvider$ctrl.add(value);
     }
   }
@@ -386,7 +386,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   // private methods
   //-----------------------------
 
-  bool _distinctDataProvider(List<ListItem<T>> current, List<ListItem<T>> next) {
+  bool distinctDataProvider(List<ListItem<T>> current, List<ListItem<T>> next) {
     if (current == null && next == null) return false;
     if (current == null || next == null) return true;
     if (current.length != next.length) return true;

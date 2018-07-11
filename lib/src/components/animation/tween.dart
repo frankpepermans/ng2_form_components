@@ -1,5 +1,3 @@
-library ng2_form_components.components.animation.tween;
-
 import 'dart:async';
 import 'dart:html';
 

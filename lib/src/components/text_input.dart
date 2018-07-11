@@ -20,7 +20,8 @@ typedef void TextInputAction(String inputValue);
     pipes: const <dynamic>[commonPipes],
     providers: const <dynamic>[
       StateService,
-      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), TextInput)
+      const ExistingProvider.forToken(
+          const OpaqueToken('statefulComponent'), TextInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -36,9 +37,11 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   TextInputAction get action => _action;
   @Input()
   set action(TextInputAction value) {
-    _action = value;
+    if (_action != value) {
+      _action = value;
 
-    _textInputAction$ctrl.add(value);
+      _textInputAction$ctrl.add(value);
+    }
   }
 
   String _inputValue;
@@ -48,12 +51,28 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
     if (_inputValue != value) setState(() => _inputValue = value);
   }
 
+  String _placeHolder;
+  String get placeHolder => _placeHolder;
   @Input()
-  String placeHolder;
+  set placeHolder(String value) {
+    if (_placeHolder != value) setState(() => _placeHolder = value);
+  }
+
+  String _actionContainerClassName;
+  String get actionContainerClassName => _actionContainerClassName;
   @Input()
-  String actionContainerClassName;
+  set actionContainerClassName(String value) {
+    if (_actionContainerClassName != value)
+      setState(() => _actionContainerClassName = value);
+  }
+
+  String _actionIconClassName;
+  String get actionIconClassName => _actionIconClassName;
   @Input()
-  String actionIconClassName;
+  set actionIconClassName(String value) {
+    if (_actionIconClassName != value)
+      setState(() => _actionIconClassName = value);
+  }
 
   //-----------------------------
   // output
@@ -97,17 +116,18 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   @override
-  Stream<Entity> provideState() => new rx.Observable<SerializableTuple2<String, bool>>.merge(<
-      Stream<SerializableTuple2<String, bool>>>[
-    _input$ctrl.stream
-        .map((String inputValue) => new SerializableTuple2<String, bool>()
-      ..item1 = inputValue
-      ..item2 = false),
-    _action$ctrl.stream
-        .map((String inputValue) => new SerializableTuple2<String, bool>()
-      ..item1 = inputValue
-      ..item2 = true)
-  ]);
+  Stream<Entity> provideState() =>
+      new rx.Observable<SerializableTuple2<String, bool>>.merge(<
+          Stream<SerializableTuple2<String, bool>>>[
+        _input$ctrl.stream
+            .map((String inputValue) => new SerializableTuple2<String, bool>()
+              ..item1 = inputValue
+              ..item2 = false),
+        _action$ctrl.stream
+            .map((String inputValue) => new SerializableTuple2<String, bool>()
+              ..item1 = inputValue
+              ..item2 = true)
+      ]);
 
   @override
   void receiveState(SerializableTuple2<String, bool> entity, StatePhase phase) {

@@ -1,5 +1,3 @@
-library ng2_form_components.components.helpers.drag_drop;
-
 import 'dart:async';
 import 'dart:html';
 

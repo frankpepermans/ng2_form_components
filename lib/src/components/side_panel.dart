@@ -33,7 +33,7 @@ class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T> implemen
   String _orientation = 'right';
   String get orientation => _orientation;
   @Input() set orientation(String value) {
-    _orientation = value;
+    if (_orientation != value) setState(() => _orientation = value);
   }
 
   //-----------------------------
