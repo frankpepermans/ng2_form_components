@@ -1,5 +1,3 @@
-library ng2_form_components.infrastructure.list_renderer_service;
-
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart' as rx;

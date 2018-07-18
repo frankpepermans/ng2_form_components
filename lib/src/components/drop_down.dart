@@ -33,7 +33,7 @@ import 'package:ng2_state/ng2_state.dart'
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
-    implements OnChanges, OnDestroy, AfterViewInit, BeforeDestroyChild {
+    implements OnDestroy, AfterViewInit, BeforeDestroyChild {
   //-----------------------------
   // input
   //-----------------------------
@@ -69,14 +69,23 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
   @Input()
   set selectedItems(Iterable<ListItem<T>> value) {
-    if (_selectedItems != value) setState(() => _selectedItems = value);
+    if (_selectedItems != value) setState(() {
+      _selectedItems = value;
+
+      _selectedItems$ctrl.add(selectedItems);
+    });
   }
 
   String _headerLabel;
   String get headerLabel => _headerLabel;
   @Input()
   set headerLabel(String value) {
-    if (_headerLabel != value) setState(() => _headerLabel = value);
+    if (_headerLabel != value) setState(() {
+      _headerLabel = value;
+
+      _headerLabel$ctrl.add(headerLabel);
+      _selectedItems$ctrl.add(selectedItems);
+    });
   }
 
   String _className = 'ng2-form-components-drop-down';
@@ -217,17 +226,6 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
       setSelectedItems(listCast);
     });
-  }
-
-  @override
-  void ngOnChanges(Map<String, SimpleChange> changes) {
-    if (changes.containsKey('headerLabel')) {
-      _headerLabel$ctrl.add(headerLabel);
-      _selectedItems$ctrl.add(selectedItems);
-    }
-
-    if (changes.containsKey('selectedItems'))
-      _selectedItems$ctrl.add(selectedItems);
   }
 
   @override

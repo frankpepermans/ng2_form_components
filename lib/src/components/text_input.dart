@@ -26,7 +26,7 @@ typedef void TextInputAction(String inputValue);
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
-    implements OnChanges, OnDestroy {
+    implements OnDestroy {
   @ViewChild('inputField')
   Element inputField;
 
@@ -63,7 +63,11 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   @Input()
   set actionContainerClassName(String value) {
     if (_actionContainerClassName != value)
-      setState(() => _actionContainerClassName = value);
+      setState(() {
+        _actionContainerClassName = value;
+
+        actionContainerClassMap = <String, bool>{actionContainerClassName: true};
+      });
   }
 
   String _actionIconClassName;
@@ -71,7 +75,11 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
   @Input()
   set actionIconClassName(String value) {
     if (_actionIconClassName != value)
-      setState(() => _actionIconClassName = value);
+      setState(() {
+        _actionIconClassName = value;
+
+        actionIconClassMap = <String, bool>{actionIconClassName: true};
+      });
   }
 
   //-----------------------------
@@ -144,15 +152,6 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
     }
 
     deliverStateChanges();
-  }
-
-  @override
-  void ngOnChanges(Map<String, SimpleChange> changes) {
-    if (changes.containsKey('actionContainerClassName'))
-      actionContainerClassMap = <String, bool>{actionContainerClassName: true};
-
-    if (changes.containsKey('actionIconClassName'))
-      actionIconClassMap = <String, bool>{actionIconClassName: true};
   }
 
   @override

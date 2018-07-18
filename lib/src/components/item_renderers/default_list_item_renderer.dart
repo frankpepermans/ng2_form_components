@@ -68,5 +68,7 @@ class DefaultListItemRenderer<T extends Comparable<dynamic>>
         .listen((_) => changeDetector.markForCheck());
   }
 
-  void triggerSelection() => listRendererService.triggerSelection(listItem);
+  void triggerSelection() {
+    listRendererService.triggerSelection(listItem);
+  }
 }

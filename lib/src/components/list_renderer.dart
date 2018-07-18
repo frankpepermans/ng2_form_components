@@ -125,7 +125,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   List<ListItem<T>> get selectedItems => _selectedItems;
   @Input()
   set selectedItems(List<ListItem<T>> value) {
-    if (_selectedItems != value) {
+    if (distinctDataProvider(_selectedItems, value)) {
       setState(() => _selectedItems = value);
 
       internalSelectedItems?.forEach(handleSelection);
@@ -526,7 +526,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
             handleSelection(listItem as ListItem<T>));
 
     _selectionStateSubscription =
-        _selectedItems$.listen(_selectedItems$ctrl.add);
+        _selectedItems$.listen((_) {
+          _selectedItems$ctrl.add(_);
+        });
 
     _rendererEventSubscription =
         listRendererService.event$.listen(_itemRendererEvent$ctrl.add);

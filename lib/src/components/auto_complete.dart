@@ -34,7 +34,7 @@ import 'package:ng2_state/ng2_state.dart'
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
-    implements OnChanges, OnDestroy, AfterViewInit {
+    implements OnDestroy, AfterViewInit {
   @ViewChild('searchInput')
   Element searchInput;
 
@@ -58,6 +58,16 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   @Input()
   set minCharsRequired(int value) {
     if (_minCharsRequired != value) setState(() => _minCharsRequired = value);
+  }
+
+  @Input()
+  @override
+  set dataProvider(Iterable<ListItem<T>> value) {
+    if (dataProvider != value) {
+      super.dataProvider = value;
+
+      _dataProviderChanged$ctrl.add(dataProvider);
+    }
   }
 
   //-----------------------------
@@ -151,14 +161,6 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
           ..item1 = entity.item1
           ..item2 = entity.item2,
         phase);
-  }
-
-  @override
-  void ngOnChanges(Map<String, SimpleChange> changes) {
-    super.ngOnChanges(changes);
-
-    if (changes.containsKey('dataProvider'))
-      _dataProviderChanged$ctrl.add(dataProvider);
   }
 
   @override
