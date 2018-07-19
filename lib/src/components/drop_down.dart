@@ -27,9 +27,7 @@ import 'package:ng2_state/ng2_state.dart'
     templateUrl: 'drop_down.html',
     directives: const <dynamic>[ListRenderer, Tween, coreDirectives],
     pipes: const <dynamic>[commonPipes],
-    providers: const <dynamic>[
-      StateService
-    ],
+    providers: const <dynamic>[StateService],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
@@ -59,7 +57,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   bool get updateHeaderLabelWithSelection => _updateHeaderLabelWithSelection;
   @Input()
   set updateHeaderLabelWithSelection(bool value) {
-    if (_updateHeaderLabelWithSelection != value) setState(() => _updateHeaderLabelWithSelection = value);
+    if (_updateHeaderLabelWithSelection != value)
+      setState(() => _updateHeaderLabelWithSelection = value);
   }
 
   List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
@@ -69,23 +68,25 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   Iterable<ListItem<T>> get selectedItems => _selectedItems;
   @Input()
   set selectedItems(Iterable<ListItem<T>> value) {
-    if (_selectedItems != value) setState(() {
-      _selectedItems = value;
+    if (_selectedItems != value)
+      setState(() {
+        _selectedItems = value;
 
-      _selectedItems$ctrl.add(selectedItems);
-    });
+        _selectedItems$ctrl.add(selectedItems);
+      });
   }
 
   String _headerLabel;
   String get headerLabel => _headerLabel;
   @Input()
   set headerLabel(String value) {
-    if (_headerLabel != value) setState(() {
-      _headerLabel = value;
+    if (_headerLabel != value)
+      setState(() {
+        _headerLabel = value;
 
-      _headerLabel$ctrl.add(headerLabel);
-      _selectedItems$ctrl.add(selectedItems);
-    });
+        _headerLabel$ctrl.add(headerLabel);
+        _selectedItems$ctrl.add(selectedItems);
+      });
   }
 
   String _className = 'ng2-form-components-drop-down';
@@ -107,7 +108,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   bool get allowMultiSelection => _allowMultiSelection;
   @Input()
   set allowMultiSelection(bool value) {
-    if (_allowMultiSelection != value) setState(() => _allowMultiSelection = value);
+    if (_allowMultiSelection != value)
+      setState(() => _allowMultiSelection = value);
   }
 
   int _childOffset = 20;
@@ -122,7 +124,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
-    if (_resolveRendererHandler != value) setState(() => _resolveRendererHandler = value);
+    if (_resolveRendererHandler != value)
+      setState(() => _resolveRendererHandler = value);
   }
 
   Function _defaultHandler;
@@ -136,7 +139,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   bool get resetAfterSelection => _resetAfterSelection;
   @Input()
   set resetAfterSelection(bool value) {
-    if (_resetAfterSelection != value) setState(() => _resetAfterSelection = value);
+    if (_resetAfterSelection != value)
+      setState(() => _resetAfterSelection = value);
   }
 
   //-----------------------------
@@ -210,16 +214,16 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
   @override
   void receiveState(covariant Entity entity, StatePhase phase) {
-    final SerializableTuple2<bool, Iterable<Entity>> tuple =
-        entity as SerializableTuple2<bool, Iterable<Entity>>;
+    final SerializableTuple2 tuple = entity as SerializableTuple2;
+    final bool item1 = tuple.item1;
+    final Iterable<Entity> item2 = new List<Entity>.from(tuple.item2);
+
     final List<ListItem<T>> listCast = <ListItem<T>>[];
 
     if (phase == StatePhase.REPLAY)
-      scheduleMicrotask(() => _openClose$ctrl.add(tuple.item1));
+      scheduleMicrotask(() => _openClose$ctrl.add(item1));
 
-    if (tuple.item2 != null)
-      tuple.item2
-          .forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    item2?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     scheduleMicrotask(() {
       _selectedItems$ctrl.add(listCast);

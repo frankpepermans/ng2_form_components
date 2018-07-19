@@ -28,7 +28,8 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
     }'''
     ],
     providers: const <Provider>[
-      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), WindowContainer)
+      const ExistingProvider.forToken(
+          const OpaqueToken('statefulComponent'), WindowContainer)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -56,8 +57,7 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
 
   StreamSubscription<_DragPosition> _dragSubscription, _dragCommitSubscription;
 
-  WindowContainer(@Inject(Element) Element elementRef)
-      : super(elementRef);
+  WindowContainer(@Inject(Element) Element elementRef) : super(elementRef);
 
   @override
   Stream<Entity> provideState() => _dragPosition$ctrl.stream
@@ -68,8 +68,9 @@ class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
         ..item2 = value.top);
 
   @override
-  void receiveState(SerializableTuple2<num, num> state, StatePhase phase) =>
-      _dragPosition$ctrl.add(new _DragPosition(state.item1, state.item2));
+  void receiveState(SerializableTuple2 state, StatePhase phase) =>
+      _dragPosition$ctrl
+          .add(new _DragPosition(state.item1 as num, state.item2 as num));
 
   @override
   void ngOnDestroy() {

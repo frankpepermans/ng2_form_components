@@ -66,7 +66,9 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
       setState(() {
         _actionContainerClassName = value;
 
-        actionContainerClassMap = <String, bool>{actionContainerClassName: true};
+        actionContainerClassMap = <String, bool>{
+          actionContainerClassName: true
+        };
       });
   }
 
@@ -139,9 +141,12 @@ class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
 
   @override
   void receiveState(SerializableTuple2<String, bool> entity, StatePhase phase) {
-    inputValue = _internalValue = entity.item1;
+    final String item1 = entity.item1;
+    final bool item2 = entity.item2;
 
-    if (entity.item2 && _internalValue != null && _internalValue.isNotEmpty) {
+    inputValue = _internalValue = item1;
+
+    if (item2 && _internalValue != null && _internalValue.isNotEmpty) {
       if (action != null)
         action(_internalValue);
       else {

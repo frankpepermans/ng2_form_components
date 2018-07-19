@@ -139,8 +139,8 @@ class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
           new SerializableTuple1<String>()..item1 = inputValue);
 
   @override
-  void receiveState(SerializableTuple1<String> entity, StatePhase phase) =>
-      _inputValue$ctrl.add(entity.item1);
+  void receiveState(SerializableTuple1 entity, StatePhase phase) =>
+      _inputValue$ctrl.add(entity.item1 as String);
 
   @override
   void ngAfterViewInit() {

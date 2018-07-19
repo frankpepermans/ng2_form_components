@@ -62,10 +62,15 @@ class UnselectedItemsPipe<T extends Comparable<dynamic>>
 @Component(
     selector: 'list-renderer',
     templateUrl: 'list_renderer.html',
-    directives: const <dynamic>[coreDirectives, ListItemRenderer, DragDropListItemRenderer],
+    directives: const <dynamic>[
+      coreDirectives,
+      ListItemRenderer,
+      DragDropListItemRenderer
+    ],
     providers: const <dynamic>[
       StateService,
-      const ExistingProvider.forToken(const OpaqueToken('statefulComponent'), ListRenderer)
+      const ExistingProvider.forToken(
+          const OpaqueToken('statefulComponent'), ListRenderer)
     ],
     pipes: const <dynamic>[commonPipes, SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.Stateful,
@@ -109,7 +114,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   ResolveRendererHandler get resolveRendererHandler => _resolveRendererHandler;
   @Input()
   set resolveRendererHandler(ResolveRendererHandler value) {
-    if (_resolveRendererHandler != value) setState(() => _resolveRendererHandler = value);
+    if (_resolveRendererHandler != value)
+      setState(() => _resolveRendererHandler = value);
   }
 
   List<ListItem<T>> _dataProvider = <ListItem<T>>[];
@@ -137,14 +143,16 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   bool get allowMultiSelection => _allowMultiSelection;
   @Input()
   set allowMultiSelection(bool value) {
-    if (_allowMultiSelection != value) setState(() => _allowMultiSelection = value);
+    if (_allowMultiSelection != value)
+      setState(() => _allowMultiSelection = value);
   }
 
   bool _moveSelectionOnTop = false;
   bool get moveSelectionOnTop => _moveSelectionOnTop;
   @Input()
   set moveSelectionOnTop(bool value) {
-    if (_moveSelectionOnTop != value) setState(() => _moveSelectionOnTop = value);
+    if (_moveSelectionOnTop != value)
+      setState(() => _moveSelectionOnTop = value);
   }
 
   int _childOffset = 20;
@@ -235,7 +243,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   rx.Observable<List<ListItem<T>>> get internalSelectedItemsChanged =>
       _selectedItems$;
   Iterable<ListItem<T>> internalSelectedItems =
-      new List<ListItem<T>>.unmodifiable(const <ListItem<Comparable<dynamic>>>[]);
+      new List<ListItem<T>>.unmodifiable(
+          const <ListItem<Comparable<dynamic>>>[]);
 
   final Element element;
 
@@ -287,8 +296,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
   // constructor
   //-----------------------------
 
-  ListRenderer(@Inject(Element) this.element)
-      : super(element) {
+  ListRenderer(@Inject(Element) this.element) : super(element) {
     _initStreams();
   }
 
@@ -302,20 +310,21 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
 
   @override
   void receiveState(covariant Entity entity, StatePhase phase) {
-    final SerializableTuple1<int> tuple = entity as SerializableTuple1<int>;
+    final SerializableTuple1 tuple = entity as SerializableTuple1;
+    final int item1 = tuple.item1;
 
     if (scrollPane != null) {
-      if (tuple.item1 > 0) {
-        scrollPane.scrollTop = tuple.item1;
+      if (item1 > 0) {
+        scrollPane.scrollTop = item1;
 
-        if (scrollPane.scrollTop != tuple.item1) {
-          _pendingScrollTop = tuple.item1;
+        if (scrollPane.scrollTop != item1) {
+          _pendingScrollTop = item1;
 
           _initDomChangeListener();
         }
       }
     } else {
-      _pendingScrollTop = tuple.item1;
+      _pendingScrollTop = item1;
     }
   }
 
@@ -359,8 +368,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
     listRendererService.addRenderer(this);
 
     observer = new MutationObserver(notifyDomChanged)
-      ..observe(element,
-          subtree: true, childList: true, attributes: false);
+      ..observe(element, subtree: true, childList: true, attributes: false);
 
     _domClickSubscription = window.onMouseDown.listen((MouseEvent event) {
       Node target = event.target as Node;
@@ -374,8 +382,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
       _requestClose$ctrl.add(true);
     });
 
-    if (_pendingScrollTop > 0)
-      scrollPane.scrollTop = _pendingScrollTop;
+    if (_pendingScrollTop > 0) scrollPane.scrollTop = _pendingScrollTop;
 
     if (scrollPane != null) _initDomChangeListener();
 
@@ -391,7 +398,7 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
     if (current == null || next == null) return true;
     if (current.length != next.length) return true;
 
-    for (int i=0, len=next.length; i<len; i++) {
+    for (int i = 0, len = next.length; i < len; i++) {
       if (current[i].data != next[i].data) return true;
     }
 
@@ -487,7 +494,8 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
             .startWith(internalSelectedItems as List<ListItem<T>>),
         (ListItem<T> incoming, Iterable<ListItem<T>> currentList) {
       if (incoming == null)
-        return new List<ListItem<T>>.unmodifiable(const <ListItem<Comparable<dynamic>>>[]);
+        return new List<ListItem<T>>.unmodifiable(
+            const <ListItem<Comparable<dynamic>>>[]);
 
       List<ListItem<T>> newList = currentList.toList(growable: true);
 
@@ -525,10 +533,9 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
         .listen((ListItem<Comparable<dynamic>> listItem) =>
             handleSelection(listItem as ListItem<T>));
 
-    _selectionStateSubscription =
-        _selectedItems$.listen((_) {
-          _selectedItems$ctrl.add(_);
-        });
+    _selectionStateSubscription = _selectedItems$.listen((_) {
+      _selectedItems$ctrl.add(_);
+    });
 
     _rendererEventSubscription =
         listRendererService.event$.listen(_itemRendererEvent$ctrl.add);

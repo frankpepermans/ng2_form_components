@@ -144,22 +144,26 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   }
 
   @override
-  void receiveState(SerializableTuple3<bool, Iterable<Entity>, String> entity,
+  void receiveState(SerializableTuple3 entity,
       StatePhase phase) {
+    final bool item1 = entity.item1;
+    final Iterable<Entity> item2 = new List<Entity>.from(entity.item2);
+    final String item3 = entity.item3;
+
     if (phase == StatePhase.REPLAY) _focus$ctrl.add(true);
 
-    if (entity.item3 != lastReplayedInputValue) {
-      lastReplayedInputValue = inputValue = entity.item3;
+    if (item3 != lastReplayedInputValue) {
+      lastReplayedInputValue = inputValue = item3;
 
-      _inputCriteriaMet$ctrl.add(entity.item3.length >= minCharsRequired);
+      _inputCriteriaMet$ctrl.add(item3.length >= minCharsRequired);
 
-      _input$ctrl.add(entity.item3);
+      _input$ctrl.add(item3);
     }
 
     super.receiveState(
         new SerializableTuple2<bool, Iterable<Entity>>()
-          ..item1 = entity.item1
-          ..item2 = entity.item2,
+          ..item1 = item1
+          ..item2 = item2,
         phase);
   }
 

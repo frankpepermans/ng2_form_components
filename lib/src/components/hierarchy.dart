@@ -305,20 +305,23 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   }
 
   @override
-  void receiveState(SerializableTuple3<int, List<Entity>, List<Entity>> entity,
+  void receiveState(SerializableTuple3 entity,
       StatePhase phase) {
+    final int item1 = entity.item1;
+    final List<Entity> item2 = new List<Entity>.from(entity.item2), item3 = new List<Entity>.from(entity.item3);
+
     final List<ListItem<T>> listCast = <ListItem<T>>[];
     final List<ListItem<T>> listCast2 = <ListItem<T>>[];
 
-    entity.item2
+    item2
         ?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
 
     super.receiveState(
-        new SerializableTuple1<int>()..item1 = entity.item1, phase);
+        new SerializableTuple1<int>()..item1 = item1, phase);
 
     _receivedSelection = listCast;
 
-    entity.item3?.forEach((Entity entity) {
+    item3?.forEach((Entity entity) {
       final ListItem<T> listItem = entity as ListItem<T>;
       _isOpenMap[listItem] = true;
 
@@ -329,7 +332,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
     listRendererService.notifyIsOpenChange();
 
-    if (entity.item3 != null && entity.item3.isNotEmpty) deliverStateChanges();
+    if (item3 != null && item3.isNotEmpty) deliverStateChanges();
   }
 
   @override
