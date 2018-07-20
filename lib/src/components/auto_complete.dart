@@ -133,7 +133,8 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
           .distinct((String vA, String vB) => vA.compareTo(vB) == 0),
           (Entity tuple, String input) {
         final SerializableTuple2<bool, Iterable<ListItem<T>>> cast = tuple;
-        new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
+        
+        return new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
           ..item1 = cast.item1
           ..item2 = cast.item2
           ..item3 = input;
