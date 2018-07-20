@@ -126,22 +126,18 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   //-----------------------------
 
   @override
-  Stream<Entity> provideState() {
-    final rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>
-        superProvider = super.provideState()
-            as rx.Observable<SerializableTuple2<bool, Iterable<ListItem<T>>>>;
-
-    return rx.Observable.combineLatest2(
-        superProvider,
-        new rx.Observable<String>(_input$ctrl.stream)
-            .startWith('')
-            .distinct((String vA, String vB) => vA.compareTo(vB) == 0),
-        (SerializableTuple2<bool, Iterable<ListItem<T>>> tuple, String input) =>
-            new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
-              ..item1 = tuple.item1
-              ..item2 = tuple.item2
-              ..item3 = input);
-  }
+  Stream<Entity> provideState() => rx.Observable.combineLatest2(
+      super.provideState(),
+      new rx.Observable<String>(_input$ctrl.stream)
+          .startWith('')
+          .distinct((String vA, String vB) => vA.compareTo(vB) == 0),
+          (Entity tuple, String input) {
+        final SerializableTuple2<bool, Iterable<ListItem<T>>> cast = tuple;
+        new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
+          ..item1 = cast.item1
+          ..item2 = cast.item2
+          ..item3 = input;
+      });
 
   @override
   void receiveState(SerializableTuple3 entity,
