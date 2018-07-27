@@ -1,8 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
-// Generator: CodeGenerator
-// Target: abstract class ListItem
+// CodeGenerator
 // **************************************************************************
 
 import 'package:dorm/dorm.dart';
@@ -162,14 +161,22 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       duplicate(ignoredSymbols: const <Symbol>[ListItem.SELECTABLE_SYMBOL])
         ..selectable = value;
 
-  /// Duplicates the [ListItem] and any recusrive entities to a new [ListItem]
+  /// Duplicates the [ListItem] and any recursive entities to a new [ListItem]
   @override
   ListItem<T> duplicate({List<Symbol> ignoredSymbols}) =>
       super.duplicate(ignoredSymbols: ignoredSymbols) as ListItem<T>;
+  @override
+  bool operator ==(Object other) =>
+      other is ListItem<T> && other.hashCode == this.hashCode;
+  @override
+  int get hashCode => hash_finish(hash_combine(
+      hash_combine(
+          hash_combine(hash_combine(0, this.container.hashCode),
+              this.isAlwaysOpen.hashCode),
+          this.parent.hashCode),
+      this.selectable.hashCode));
 
   /// toString implementation for debugging purposes
   @override
-  String toString() {
-    return 'i112ng2_form_components_lib_src_components_list_item';
-  }
+  String toString() => 'i112ng2_form_components_lib_src_components_list_item';
 }

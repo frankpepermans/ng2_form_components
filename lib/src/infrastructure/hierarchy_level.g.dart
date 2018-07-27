@@ -1,8 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
-// Generator: CodeGenerator
-// Target: abstract class HierarchyLevel
+// CodeGenerator
 // **************************************************************************
 
 import 'package:dorm/dorm.dart';
@@ -70,6 +69,7 @@ class HierarchyLevel extends Entity
   HierarchyLevel() {
     Entity.ASSEMBLER
         .registerProxies(this, <DormProxy<dynamic>>[_children, _label]);
+    this.children = new List<HierarchyLevel>();
   }
 
   /// Internal constructor
@@ -85,14 +85,18 @@ class HierarchyLevel extends Entity
       duplicate(ignoredSymbols: const <Symbol>[HierarchyLevel.LABEL_SYMBOL])
         ..label = value;
 
-  /// Duplicates the [HierarchyLevel] and any recusrive entities to a new [HierarchyLevel]
+  /// Duplicates the [HierarchyLevel] and any recursive entities to a new [HierarchyLevel]
   @override
   HierarchyLevel duplicate({List<Symbol> ignoredSymbols}) =>
       super.duplicate(ignoredSymbols: ignoredSymbols) as HierarchyLevel;
+  @override
+  bool operator ==(Object other) =>
+      other is HierarchyLevel && other.hashCode == this.hashCode;
+  @override
+  int get hashCode => hash_finish(hash_combine(
+      hash_combine(0, hash_combineAll(this.children)), this.label.hashCode));
 
   /// toString implementation for debugging purposes
   @override
-  String toString() {
-    return 'HierarchyLevel: {label: $label}';
-  }
+  String toString() => 'HierarchyLevel: {label: $label}';
 }

@@ -1,8 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 // **************************************************************************
-// Generator: CodeGenerator
-// Target: abstract class Person
+// CodeGenerator
 // **************************************************************************
 
 import 'package:dorm/dorm.dart';
@@ -74,14 +73,18 @@ class Person extends Entity with sup.Person implements Comparable<dynamic> {
       duplicate(ignoredSymbols: const <Symbol>[Person.NAME_SYMBOL])
         ..name = value;
 
-  /// Duplicates the [Person] and any recusrive entities to a new [Person]
+  /// Duplicates the [Person] and any recursive entities to a new [Person]
   @override
-  Person duplicate({List<Symbol> ignoredSymbols: null}) =>
+  Person duplicate({List<Symbol> ignoredSymbols}) =>
       super.duplicate(ignoredSymbols: ignoredSymbols) as Person;
+  @override
+  bool operator ==(Object other) =>
+      other is Person && other.hashCode == this.hashCode;
+  @override
+  int get hashCode => hash_finish(
+      hash_combine(hash_combine(0, this.image.hashCode), this.name.hashCode));
 
   /// toString implementation for debugging purposes
   @override
-  String toString() {
-    return 'i102ng2_form_components_web_person';
-  }
+  String toString() => 'i102ng2_form_components_web_person';
 }

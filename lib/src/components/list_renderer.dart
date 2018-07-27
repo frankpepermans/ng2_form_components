@@ -448,10 +448,11 @@ class ListRenderer<T extends Comparable<dynamic>> extends FormComponent<T>
                           scrollPaneElement.clientHeight -
                           20))
               .where((Tuple2<int, bool> tuple) => tuple.item2)
-              .max((Tuple2<int, bool> tA, Tuple2<int, bool> tB) =>
-                  (tA.item1 > tB.item1) ? 1 : -1)
-              .asStream()
+              .bufferCount(2, 1)
+              .map((List<Tuple2<int, bool>> list) =>
+                  (list.first.item1 > list.last.item1) ? list.first : list.last)
               .map((Tuple2<int, bool> tuple) => tuple.item2)
+              .debounce(const Duration(milliseconds: 500))
               .listen((bool value) {
                 if (!_scrolledToBottom$ctrl.isClosed)
                   _scrolledToBottom$ctrl.add(value);
