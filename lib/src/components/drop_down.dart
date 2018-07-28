@@ -30,26 +30,26 @@ import 'package:ng2_state/ng2_state.dart'
     providers: const <dynamic>[StateService],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
+class DropDown extends FormComponent
     implements OnDestroy, AfterViewInit, BeforeDestroyChild {
   //-----------------------------
   // input
   //-----------------------------
 
-  LabelHandler<T> _labelHandler;
-  LabelHandler<T> get labelHandler => _labelHandler;
+  LabelHandler<Comparable<dynamic>> _labelHandler;
+  LabelHandler<Comparable<dynamic>> get labelHandler => _labelHandler;
   @Input()
-  set labelHandler(LabelHandler<T> value) {
+  set labelHandler(LabelHandler<Comparable<dynamic>> value) {
     if (_labelHandler != value) setState(() => _labelHandler = value);
   }
 
   List<ListItem<Comparable<dynamic>>> get dataProviderCast =>
       dataProvider?.toList()?.cast<ListItem<Comparable<dynamic>>>();
 
-  Iterable<ListItem<T>> _dataProvider;
-  Iterable<ListItem<T>> get dataProvider => _dataProvider;
+  Iterable<ListItem<Comparable<dynamic>>> _dataProvider;
+  Iterable<ListItem<Comparable<dynamic>>> get dataProvider => _dataProvider;
   @Input()
-  set dataProvider(Iterable<ListItem<T>> value) {
+  set dataProvider(Iterable<ListItem<Comparable<dynamic>>> value) {
     if (_dataProvider != value) setState(() => _dataProvider = value);
   }
 
@@ -64,10 +64,11 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   List<ListItem<Comparable<dynamic>>> get selectedItemsCast =>
       selectedItems?.toList()?.cast<ListItem<Comparable<dynamic>>>();
 
-  Iterable<ListItem<T>> _selectedItems = <ListItem<T>>[];
-  Iterable<ListItem<T>> get selectedItems => _selectedItems;
+  Iterable<ListItem<Comparable<dynamic>>> _selectedItems =
+      <ListItem<Comparable<dynamic>>>[];
+  Iterable<ListItem<Comparable<dynamic>>> get selectedItems => _selectedItems;
   @Input()
-  set selectedItems(Iterable<ListItem<T>> value) {
+  set selectedItems(Iterable<ListItem<Comparable<dynamic>>> value) {
     if (_selectedItems != value)
       setState(() {
         _selectedItems = value;
@@ -148,7 +149,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   @Output()
-  Stream<Iterable<ListItem<T>>> get selectedItemsChanged =>
+  Stream<Iterable<ListItem<Comparable<dynamic>>>> get selectedItemsChanged =>
       _selectedItems$ctrl.stream.distinct(_distinctSelectedItems);
 
   @override
@@ -162,8 +163,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   // private properties
   //-----------------------------
 
-  final StreamController<Iterable<ListItem<T>>> _selectedItems$ctrl =
-      new StreamController<Iterable<ListItem<T>>>.broadcast();
+  final StreamController<Iterable<ListItem<Comparable<dynamic>>>>
+      _selectedItems$ctrl =
+      new StreamController<Iterable<ListItem<Comparable<dynamic>>>>.broadcast();
   final StreamController<String> _headerLabel$ctrl =
       new StreamController<String>();
   final StreamController<bool> _openClose$ctrl =
@@ -176,7 +178,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
   StreamSubscription<String> _currentHeaderLabelSubscription;
   StreamSubscription<bool> _openCloseSubscription;
-  StreamSubscription<Iterable<ListItem<T>>> _selectedItemsSubscription;
+  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>>
+      _selectedItemsSubscription;
   StreamSubscription<bool> _beforeDestroyChildSubscription;
 
   bool _isClosedFromList = false;
@@ -202,13 +205,15 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
   @override
   Stream<Entity> provideState() => rx.Observable.combineLatest2(
-      new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
+      new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(
+              _selectedItems$ctrl.stream)
           .startWith(selectedItems),
       new rx.Observable<bool>(_openClose$ctrl.stream)
           .startWith(isOpen)
           .distinct((bool vA, bool vB) => vA == vB),
-      (Iterable<ListItem<T>> items, bool isOpen) =>
-          new SerializableTuple2<bool, Iterable<ListItem<T>>>()
+      (Iterable<ListItem<Comparable<dynamic>>> items, bool isOpen) =>
+          new SerializableTuple2<bool,
+              Iterable<ListItem<Comparable<dynamic>>>>()
             ..item1 = isOpen
             ..item2 = items);
 
@@ -218,12 +223,14 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     final bool item1 = tuple.item1;
     final Iterable<Entity> item2 = new List<Entity>.from(tuple.item2);
 
-    final List<ListItem<T>> listCast = <ListItem<T>>[];
+    final List<ListItem<Comparable<dynamic>>> listCast =
+        <ListItem<Comparable<dynamic>>>[];
 
     if (phase == StatePhase.REPLAY)
       scheduleMicrotask(() => _openClose$ctrl.add(item1));
 
-    item2?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+    item2?.forEach((Entity entity) =>
+        listCast.add(entity as ListItem<Comparable<dynamic>>));
 
     scheduleMicrotask(() {
       _selectedItems$ctrl.add(listCast);
@@ -281,9 +288,9 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   //-----------------------------
 
   void updateSelectedItemsCast(List<ListItem<Comparable<dynamic>>> items) =>
-      updateSelectedItems(items?.cast<ListItem<T>>());
+      updateSelectedItems(items?.cast<ListItem<Comparable<dynamic>>>());
 
-  void setSelectedItems(Iterable<ListItem<T>> value) =>
+  void setSelectedItems(Iterable<ListItem<Comparable<dynamic>>> value) =>
       setState(() => selectedItems = value);
 
   void setOpenOrClosed(bool value) {
@@ -291,14 +298,15 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
   }
 
   void _initStreams() {
-    _currentHeaderLabelSubscription = rx.Observable
-        .combineLatest2(
-            new rx.Observable<String>(_headerLabel$ctrl.stream).startWith(''),
-            new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
-                .startWith(const []),
-            (String label, Iterable<ListItem<T>> selectedItems) =>
-                new Tuple2<String, Iterable<ListItem<T>>>(label, selectedItems))
-        .switchMap((Tuple2<String, Iterable<ListItem<T>>> tuple) {
+    _currentHeaderLabelSubscription = rx.Observable.combineLatest2(
+        new rx.Observable<String>(_headerLabel$ctrl.stream).startWith(''),
+        new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(
+                _selectedItems$ctrl.stream)
+            .startWith(const []),
+        (String label, Iterable<ListItem<Comparable<dynamic>>> selectedItems) =>
+            new Tuple2<String, Iterable<ListItem<Comparable<dynamic>>>>(
+                label, selectedItems)).switchMap(
+        (Tuple2<String, Iterable<ListItem<Comparable<dynamic>>>> tuple) {
       Stream<String> returnValue;
 
       if (updateHeaderLabelWithSelection &&
@@ -311,9 +319,10 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
           return new rx.Observable<String>.just(null);
         } else {
-          returnValue = new rx.Observable<ListItem<T>>(
-                  new Stream<ListItem<T>>.fromIterable(tuple.item2))
-              .flatMap((ListItem<T> listItem) {
+          returnValue = new rx.Observable<ListItem<Comparable<dynamic>>>(
+                  new Stream<ListItem<Comparable<dynamic>>>.fromIterable(
+                      tuple.item2))
+              .flatMap((ListItem<Comparable<dynamic>> listItem) {
                 if (labelHandler != null)
                   return rx.Observable<String>.just(
                       labelHandler(listItem.data));
@@ -339,32 +348,33 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
 
       if (isOpen) {
         FormComponent.openFormComponents
-            .where((FormComponent<Comparable<dynamic>> component) =>
+            .where((FormComponent component) =>
                 component != this && component is DropDown)
-            .map((FormComponent<Comparable<dynamic>> component) =>
-                component as DropDown<Comparable<dynamic>>)
-            .where(
-                (DropDown<Comparable<dynamic>> component) => component.isOpen)
-            .forEach((FormComponent<Comparable<dynamic>> component) =>
-                (component as DropDown<Comparable<dynamic>>).openOrClose());
+            .map((FormComponent component) => component as DropDown)
+            .where((DropDown component) => component.isOpen)
+            .forEach((FormComponent component) =>
+                (component as DropDown).openOrClose());
       }
     });
 
-    _selectedItemsSubscription = rx.Observable
-        .combineLatest2(
-            new rx.Observable<bool>(_openClose$ctrl.stream)
-                .startWith(isOpen)
-                .distinct((bool vA, bool vB) => vA == vB)
-                .switchMap(_awaitCloseAnimation),
-            new rx.Observable<Iterable<ListItem<T>>>(_selectedItems$ctrl.stream)
-                .startWith(const []),
-            (bool isOpen, Iterable<ListItem<T>> selectedItems) {
-          if (!isOpen) return selectedItems;
+    _selectedItemsSubscription =
+        rx.Observable.combineLatest2(
+                new rx.Observable<bool>(_openClose$ctrl.stream)
+                    .startWith(isOpen)
+                    .distinct((bool vA, bool vB) => vA == vB)
+                    .switchMap(_awaitCloseAnimation),
+                new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(
+                        _selectedItems$ctrl.stream)
+                    .startWith(const []),
+                (bool isOpen,
+                    Iterable<ListItem<Comparable<dynamic>>> selectedItems) {
+      if (!isOpen) return selectedItems;
 
-          return null;
-        })
-        .where((Iterable<ListItem<T>> selectedItems) => selectedItems != null)
-        .listen(setSelectedItems);
+      return null;
+    })
+            .where((Iterable<ListItem<Comparable<dynamic>>> selectedItems) =>
+                selectedItems != null)
+            .listen(setSelectedItems);
   }
 
   Stream<bool> _awaitCloseAnimation(bool isOpen) {
@@ -383,8 +393,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     return ngBeforeDestroyChild().map((_) => isOpen);
   }
 
-  bool _distinctSelectedItems(
-      Iterable<ListItem<T>> sA, Iterable<ListItem<T>> sB) {
+  bool _distinctSelectedItems(Iterable<ListItem<Comparable<dynamic>>> sA,
+      Iterable<ListItem<Comparable<dynamic>>> sB) {
     if (sA == null && sB == null) return true;
 
     if (sA == null || sB == null) return false;
@@ -392,7 +402,8 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     if (sA.length != sB.length) return false;
 
     for (int i = 0, len = sA.length; i < len; i++) {
-      final ListItem<T> iA = sA.elementAt(i), iB = sB.elementAt(i);
+      final ListItem<Comparable<dynamic>> iA = sA.elementAt(i),
+          iB = sB.elementAt(i);
 
       if (iA.data.compareTo(iB.data) != 0) return false;
     }
@@ -432,7 +443,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     openOrClose();
   }
 
-  String getHierarchyOffset(ListItem<T> listItem) {
+  String getHierarchyOffset(ListItem<Comparable<dynamic>> listItem) {
     int offset = 0;
     ListItem<Comparable<dynamic>> current = listItem;
 
@@ -445,7 +456,7 @@ class DropDown<T extends Comparable<dynamic>> extends FormComponent<T>
     return '${offset}px';
   }
 
-  void updateSelectedItems(Iterable<ListItem<T>> items) {
+  void updateSelectedItems(Iterable<ListItem<Comparable<dynamic>>> items) {
     _selectedItems$ctrl.add(items);
 
     if (resetAfterSelection)

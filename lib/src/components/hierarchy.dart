@@ -60,13 +60,13 @@ typedef bool ShouldOpenDiffer(
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
+class Hierarchy extends ListRenderer
     implements OnDestroy, AfterViewInit, BeforeDestroyChild {
-  Hierarchy<T> _subHierarchy;
-  Hierarchy<T> get subHierarchy => _subHierarchy;
+  Hierarchy _subHierarchy;
+  Hierarchy get subHierarchy => _subHierarchy;
   @ViewChild('subHierarchy')
   set subHierarchy(Hierarchy value) {
-    _subHierarchy = value as Hierarchy<T>;
+    _subHierarchy = value as Hierarchy;
   }
 
   @override
@@ -81,7 +81,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
   @override
   @Input()
-  set dataProvider(List<ListItem<T>> value) {
+  set dataProvider(List<ListItem<Comparable<dynamic>>> value) {
     if (distinctDataProvider(dataProvider, value)) {
       forceAnimateOnOpen = false;
 
@@ -104,7 +104,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
       _listRendererService$ctrl.add(value);
 
       value?.triggerEvent(
-          new ItemRendererEvent<Hierarchy<Comparable<dynamic>>, T>(
+          new ItemRendererEvent<Hierarchy, Comparable<dynamic>>(
               'childRegistry', null, this));
     }
   }
@@ -135,8 +135,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
         value.forEach((ListItem<Comparable<dynamic>> listItem) {
           listRendererService.rendererSelection$
               .take(1)
-              .map((_) => new ItemRendererEvent<bool, T>(
-              'selection', listItem as ListItem<T>, true))
+              .map((_) => new ItemRendererEvent<bool, Comparable<dynamic>>(
+              'selection', listItem as ListItem<Comparable<dynamic>>, true))
               .listen(listRendererService?.triggerEvent);
 
           listRendererService?.triggerSelection(listItem);
@@ -181,9 +181,9 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
   @override
   @Output()
-  rx.Observable<List<ListItem<T>>> get selectedItemsChanged =>
-      new rx.Observable<List<ListItem<T>>>(
-          _selection$ as Stream<List<ListItem<T>>>);
+  rx.Observable<List<ListItem<Comparable<dynamic>>>> get selectedItemsChanged =>
+      new rx.Observable<List<ListItem<Comparable<dynamic>>>>(
+          _selection$ as Stream<List<ListItem<Comparable<dynamic>>>>);
   @override
   @Output()
   Stream<bool> get requestClose => super.requestClose;
@@ -202,26 +202,26 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   // private properties
   //-----------------------------
 
-  final Map<ListItem<T>, List<ListItem<T>>> _resolvedChildren =
-      <ListItem<T>, List<ListItem<T>>>{};
+  final Map<ListItem<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>> _resolvedChildren =
+      <ListItem<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>{};
 
-  final StreamController<Tuple2<Hierarchy<Comparable<dynamic>>, bool>>
+  final StreamController<Tuple2<Hierarchy, bool>>
       _childHierarchies$ctrl = new StreamController<
-          Tuple2<Hierarchy<Comparable<dynamic>>, bool>>.broadcast();
+          Tuple2<Hierarchy, bool>>.broadcast();
   final StreamController<ClearSelectionWhereHandler>
       _clearChildHierarchies$ctrl =
       new StreamController<ClearSelectionWhereHandler>.broadcast();
-  final StreamController<List<Hierarchy<Comparable<dynamic>>>>
+  final StreamController<List<Hierarchy>>
       _childHierarchyList$ctrl =
-      new StreamController<List<Hierarchy<Comparable<dynamic>>>>.broadcast();
+      new StreamController<List<Hierarchy>>.broadcast();
   final StreamController<
-          Map<Hierarchy<Comparable<dynamic>>,
+          Map<Hierarchy,
               List<ListItem<Comparable<dynamic>>>>> _selection$Ctrl =
       new StreamController<
-          Map<Hierarchy<Comparable<dynamic>>,
+          Map<Hierarchy,
               List<ListItem<Comparable<dynamic>>>>>.broadcast();
-  final StreamController<List<ListItem<T>>> _openListItems$Ctrl =
-      new StreamController<List<ListItem<T>>>.broadcast();
+  final StreamController<List<ListItem<Comparable<dynamic>>>> _openListItems$Ctrl =
+      new StreamController<List<ListItem<Comparable<dynamic>>>>.broadcast();
   final StreamController<int> _beforeDestroyChild$ctrl =
       new StreamController<int>.broadcast();
   final StreamController<bool> _domModified$ctrl =
@@ -229,32 +229,32 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   final StreamController<ListRendererService> _listRendererService$ctrl =
       new StreamController<ListRendererService>();
 
-  Map<ListItem<T>, bool> _isOpenMap = <ListItem<T>, bool>{};
+  Map<ListItem<Comparable<dynamic>>, bool> _isOpenMap = <ListItem<Comparable<dynamic>>, bool>{};
 
   StreamSubscription<dynamic> _windowMutationListener;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>>
       _eventSubscription;
   StreamSubscription<
-      Tuple2<List<Hierarchy<Comparable<dynamic>>>,
+      Tuple2<List<Hierarchy>,
           ClearSelectionWhereHandler>> _clearChildHierarchiesSubscription;
   StreamSubscription<
-          Tuple2<Hierarchy<Comparable<dynamic>>,
-              List<Hierarchy<Comparable<dynamic>>>>>
+          Tuple2<Hierarchy,
+              List<Hierarchy>>>
       _registerChildHierarchySubscription;
   StreamSubscription<
-      Map<Hierarchy<Comparable<dynamic>>,
+      Map<Hierarchy,
           List<ListItem<Comparable<dynamic>>>>> _selectionBuilderSubscription;
 
   Stream<List<ListItem<Comparable<dynamic>>>> _selection$;
 
   bool forceAnimateOnOpen = false;
 
-  List<ListItem<T>> _receivedSelection;
+  List<ListItem<Comparable<dynamic>>> _receivedSelection;
 
-  final Map<ListItem<T>,
-          StreamSubscription<Tuple2<Map<ListItem<T>, bool>, int>>>
+  final Map<ListItem<Comparable<dynamic>>,
+          StreamSubscription<Tuple2<Map<ListItem<Comparable<dynamic>>, bool>, int>>>
       _onBeforeDestroyChildSubscriptions =
-      <ListItem<T>, StreamSubscription<Tuple2<Map<ListItem<T>, bool>, int>>>{};
+      <ListItem<Comparable<dynamic>>, StreamSubscription<Tuple2<Map<ListItem<Comparable<dynamic>>, bool>, int>>>{};
 
   //-----------------------------
   // constructor
@@ -277,18 +277,18 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
       new rx.Observable<Entity>(super.provideState())
           .startWith(new SerializableTuple1<int>()..item1 = 0),
       internalSelectedItemsChanged.startWith(const []),
-      new rx.Observable<List<ListItem<T>>>(_openListItems$Ctrl.stream)
+      new rx.Observable<List<ListItem<Comparable<dynamic>>>>(_openListItems$Ctrl.stream)
           .where((_) => !autoOpenChildren),
-          (Entity scrollPosition, List<ListItem<T>> selectedItems,
-          List<ListItem<T>> openItems) =>
-      new SerializableTuple3<int, List<ListItem<T>>,
-          List<ListItem<T>>>()
+          (Entity scrollPosition, List<ListItem<Comparable<dynamic>>> selectedItems,
+          List<ListItem<Comparable<dynamic>>> openItems) =>
+      new SerializableTuple3<int, List<ListItem<Comparable<dynamic>>>,
+          List<ListItem<Comparable<dynamic>>>>()
         ..item1 = (scrollPosition as SerializableTuple1<int>)?.item1
         ..item2 = selectedItems
         ..item3 = openItems)
       .asBroadcastStream()
       .startWith(
-      new SerializableTuple3<int, List<ListItem<T>>, List<ListItem<T>>>()
+      new SerializableTuple3<int, List<ListItem<Comparable<dynamic>>>, List<ListItem<Comparable<dynamic>>>>()
         ..item1 = 0
         ..item2 = const []
         ..item3 = const []);
@@ -310,11 +310,11 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     final int item1 = entity.item1;
     final List<Entity> item2 = new List<Entity>.from(entity.item2), item3 = new List<Entity>.from(entity.item3);
 
-    final List<ListItem<T>> listCast = <ListItem<T>>[];
-    final List<ListItem<T>> listCast2 = <ListItem<T>>[];
+    final List<ListItem<Comparable<dynamic>>> listCast = <ListItem<Comparable<dynamic>>>[];
+    final List<ListItem<Comparable<dynamic>>> listCast2 = <ListItem<Comparable<dynamic>>>[];
 
     item2
-        ?.forEach((Entity entity) => listCast.add(entity as ListItem<T>));
+        ?.forEach((Entity entity) => listCast.add(entity as ListItem<Comparable<dynamic>>));
 
     super.receiveState(
         new SerializableTuple1<int>()..item1 = item1, phase);
@@ -322,7 +322,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     _receivedSelection = listCast;
 
     item3?.forEach((Entity entity) {
-      final ListItem<T> listItem = entity as ListItem<T>;
+      final ListItem<Comparable<dynamic>> listItem = entity as ListItem<Comparable<dynamic>>;
       _isOpenMap[listItem] = true;
 
       listCast2.add(listItem);
@@ -387,21 +387,21 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
         .combineLatest2(
             _childHierarchyList$ctrl.stream,
             _clearChildHierarchies$ctrl.stream,
-            (List<Hierarchy<Comparable<dynamic>>> childHierarchies,
+            (List<Hierarchy> childHierarchies,
                     ClearSelectionWhereHandler handler) =>
-                new Tuple2<List<Hierarchy<Comparable<dynamic>>>,
+                new Tuple2<List<Hierarchy>,
                     ClearSelectionWhereHandler>(childHierarchies, handler))
         .listen(
-            (Tuple2<List<Hierarchy<Comparable<dynamic>>>, ClearSelectionWhereHandler> tuple) =>
+            (Tuple2<List<Hierarchy>, ClearSelectionWhereHandler> tuple) =>
                 tuple.item1.forEach(
-                    (Hierarchy<Comparable<dynamic>> childHierarchy) =>
+                    (Hierarchy childHierarchy) =>
                         childHierarchy.clearSelection(tuple.item2)));
 
     _registerChildHierarchySubscription = rx.Observable
         .zip2(_childHierarchies$ctrl.stream, _childHierarchyList$ctrl.stream,
-            (Tuple2<Hierarchy<Comparable<dynamic>>, bool> childHierarchy,
-                List<Hierarchy<Comparable<dynamic>>> hierarchies) {
-          final List<Hierarchy<Comparable<dynamic>>> clone =
+            (Tuple2<Hierarchy, bool> childHierarchy,
+                List<Hierarchy> hierarchies) {
+          final List<Hierarchy> clone =
               hierarchies.toList();
 
           if (childHierarchy.item2)
@@ -409,42 +409,42 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
           else
             clone.remove(childHierarchy.item1);
 
-          return new Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>,
-                  List<Hierarchy<Comparable<dynamic>>>>(childHierarchy,
-              new List<Hierarchy<Comparable<dynamic>>>.unmodifiable(clone));
+          return new Tuple2<Tuple2<Hierarchy, bool>,
+                  List<Hierarchy>>(childHierarchy,
+              new List<Hierarchy>.unmodifiable(clone));
         })
         .doOnData(
-            (Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) =>
+            (Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) =>
                 _childHierarchyList$ctrl.add(tuple.item2))
-        .where((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) =>
+        .where((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) =>
             tuple.item1.item2)
-        .map((Tuple2<Tuple2<Hierarchy<Comparable<dynamic>>, bool>, List<Hierarchy<Comparable<dynamic>>>> tuple) =>
-            new Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>>(
+        .map((Tuple2<Tuple2<Hierarchy, bool>, List<Hierarchy>> tuple) =>
+            new Tuple2<Hierarchy, List<Hierarchy>>(
                 tuple.item1.item1, tuple.item2))
         .flatMap(
-            (Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>> tuple) =>
+            (Tuple2<Hierarchy, List<Hierarchy>> tuple) =>
                 tuple.item1.onDestroy.take(1).map((_) => tuple))
-        .listen((Tuple2<Hierarchy<Comparable<dynamic>>, List<Hierarchy<Comparable<dynamic>>>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy<Comparable<dynamic>>, bool>(tuple.item1, false)));
+        .listen((Tuple2<Hierarchy, List<Hierarchy>> tuple) => _childHierarchies$ctrl.add(new Tuple2<Hierarchy, bool>(tuple.item1, false)));
 
     _selectionBuilderSubscription = rx.Observable
         .zip2(
-            new rx.Observable<Map<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>>(_selection$Ctrl.stream).startWith(
-                <Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>{}),
-            new rx.Observable<List<Hierarchy<Comparable<dynamic>>>>(_childHierarchyList$ctrl.stream)
-                .switchMap((List<Hierarchy<Comparable<dynamic>>> hierarchies) =>
-                    new rx.Observable<Tuple2<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>>.merge(
-                        (new List<Hierarchy<Comparable<dynamic>>>.from(hierarchies)..add(this))
-                            .map((Hierarchy<Comparable<dynamic>> hierarchy) => hierarchy.internalSelectedItemsChanged.map((List<ListItem<Comparable<dynamic>>> selectedItems) => new Tuple2<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>(hierarchy, selectedItems))))),
-            (Map<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>> selectedItems,
-                Tuple2<Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>> tuple) {
+            new rx.Observable<Map<Hierarchy, List<ListItem<Comparable<dynamic>>>>>(_selection$Ctrl.stream).startWith(
+                <Hierarchy, List<ListItem<Comparable<dynamic>>>>{}),
+            new rx.Observable<List<Hierarchy>>(_childHierarchyList$ctrl.stream)
+                .switchMap((List<Hierarchy> hierarchies) =>
+                    new rx.Observable<Tuple2<Hierarchy, List<ListItem<Comparable<dynamic>>>>>.merge(
+                        (new List<Hierarchy>.from(hierarchies)..add(this))
+                            .map((Hierarchy hierarchy) => hierarchy.internalSelectedItemsChanged.map((List<ListItem<Comparable<dynamic>>> selectedItems) => new Tuple2<Hierarchy, List<ListItem<Comparable<dynamic>>>>(hierarchy, selectedItems))))),
+            (Map<Hierarchy, List<ListItem<Comparable<dynamic>>>> selectedItems,
+                Tuple2<Hierarchy, List<ListItem<Comparable<dynamic>>>> tuple) {
           if (tuple.item1.stateGroup != null &&
               tuple.item1.stateGroup.isNotEmpty &&
               tuple.item1.stateId != null &&
               tuple.item1.stateId.isNotEmpty) {
-            Hierarchy<Comparable<dynamic>> match;
+            Hierarchy match;
 
             selectedItems
-                .forEach((Hierarchy<Comparable<dynamic>> hierarchy, _) {
+                .forEach((Hierarchy hierarchy, _) {
               if (hierarchy.stateGroup == tuple.item1.stateGroup &&
                   hierarchy.stateId == tuple.item1.stateId) match = hierarchy;
             });
@@ -461,7 +461,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
         .listen(_selection$Ctrl.add);
 
     _selection$ = _selection$Ctrl.stream.map((Map<
-            Hierarchy<Comparable<dynamic>>, List<ListItem<Comparable<dynamic>>>>
+            Hierarchy, List<ListItem<Comparable<dynamic>>>>
         map) {
       final List<ListItem<Comparable<dynamic>>> fold =
           <ListItem<Comparable<dynamic>>>[];
@@ -472,7 +472,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     });
 
     _childHierarchyList$ctrl.add(const []);
-    _selection$Ctrl.add(<Hierarchy<Comparable<dynamic>>, List<ListItem<T>>>{});
+    _selection$Ctrl.add(<Hierarchy, List<ListItem<Comparable<dynamic>>>>{});
     _listRendererService$ctrl.add(listRendererService);
   }
 
@@ -484,7 +484,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
       if (eventCast.data != null) {
         for (int i = 0, len = dataProvider.length; i < len; i++) {
-          ListItem<T> entry = dataProvider.elementAt(i);
+          ListItem<Comparable<dynamic>> entry = dataProvider.elementAt(i);
 
           if (shouldOpenDiffer(eventCast.listItem, entry) && !isOpen(entry))
             toggleChildren(entry, i);
@@ -499,7 +499,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     if (!_domModified$ctrl.isClosed) _domModified$ctrl.add(true);
   }
 
-  void _processIncomingSelectedState(List<ListItem<T>> selectedItems) {
+  void _processIncomingSelectedState(List<ListItem<Comparable<dynamic>>> selectedItems) {
     if (selectedItems != null && selectedItems.isNotEmpty) {
       if (level == 0)
         selectedItems.forEach(handleSelection);
@@ -514,8 +514,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
             new rx.Observable<ListItem<Comparable<dynamic>>>(
                     listRendererService.rendererSelection$)
                 .take(1)
-                .map((_) => new ItemRendererEvent<bool, T>(
-                    'selection', listItem as ListItem<T>, true))
+                .map((_) => new ItemRendererEvent<bool, Comparable<dynamic>>(
+                    'selection', listItem as ListItem<Comparable<dynamic>>, true))
                 .listen(handleRendererEvent);
 
             listRendererService.triggerSelection(listItem);
@@ -540,7 +540,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   Future<Null> autoOpenChildrenNow() {
     int index = 0;
 
-    return forEachAsync(dataProvider, (ListItem<T> listItem) async {
+    return forEachAsync(dataProvider, (ListItem<Comparable<dynamic>> listItem) async {
       if (!isOpen(listItem)) {
         await maybeToggleChildren(listItem, index);
 
@@ -558,7 +558,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   Future<Null> autoCloseChildrenNow() {
     int index = 0;
 
-    return forEachAsync(dataProvider, (ListItem<T> listItem) async {
+    return forEachAsync(dataProvider, (ListItem<Comparable<dynamic>> listItem) async {
       if (isOpen(listItem)) {
         if (subHierarchy != null) await subHierarchy.autoCloseChildrenNow();
 
@@ -594,7 +594,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     return completer.future;
   }
 
-  bool resolveOpenState(ListItem<T> listItem, int index) {
+  bool resolveOpenState(ListItem<Comparable<dynamic>> listItem, int index) {
     if (autoOpenChildren && !_isOpenMap.containsKey(listItem))
       toggleChildren(listItem, index);
 
@@ -602,13 +602,13 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   }
 
   @override
-  bool isOpen(ListItem<T> listItem) {
+  bool isOpen(ListItem<Comparable<dynamic>> listItem) {
     if (listItem.isAlwaysOpen) return true;
 
     bool result = false;
 
     for (int i = 0, len = _isOpenMap.keys.length; i < len; i++) {
-      ListItem<T> item = _isOpenMap.keys.elementAt(i);
+      ListItem<Comparable<dynamic>> item = _isOpenMap.keys.elementAt(i);
 
       if (item.compareTo(listItem) == 0) {
         result = _isOpenMap[item];
@@ -620,37 +620,37 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     return result;
   }
 
-  Future<Null> maybeToggleChildren(ListItem<T> listItem, int index) {
+  Future<Null> maybeToggleChildren(ListItem<Comparable<dynamic>> listItem, int index) {
     if (!allowToggle) return toggleChildren(listItem, index);
 
     return new Future<Null>.value();
   }
 
-  Future<Null> toggleChildren(ListItem<T> listItem, int index) async {
+  Future<Null> toggleChildren(ListItem<Comparable<dynamic>> listItem, int index) async {
     final Completer<Null> completer = new Completer<Null>();
-    final List<ListItem<T>> openItems = <ListItem<T>>[];
-    final Map<ListItem<T>, bool> clone = <ListItem<T>, bool>{};
-    final StreamSubscription<Tuple2<Map<ListItem<T>, bool>, int>>
+    final List<ListItem<Comparable<dynamic>>> openItems = <ListItem<Comparable<dynamic>>>[];
+    final Map<ListItem<Comparable<dynamic>>, bool> clone = <ListItem<Comparable<dynamic>>, bool>{};
+    final StreamSubscription<Tuple2<Map<ListItem<Comparable<dynamic>>, bool>, int>>
         existingSubscription = _onBeforeDestroyChildSubscriptions[listItem];
-    ListItem<T> match;
+    ListItem<Comparable<dynamic>> match;
 
     forceAnimateOnOpen = true;
 
-    _isOpenMap.forEach((ListItem<T> item, bool isOpen) => clone[item] = isOpen);
+    _isOpenMap.forEach((ListItem<Comparable<dynamic>> item, bool isOpen) => clone[item] = isOpen);
 
-    clone.forEach((ListItem<T> item, _) {
+    clone.forEach((ListItem<Comparable<dynamic>> item, _) {
       if (item.compareTo(listItem) == 0) match = item;
     });
 
     if (match != listItem) {
       clone.keys
-          .where((ListItem<T> item) => item.compareTo(match) == 0)
+          .where((ListItem<Comparable<dynamic>> item) => item.compareTo(match) == 0)
           .toList(growable: false)
           .forEach(clone.remove);
     }
 
-    ListItem<T> listItemMatch = clone.keys.firstWhere(
-        (ListItem<T> item) => item.compareTo(listItem) == 0,
+    ListItem<Comparable<dynamic>> listItemMatch = clone.keys.firstWhere(
+        (ListItem<Comparable<dynamic>> item) => item.compareTo(listItem) == 0,
         orElse: () => null);
 
     if (listItemMatch == null)
@@ -658,12 +658,12 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     else
       clone[listItem] = !clone[listItem];
 
-    clone.forEach((ListItem<T> listItem, bool isOpen) {
+    clone.forEach((ListItem<Comparable<dynamic>> listItem, bool isOpen) {
       if (isOpen) openItems.add(listItem);
     });
 
     listItemMatch = clone.keys.firstWhere(
-        (ListItem<T> item) => item.compareTo(listItem) == 0,
+        (ListItem<Comparable<dynamic>> item) => item.compareTo(listItem) == 0,
         orElse: () => null);
 
     if (existingSubscription != null) await existingSubscription.cancel();
@@ -684,8 +684,8 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
       } else {
         _onBeforeDestroyChildSubscriptions[listItem] = ngBeforeDestroyChild(
                 <int>[index])
-            .map((int i) => new Tuple2<Map<ListItem<T>, bool>, int>(clone, i))
-            .listen((Tuple2<Map<ListItem<T>, bool>, int> tuple) {
+            .map((int i) => new Tuple2<Map<ListItem<Comparable<dynamic>>, bool>, int>(clone, i))
+            .listen((Tuple2<Map<ListItem<Comparable<dynamic>>, bool>, int> tuple) {
           if (tuple.item2 == index) {
             _isOpenMap = tuple.item1;
 
@@ -706,9 +706,9 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
   }
 
   void _cleanupOpenMap() {
-    final List<ListItem<T>> removeList = <ListItem<T>>[];
+    final List<ListItem<Comparable<dynamic>>> removeList = <ListItem<Comparable<dynamic>>>[];
 
-    _isOpenMap.forEach((ListItem<T> item, bool isOpen) {
+    _isOpenMap.forEach((ListItem<Comparable<dynamic>> item, bool isOpen) {
       if (!isOpen) removeList.add(item);
     });
 
@@ -722,21 +722,21 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
     _onBeforeDestroyChildSubscriptions.clear();
   }
 
-  List<ListItem<T>> resolveChildren(ListItem<T> listItem) {
+  List<ListItem<Comparable<dynamic>>> resolveChildren(ListItem<Comparable<dynamic>> listItem) {
     if (_resolvedChildren.containsKey(listItem))
       return _resolvedChildren[listItem];
 
-    final List<ListItem<T>> result = _resolvedChildren[listItem] =
-        resolveChildrenHandler(level, listItem) as List<ListItem<T>>;
+    final List<ListItem<Comparable<dynamic>>> result = _resolvedChildren[listItem] =
+        resolveChildrenHandler(level, listItem) as List<ListItem<Comparable<dynamic>>>;
 
     return result;
   }
 
-  void handleRendererEvent(ItemRendererEvent<dynamic, T> event) {
+  void handleRendererEvent(ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
     if (event.type == 'childRegistry')
       _childHierarchies$ctrl.add(
-          new Tuple2<Hierarchy<Comparable<dynamic>>, bool>(
-              event.data as Hierarchy<Comparable<dynamic>>, true));
+          new Tuple2<Hierarchy, bool>(
+              event.data as Hierarchy, true));
     else if (!allowMultiSelection && event.type == 'selection') {
       clearSelection((ListItem<Comparable<dynamic>> listItem) =>
           listItem != event.listItem);
@@ -751,7 +751,7 @@ class Hierarchy<T extends Comparable<dynamic>> extends ListRenderer<T>
 
   @override
   void handleSelection(ListItem<Comparable<dynamic>> listItem) {
-    super.handleSelection(listItem as ListItem<T>);
+    super.handleSelection(listItem as ListItem<Comparable<dynamic>>);
 
     if (!allowMultiSelection && !_clearChildHierarchies$ctrl.isClosed)
       _clearChildHierarchies$ctrl

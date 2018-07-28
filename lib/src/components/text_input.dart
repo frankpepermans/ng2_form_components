@@ -25,7 +25,7 @@ typedef void TextInputAction(String inputValue);
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class TextInput<T extends Comparable<dynamic>> extends FormComponent<T>
+class TextInput extends FormComponent
     implements OnDestroy {
   @ViewChild('inputField')
   Element inputField;

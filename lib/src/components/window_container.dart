@@ -33,7 +33,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class WindowContainer<T extends Comparable<dynamic>> extends FormComponent<T>
+class WindowContainer extends FormComponent
     implements StatefulComponent, OnDestroy, AfterViewInit {
   @ViewChild('header')
   Element headerRef;

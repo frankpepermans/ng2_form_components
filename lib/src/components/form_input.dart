@@ -22,7 +22,7 @@ import 'package:ng2_state/ng2_state.dart'
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class FormInput<T extends Comparable<dynamic>> extends FormComponent<T>
+class FormInput extends FormComponent
     implements OnDestroy, AfterViewInit {
   @ViewChild('textarea')
   Element textarea;

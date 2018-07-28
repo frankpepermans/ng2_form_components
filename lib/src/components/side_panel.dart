@@ -29,7 +29,7 @@ import 'package:ng2_state/ng2_state.dart'
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class SidePanel<T extends Comparable<dynamic>> extends FormComponent<T>
+class SidePanel extends FormComponent
     implements OnDestroy, BeforeDestroyChild {
   //-----------------------------
   // input

@@ -1,5 +1,3 @@
-library ng2_form_components.components.auto_complete;
-
 import 'dart:async';
 import 'dart:html';
 
@@ -10,7 +8,6 @@ import 'package:dorm/dorm.dart';
 import 'package:angular/angular.dart';
 
 import 'package:ng2_form_components/src/components/drop_down.dart';
-import 'package:ng2_form_components/src/components/internal/form_component.dart';
 import 'package:ng2_form_components/src/components/list_renderer.dart';
 import 'package:ng2_form_components/src/components/list_item.g.dart';
 import 'package:ng2_form_components/src/components/animation/tween.dart';
@@ -33,7 +30,7 @@ import 'package:ng2_state/ng2_state.dart'
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
+class AutoComplete extends DropDown
     implements OnDestroy, AfterViewInit {
   @ViewChild('searchInput')
   Element searchInput;
@@ -62,7 +59,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   @Input()
   @override
-  set dataProvider(Iterable<ListItem<T>> value) {
+  set dataProvider(Iterable<ListItem<Comparable<dynamic>>> value) {
     if (dataProvider != value) {
       super.dataProvider = value;
 
@@ -78,7 +75,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   Stream<String> get inputChanged => _inputChanged$;
   @override
   @Output()
-  Stream<Iterable<ListItem<T>>> get selectedItemsChanged =>
+  Stream<Iterable<ListItem<Comparable<dynamic>>>> get selectedItemsChanged =>
       super.selectedItemsChanged;
 
   //-----------------------------
@@ -87,15 +84,15 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   Stream<String> _inputChanged$;
 
-  StreamSubscription<Tuple2<bool, List<ListItem<T>>>>
+  StreamSubscription<Tuple2<bool, List<ListItem<Comparable<dynamic>>>>>
       _mergedDataProviderChangedSubscription;
   StreamSubscription<String> _inputChangedSubscription;
   StreamSubscription<String> _currentHeaderLabelSubscription;
 
   final StreamController<String> _input$ctrl =
       new StreamController<String>.broadcast();
-  final StreamController<Iterable<ListItem<T>>> _dataProviderChanged$ctrl =
-      new StreamController<Iterable<ListItem<T>>>.broadcast();
+  final StreamController<Iterable<ListItem<Comparable<dynamic>>>> _dataProviderChanged$ctrl =
+      new StreamController<Iterable<ListItem<Comparable<dynamic>>>>.broadcast();
   final StreamController<bool> _inputCriteriaMet$ctrl =
       new StreamController<bool>.broadcast();
   final StreamController<bool> _focus$ctrl =
@@ -109,7 +106,7 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   bool hasDropDownValues = false;
   String inputValue, lastReplayedInputValue;
 
-  List<ListItem<T>> mergedDataProvider = <ListItem<T>>[];
+  List<ListItem<Comparable<dynamic>>> mergedDataProvider = <ListItem<Comparable<dynamic>>>[];
 
   //-----------------------------
   // constructor
@@ -132,9 +129,9 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
           .startWith('')
           .distinct((String vA, String vB) => vA.compareTo(vB) == 0),
           (Entity tuple, String input) {
-        final SerializableTuple2<bool, Iterable<ListItem<T>>> cast = tuple;
+        final SerializableTuple2<bool, Iterable<ListItem<Comparable<dynamic>>>> cast = tuple;
 
-        return new SerializableTuple3<bool, Iterable<ListItem<T>>, String>()
+        return new SerializableTuple3<bool, Iterable<ListItem<Comparable<dynamic>>>, String>()
           ..item1 = cast.item1
           ..item2 = cast.item2
           ..item3 = input;
@@ -203,16 +200,16 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
   //-----------------------------
 
   @override
-  void setSelectedItems(Iterable<ListItem<T>> value) {
+  void setSelectedItems(Iterable<ListItem<Comparable<dynamic>>> value) {
     if (mergedDataProvider == null)
-      mergedDataProvider = new List<ListItem<T>>.from(value);
+      mergedDataProvider = new List<ListItem<Comparable<dynamic>>>.from(value);
     else {
-      final List<ListItem<T>> clonedList =
+      final List<ListItem<Comparable<dynamic>>> clonedList =
           mergedDataProvider.toList(growable: true);
 
-      value.forEach((ListItem<T> listItem) {
-        ListItem<T> matchingListItem = mergedDataProvider.firstWhere(
-            (ListItem<T> existingListItem) =>
+      value.forEach((ListItem<Comparable<dynamic>> listItem) {
+        ListItem<Comparable<dynamic>> matchingListItem = mergedDataProvider.firstWhere(
+            (ListItem<Comparable<dynamic>> existingListItem) =>
                 existingListItem.compareTo(listItem) == 0,
             orElse: () => null);
 
@@ -241,13 +238,13 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   void _initStreams() {
     _currentHeaderLabelSubscription =
-        new rx.Observable<Iterable<ListItem<T>>>(selectedItemsChanged)
-            .startWith(const []).map((Iterable<ListItem<T>> selectedItems) {
+        new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(selectedItemsChanged)
+            .startWith(const []).map((Iterable<ListItem<Comparable<dynamic>>> selectedItems) {
       if (selectedItems != null && selectedItems.isNotEmpty) {
         return (selectedItems.length == 1)
             ? labelHandler(selectedItems.first.data)
             : selectedItems
-                .map((ListItem<T> listItem) =>
+                .map((ListItem<Comparable<dynamic>> listItem) =>
                     labelHandler(listItem.data))
                 .join(', ');
       }
@@ -261,51 +258,51 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
         .debounce(const Duration(milliseconds: 50))
         .where((String input) => input.length >= minCharsRequired);
 
-    final Stream<Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>
+    final Stream<Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool>>
         mergedDataProviderChanged$ = rx.Observable
             .combineLatest3(
                 new rx.Observable<bool>(_focus$ctrl.stream)
                     .distinct((bool bA, bool bB) => bA == bB)
                     .startWith(false),
-                new rx.Observable<Iterable<ListItem<T>>>(
+                new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(
                     _dataProviderChanged$ctrl.stream),
-                new rx.Observable<Iterable<ListItem<T>>>(selectedItemsChanged)
+                new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(selectedItemsChanged)
                     .startWith(const []),
-                (bool hasBeenFocused, Iterable<ListItem<T>> dataProvider,
-                        Iterable<ListItem<T>> selectedItems) =>
+                (bool hasBeenFocused, Iterable<ListItem<Comparable<dynamic>>> dataProvider,
+                        Iterable<ListItem<Comparable<dynamic>>> selectedItems) =>
                     new Tuple4<
                         bool,
-                        Iterable<ListItem<T>>,
-                        Iterable<ListItem<T>>,
+                        Iterable<ListItem<Comparable<dynamic>>>,
+                        Iterable<ListItem<Comparable<dynamic>>>,
                         bool>(hasBeenFocused, dataProvider, selectedItems, true))
             .asBroadcastStream();
 
     final Stream<
-            Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>
+            Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool>>
         mergedSelectedItemsChangedChanged$ = rx.Observable
             .combineLatest3(
                 new rx.Observable<bool>(_focus$ctrl.stream)
                     .distinct((bool bA, bool bB) => bA == bB)
                     .startWith(false),
                 new rx.Observable<String>(_input$ctrl.stream).startWith(null),
-                new rx.Observable<Iterable<ListItem<T>>>(selectedItemsChanged)
+                new rx.Observable<Iterable<ListItem<Comparable<dynamic>>>>(selectedItemsChanged)
                     .startWith(null),
                 (bool hasBeenFocused, dynamic _,
-                        Iterable<ListItem<T>> selectedItems) =>
+                        Iterable<ListItem<Comparable<dynamic>>> selectedItems) =>
                     new Tuple4<
                         bool,
-                        Iterable<ListItem<T>>,
-                        Iterable<ListItem<T>>,
+                        Iterable<ListItem<Comparable<dynamic>>>,
+                        Iterable<ListItem<Comparable<dynamic>>>,
                         bool>(hasBeenFocused, null, selectedItems, false))
             .asBroadcastStream();
 
     final rx.Observable<
-        Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>,
+        Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>,
             bool>> merged$ = new rx.Observable<
-        Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>,
+        Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>,
             bool>>.merge(<
         Stream<
-            Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>>>[
+            Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool>>>[
       mergedDataProviderChanged$,
       mergedSelectedItemsChangedChanged$
     ]).asBroadcastStream();
@@ -315,14 +312,14 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
         .distinct((bool bA, bool bB) => bA == bB)
         .switchMap((bool isCriteriaMet) => merged$
             .where(
-                (Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) =>
+                (Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool> tuple) =>
                     tuple.item4 == isCriteriaMet)
-            .map((Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>
+            .map((Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool>
                     tuple) =>
-                new Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool>(
+                new Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool>(
                     tuple.item1, tuple.item2, tuple.item3, isCriteriaMet)))
         .map(_rebuildMergedDataProvider)
-        .doOnData((Tuple2<bool, List<ListItem<T>>> tuple) {
+        .doOnData((Tuple2<bool, List<ListItem<Comparable<dynamic>>>> tuple) {
           mergedDataProvider = tuple.item2;
 
           showLoading = false;
@@ -341,27 +338,27 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
     });
   }
 
-  Tuple2<bool, List<ListItem<T>>> _rebuildMergedDataProvider(
-      Tuple4<bool, Iterable<ListItem<T>>, Iterable<ListItem<T>>, bool> tuple) {
-    final List<ListItem<T>> list = <ListItem<T>>[];
+  Tuple2<bool, List<ListItem<Comparable<dynamic>>>> _rebuildMergedDataProvider(
+      Tuple4<bool, Iterable<ListItem<Comparable<dynamic>>>, Iterable<ListItem<Comparable<dynamic>>>, bool> tuple) {
+    final List<ListItem<Comparable<dynamic>>> list = <ListItem<Comparable<dynamic>>>[];
 
     if (moveSelectionOnTop && tuple.item3 != null) {
-      tuple.item3.forEach((ListItem<T> listItem) {
-        if (list.firstWhere((ListItem<T> item) => listItem.compareTo(item) == 0,
+      tuple.item3.forEach((ListItem<Comparable<dynamic>> listItem) {
+        if (list.firstWhere((ListItem<Comparable<dynamic>> item) => listItem.compareTo(item) == 0,
                 orElse: () => null) ==
             null) list.add(listItem);
       });
     }
 
     if (tuple.item4 && tuple.item2 != null) {
-      tuple.item2.forEach((ListItem<T> listItem) {
-        if (list.firstWhere((ListItem<T> item) => listItem.compareTo(item) == 0,
+      tuple.item2.forEach((ListItem<Comparable<dynamic>> listItem) {
+        if (list.firstWhere((ListItem<Comparable<dynamic>> item) => listItem.compareTo(item) == 0,
                 orElse: () => null) ==
             null) list.add(listItem);
       });
     }
 
-    return new Tuple2<bool, List<ListItem<T>>>(tuple.item1, list);
+    return new Tuple2<bool, List<ListItem<Comparable<dynamic>>>>(tuple.item1, list);
   }
 
   //-----------------------------
@@ -390,5 +387,5 @@ class AutoComplete<T extends Comparable<dynamic>> extends DropDown<T>
 
   @override
   void updateSelectedItemsCast(List<ListItem<Comparable<dynamic>>> items) =>
-      super.updateSelectedItems(items?.cast<ListItem<T>>());
+      super.updateSelectedItems(items?.cast<ListItem<Comparable<dynamic>>>());
 }

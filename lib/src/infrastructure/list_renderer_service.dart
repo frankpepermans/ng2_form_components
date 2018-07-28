@@ -10,7 +10,7 @@ class ListRendererService {
 
   List<ListRendererEvent<dynamic, Comparable<dynamic>>> lastResponders;
 
-  final List<ListRenderer<Comparable<dynamic>>> renderers = <ListRenderer<Comparable<dynamic>>>[];
+  final List<ListRenderer> renderers = <ListRenderer>[];
 
   Stream<ListItem<Comparable<dynamic>>> get rendererSelection$ => _rendererSelection$ctrl.stream;
   Stream<ItemRendererEvent<dynamic, Comparable<dynamic>>> get event$ => _event$ctrl.stream;
@@ -24,9 +24,9 @@ class ListRendererService {
 
   ListRendererService();
 
-  void addRenderer(ListRenderer<Comparable<dynamic>> renderer) => renderers.add(renderer);
+  void addRenderer(ListRenderer renderer) => renderers.add(renderer);
 
-  bool removeRenderer(ListRenderer<Comparable<dynamic>> renderer) => renderers.remove(renderer);
+  bool removeRenderer(ListRenderer renderer) => renderers.remove(renderer);
 
   void triggerSelection(ListItem<Comparable<dynamic>> listItem) {
     if (!_rendererSelection$ctrl.isClosed) _rendererSelection$ctrl.add(listItem);
