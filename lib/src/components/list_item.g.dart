@@ -168,13 +168,6 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   @override
   bool operator ==(Object other) =>
       other is ListItem<T> && other.hashCode == this.hashCode;
-  @override
-  int get hashCode => hash_finish(hash_combine(
-      hash_combine(
-          hash_combine(hash_combine(0, this.container.hashCode),
-              this.isAlwaysOpen.hashCode),
-          this.parent.hashCode),
-      this.selectable.hashCode));
 
   /// toString implementation for debugging purposes
   @override
