@@ -140,7 +140,7 @@ class TextInput extends FormComponent
       ]);
 
   @override
-  void receiveState(SerializableTuple2<String, bool> entity, StatePhase phase) {
+  void receiveState(SerializableTuple2 entity, StatePhase phase) {
     final String item1 = entity.item1;
     final bool item2 = entity.item2;
 
