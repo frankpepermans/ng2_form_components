@@ -181,6 +181,8 @@ class DropDown extends FormComponent
   StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>>
       _selectedItemsSubscription;
   StreamSubscription<bool> _beforeDestroyChildSubscription;
+  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>>
+      _selectFirstElementOnEnterKeySubscription;
 
   bool _isClosedFromList = false;
 
@@ -267,6 +269,7 @@ class DropDown extends FormComponent
     _openCloseSubscription?.cancel();
     _selectedItemsSubscription?.cancel();
     _beforeDestroyChildSubscription?.cancel();
+    _selectFirstElementOnEnterKeySubscription?.cancel();
 
     FormComponent.openFormComponents.remove(this);
 
@@ -375,6 +378,12 @@ class DropDown extends FormComponent
             .where((Iterable<ListItem<Comparable<dynamic>>> selectedItems) =>
                 selectedItems != null)
             .listen(setSelectedItems);
+
+    _selectFirstElementOnEnterKeySubscription = elementRef.onKeyPress
+        .where((_) => hasSelectableItems())
+        .where((KeyboardEvent event) => event.keyCode == KeyCode.ENTER)
+        .map((_) => <ListItem<Comparable<dynamic>>>[dataProvider.first])
+        .listen(updateSelectedItems);
   }
 
   Stream<bool> _awaitCloseAnimation(bool isOpen) {
@@ -468,4 +477,7 @@ class DropDown extends FormComponent
   void handleItemRendererEvent(
           ItemRendererEvent<dynamic, Comparable<dynamic>> event) =>
       _itemRendererEvent$ctrl.add(event);
+
+  bool hasSelectableItems() =>
+      isOpen && dataProvider != null && dataProvider.isNotEmpty;
 }

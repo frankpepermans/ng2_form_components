@@ -29,32 +29,36 @@ typedef bool SelectedItemsTest(ListItem<Comparable<dynamic>> listItem);
 
 @Pipe('selectedItems')
 @Injectable()
-class SelectedItemsPipe
-    implements PipeTransform {
+class SelectedItemsPipe implements PipeTransform {
   const SelectedItemsPipe();
 
-  List<ListItem<Comparable<dynamic>>> transform(List<ListItem<Comparable<dynamic>>> dataProvider,
-      SelectedItemsTest handler, bool moveSelectionOnTop) {
+  List<ListItem<Comparable<dynamic>>> transform(
+      List<ListItem<Comparable<dynamic>>> dataProvider,
+      SelectedItemsTest handler,
+      bool moveSelectionOnTop) {
     if (!moveSelectionOnTop) return const [];
 
     return dataProvider
-        .where((ListItem<Comparable<dynamic>> listItem) => listItem != null && handler(listItem))
+        .where((ListItem<Comparable<dynamic>> listItem) =>
+            listItem != null && handler(listItem))
         .toList(growable: false);
   }
 }
 
 @Pipe('unselectedItems')
 @Injectable()
-class UnselectedItemsPipe
-    implements PipeTransform {
+class UnselectedItemsPipe implements PipeTransform {
   const UnselectedItemsPipe();
 
-  List<ListItem<Comparable<dynamic>>> transform(List<ListItem<Comparable<dynamic>>> dataProvider,
-      SelectedItemsTest handler, bool moveSelectionOnTop) {
+  List<ListItem<Comparable<dynamic>>> transform(
+      List<ListItem<Comparable<dynamic>>> dataProvider,
+      SelectedItemsTest handler,
+      bool moveSelectionOnTop) {
     if (!moveSelectionOnTop) return dataProvider;
 
     return dataProvider
-        .where((ListItem<Comparable<dynamic>> listItem) => listItem != null && !handler(listItem))
+        .where((ListItem<Comparable<dynamic>> listItem) =>
+            listItem != null && !handler(listItem))
         .toList(growable: false);
   }
 }
@@ -75,8 +79,7 @@ class UnselectedItemsPipe
     pipes: const <dynamic>[commonPipes, SelectedItemsPipe, UnselectedItemsPipe],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class ListRenderer extends FormComponent
-    implements OnDestroy, AfterViewInit {
+class ListRenderer extends FormComponent implements OnDestroy, AfterViewInit {
   Element _scrollPane;
   Element get scrollPane => _scrollPane;
   @ViewChild('scrollPane')
@@ -118,7 +121,8 @@ class ListRenderer extends FormComponent
       setState(() => _resolveRendererHandler = value);
   }
 
-  List<ListItem<Comparable<dynamic>>> _dataProvider = <ListItem<Comparable<dynamic>>>[];
+  List<ListItem<Comparable<dynamic>>> _dataProvider =
+      <ListItem<Comparable<dynamic>>>[];
   List<ListItem<Comparable<dynamic>>> get dataProvider => _dataProvider;
   @Input()
   set dataProvider(List<ListItem<Comparable<dynamic>>> value) {
@@ -127,7 +131,8 @@ class ListRenderer extends FormComponent
     }
   }
 
-  List<ListItem<Comparable<dynamic>>> _selectedItems = <ListItem<Comparable<dynamic>>>[];
+  List<ListItem<Comparable<dynamic>>> _selectedItems =
+      <ListItem<Comparable<dynamic>>>[];
   List<ListItem<Comparable<dynamic>>> get selectedItems => _selectedItems;
   @Input()
   set selectedItems(List<ListItem<Comparable<dynamic>>> value) {
@@ -220,7 +225,8 @@ class ListRenderer extends FormComponent
   //-----------------------------
 
   @Output()
-  rx.Observable<List<ListItem<Comparable<dynamic>>>> get selectedItemsChanged => _selectedItems$;
+  rx.Observable<List<ListItem<Comparable<dynamic>>>> get selectedItemsChanged =>
+      _selectedItems$;
   @Output()
   Stream<bool> get requestClose => _requestClose$ctrl.stream;
   @Output()
@@ -240,8 +246,8 @@ class ListRenderer extends FormComponent
   Map<String, bool> cssMap = const <String, bool>{
     'ng2-form-components-list-renderer': true
   };
-  rx.Observable<List<ListItem<Comparable<dynamic>>>> get internalSelectedItemsChanged =>
-      _selectedItems$;
+  rx.Observable<List<ListItem<Comparable<dynamic>>>>
+      get internalSelectedItemsChanged => _selectedItems$;
   Iterable<ListItem<Comparable<dynamic>>> internalSelectedItems =
       new List<ListItem<Comparable<dynamic>>>.unmodifiable(
           const <ListItem<Comparable<dynamic>>>[]);
@@ -250,9 +256,11 @@ class ListRenderer extends FormComponent
 
   rx.Observable<List<ListItem<Comparable<dynamic>>>> _selectedItems$;
 
-  final StreamController<List<ListItem<Comparable<dynamic>>>> _selectedItems$ctrl =
+  final StreamController<List<ListItem<Comparable<dynamic>>>>
+      _selectedItems$ctrl =
       new StreamController<List<ListItem<Comparable<dynamic>>>>.broadcast();
-  final StreamController<ListItem<Comparable<dynamic>>> _incomingSelection$ctrl =
+  final StreamController<ListItem<Comparable<dynamic>>>
+      _incomingSelection$ctrl =
       new StreamController<ListItem<Comparable<dynamic>>>();
   final StreamController<bool> _requestClose$ctrl =
           new StreamController<bool>(),
@@ -266,18 +274,23 @@ class ListRenderer extends FormComponent
           ItemRendererEvent<dynamic, Comparable<dynamic>>>.broadcast();
   final StreamController<ClearSelectionWhereHandler> _clearSelection$ctrl =
       new StreamController<ClearSelectionWhereHandler>.broadcast();
-  final rx.BehaviorSubject<List<ListItem<Comparable<dynamic>>>> _dataProvider$ctrl =
+  final rx.BehaviorSubject<List<ListItem<Comparable<dynamic>>>>
+      _dataProvider$ctrl =
       new rx.BehaviorSubject<List<ListItem<Comparable<dynamic>>>>();
   final StreamController<ItemRendererEvent<int, Comparable<dynamic>>>
       _dropEffect$ctrl = new StreamController<
           ItemRendererEvent<int, Comparable<dynamic>>>.broadcast();
 
-  StreamSubscription<List<ListItem<Comparable<dynamic>>>> _dataProviderSubscription;
-  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>> _internalSelectedItemsSubscription;
-  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>> _clearSelectionSubscription;
+  StreamSubscription<List<ListItem<Comparable<dynamic>>>>
+      _dataProviderSubscription;
+  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>>
+      _internalSelectedItemsSubscription;
+  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>>
+      _clearSelectionSubscription;
   StreamSubscription<ListItem<Comparable<dynamic>>>
       _rendererSelectionSubscription;
-  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>> _selectionStateSubscription;
+  StreamSubscription<Iterable<ListItem<Comparable<dynamic>>>>
+      _selectionStateSubscription;
   StreamSubscription<MouseEvent> _domClickSubscription;
   StreamSubscription<bool> _scrollPositionSubscription;
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>>
@@ -393,13 +406,16 @@ class ListRenderer extends FormComponent
   // private methods
   //-----------------------------
 
-  bool distinctDataProvider(List<ListItem<Comparable<dynamic>>> current, List<ListItem<Comparable<dynamic>>> next) {
+  bool distinctDataProvider(List<ListItem> current,
+      List<ListItem> next) {
     if (current == null && next == null) return false;
     if (current == null || next == null) return true;
     if (current.length != next.length) return true;
 
     for (int i = 0, len = next.length; i < len; i++) {
-      if (current[i].data != next[i].data) return true;
+      ListItem lA = current[i], lB = next[i];
+      var dA = lA.data, dB = lB.data;
+      if (dA != dB) return true;
     }
 
     return false;
@@ -423,8 +439,10 @@ class ListRenderer extends FormComponent
   }
 
   void scrollIntoView(Comparable<dynamic> entry) {
-    listRendererService.respondEvents(<ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>>[
-      new ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>('scrollIntoView', null, entry)
+    listRendererService.respondEvents(<
+        ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>>[
+      new ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>(
+          'scrollIntoView', null, entry)
     ]);
   }
 
@@ -461,8 +479,8 @@ class ListRenderer extends FormComponent
   }
 
   void _initStreams() {
-    _dataProviderSubscription =
-        _dataProvider$ctrl.stream.listen((List<ListItem<Comparable<dynamic>>> dataProvider) {
+    _dataProviderSubscription = _dataProvider$ctrl.stream
+        .listen((List<ListItem<Comparable<dynamic>>> dataProvider) {
       if (dataProvider != _dataProvider) {
         setState(() {
           _willUpdateController.add(true);
@@ -472,36 +490,44 @@ class ListRenderer extends FormComponent
       }
     });
 
-    _internalSelectedItemsSubscription =
-        _selectedItems$ctrl.stream.listen((Iterable<ListItem<Comparable<dynamic>>> items) {
+    _internalSelectedItemsSubscription = _selectedItems$ctrl.stream
+        .listen((Iterable<ListItem<Comparable<dynamic>>> items) {
       listRendererService.respondEvents(<
-          ListRendererEvent<Iterable<ListItem<Comparable<dynamic>>>, Comparable<dynamic>>>[
-        new ListRendererEvent<Iterable<ListItem<Comparable<dynamic>>>, Comparable<dynamic>>(
-            'selectionChanged', null, items)
+          ListRendererEvent<Iterable<ListItem<Comparable<dynamic>>>,
+              Comparable<dynamic>>>[
+        new ListRendererEvent<Iterable<ListItem<Comparable<dynamic>>>,
+            Comparable<dynamic>>('selectionChanged', null, items)
       ]);
 
       setState(() {
         internalSelectedItems = items;
 
-        listRendererService.respondEvents(<ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>>[
-          new ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>('selectionChanged', null, null)
+        listRendererService.respondEvents(<
+            ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>>[
+          new ListRendererEvent<Comparable<dynamic>, Comparable<dynamic>>(
+              'selectionChanged', null, null)
         ]);
       });
     });
 
     _selectedItems$ = rx.Observable.zip2(
         _incomingSelection$ctrl.stream,
-        new rx.Observable<List<ListItem<Comparable<dynamic>>>>(_selectedItems$ctrl.stream)
-            .startWith(internalSelectedItems as List<ListItem<Comparable<dynamic>>>),
-        (ListItem<Comparable<dynamic>> incoming, Iterable<ListItem<Comparable<dynamic>>> currentList) {
+        new rx.Observable<List<ListItem<Comparable<dynamic>>>>(
+                _selectedItems$ctrl.stream)
+            .startWith(
+                internalSelectedItems as List<ListItem<Comparable<dynamic>>>),
+        (ListItem<Comparable<dynamic>> incoming,
+            Iterable<ListItem<Comparable<dynamic>>> currentList) {
       if (incoming == null)
         return new List<ListItem<Comparable<dynamic>>>.unmodifiable(
             const <ListItem<Comparable<dynamic>>>[]);
 
-      List<ListItem<Comparable<dynamic>>> newList = currentList.toList(growable: true);
+      List<ListItem<Comparable<dynamic>>> newList =
+          currentList.toList(growable: true);
 
       final ListItem<Comparable<dynamic>> match = newList.firstWhere(
-          (ListItem<Comparable<dynamic>> listItem) => listItem.compareTo(incoming) == 0,
+          (ListItem<Comparable<dynamic>> listItem) =>
+              listItem.compareTo(incoming) == 0,
           orElse: () => null);
 
       if (allowMultiSelection) {
@@ -519,14 +545,14 @@ class ListRenderer extends FormComponent
       return new List<ListItem<Comparable<dynamic>>>.unmodifiable(newList);
     }).asBroadcastStream();
 
-    _clearSelectionSubscription = rx.Observable
-        .combineLatest2(
+    _clearSelectionSubscription = rx.Observable.combineLatest2(
             _clearSelection$ctrl.stream,
             _selectedItems$.startWith(const []),
             (ClearSelectionWhereHandler handler,
                     List<ListItem<Comparable<dynamic>>> selectedItems) =>
                 selectedItems.where(handler))
-        .where((Iterable<ListItem<Comparable<dynamic>>> items) => items.isNotEmpty)
+        .where(
+            (Iterable<ListItem<Comparable<dynamic>>> items) => items.isNotEmpty)
         .listen((Iterable<ListItem<Comparable<dynamic>>> items) =>
             items.forEach(_incomingSelection$ctrl.add));
 
@@ -558,16 +584,13 @@ class ListRenderer extends FormComponent
     _itemRendererEventSubscription =
         _itemRendererEvent$ctrl.stream.listen(_handleItemRendererEvent);
 
-    _dropEffectSubscription = rx.Observable
-        .combineLatest3(
-            _dataProvider$ctrl.stream,
-            _dropEffect$ctrl.stream,
-            _domChange$ctrl.stream,
-            (dynamic _,
-                    ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent,
-                    dynamic __) =>
-                dropEffectEvent)
-        .listen(listRendererService.triggerEvent);
+    _dropEffectSubscription = rx.Observable.combineLatest3(
+        _dataProvider$ctrl.stream,
+        _dropEffect$ctrl.stream,
+        _domChange$ctrl.stream,
+        (dynamic _, ItemRendererEvent<int, Comparable<dynamic>> dropEffectEvent,
+                dynamic __) =>
+            dropEffectEvent).listen(listRendererService.triggerEvent);
   }
 
   void _handleItemRendererEvent(
@@ -611,7 +634,8 @@ class ListRenderer extends FormComponent
     if (listItem == null || internalSelectedItems == null) return false;
 
     for (int i = 0, len = internalSelectedItems.length; i < len; i++) {
-      final ListItem<Comparable<dynamic>> item = internalSelectedItems.elementAt(i);
+      final ListItem<Comparable<dynamic>> item =
+          internalSelectedItems.elementAt(i);
 
       if (item != null && listItem.compareTo(item) == 0) {
         return true;
