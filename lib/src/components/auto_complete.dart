@@ -185,7 +185,15 @@ class AutoComplete extends DropDown
 
     _input$ctrl.add(value);
 
-    setState(() => inputValue = value);
+    setState(() {
+      inputValue = value;
+
+      if (value == null || value.trim().isEmpty) {
+        mergedDataProvider = <ListItem<Comparable<dynamic>>>[];
+        dataProvider = <ListItem<Comparable<dynamic>>>[];
+        selectedItems = <ListItem<Comparable<dynamic>>>[];
+      }
+    });
   }
 
   @override
