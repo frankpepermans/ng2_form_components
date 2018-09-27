@@ -11,9 +11,10 @@ class MutationObserverStream extends Stream<bool> {
       bool subtree = true,
       bool childList = true,
       bool attributes = false,
+      List<String> attributeFilter = null,
       bool characterData = true})
       : controller = _buildController(
-            element, matcher, subtree, childList, attributes, characterData);
+            element, matcher, subtree, childList, attributes, attributeFilter, characterData);
 
   @override
   StreamSubscription<bool> listen(void onData(bool event),
@@ -27,6 +28,7 @@ class MutationObserverStream extends Stream<bool> {
       bool subtree,
       bool childList,
       bool attributes,
+      List<String> attributeFilter,
       bool characterData) {
     StreamController<bool> controller;
     MutationObserver observer;
@@ -48,6 +50,7 @@ class MutationObserverStream extends Stream<bool> {
                 subtree: subtree,
                 childList: childList,
                 attributes: attributes,
+                attributeFilter: attributeFilter,
                 characterData: characterData);
         },
         onCancel: () => observer.disconnect());
