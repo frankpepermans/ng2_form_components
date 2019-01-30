@@ -41,14 +41,3 @@ export 'src/utils/mutation_observer_stream.dart' show MutationObserverStream;
 export 'src/components/item_renderers/drop_effect_item_renderer.dart'
     show DropEffectItemRenderer;
 export 'src/utils/html_loader.dart' show HtmlLoader;
-
-ListItem<T> castListItem<T extends Comparable<dynamic>>(
-        ListItem<Comparable<dynamic>> listItem) =>
-    listItem != null
-        ? (new ListItem<T>()
-          ..container = listItem.container
-          ..data = listItem.data
-          ..isAlwaysOpen = listItem.isAlwaysOpen
-          ..parent = listItem.parent
-          ..selectable = listItem.selectable)
-        : null;

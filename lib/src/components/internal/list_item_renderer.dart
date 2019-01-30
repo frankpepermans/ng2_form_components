@@ -18,11 +18,11 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
 enum ListDragDropHandlerType { NONE, SORT, SWAP, ALL }
 
-typedef void ListDragDropHandler(ListItem<Comparable<dynamic>> dragListItem,
-    ListItem<Comparable<dynamic>> dropListItem, int offset);
-typedef bool IsSelectedHandler(ListItem<Comparable<dynamic>> listItem);
-typedef String GetHierarchyOffsetHandler(
-    ListItem<Comparable<dynamic>> listItem);
+typedef void ListDragDropHandler<T extends Comparable<dynamic>>(ListItem<T> dragListItem,
+    ListItem<T> dropListItem, int offset);
+typedef bool IsSelectedHandler<T extends Comparable<dynamic>>(ListItem<T> listItem);
+typedef String GetHierarchyOffsetHandler<T extends Comparable<dynamic>>(
+    ListItem<T> listItem);
 
 @Component(
     selector: 'list-item-renderer',

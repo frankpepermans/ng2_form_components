@@ -9,7 +9,7 @@ import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_i
 class DropEffectItemRenderer<T extends Comparable<dynamic>> extends ComponentState implements DynamicListItemRenderer, OnDestroy {
 
   final ListRendererService listRendererService;
-  final ListItem<Comparable<dynamic>> listItem;
+  final ListItem<T> listItem;
 
   StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEventSubscription;
 
