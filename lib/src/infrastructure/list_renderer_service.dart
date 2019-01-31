@@ -55,7 +55,7 @@ class ListRendererService {
   }
 
   bool isOpen(ListItem<Comparable<dynamic>> listItem) {
-    for (int i = 0, len = renderers.length; i < len; i++) {
+    for (var i = 0, len = renderers.length; i < len; i++) {
       if (renderers[i].isOpen(listItem)) return true;
     }
 

@@ -1,5 +1,3 @@
-library ng2_form_components.utils.window_listeners;
-
 import 'dart:async';
 import 'dart:html';
 
