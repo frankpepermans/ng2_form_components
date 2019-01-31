@@ -14,7 +14,7 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 import 'package:ng2_form_components/src/utils/html_helpers.dart';
 
 final SerializerJson<String> _serializer = SerializerJson<String>()
-  ..outgoing(const <dynamic>[])
+  ..outgoing(const [])
   ..addRule(
       DateTime,
       (int value) => (value != null)
@@ -30,8 +30,7 @@ class DragDrop implements OnDestroy {
   set ngDragDropHandler(ListDragDropHandler handler) =>
       _handler$ctrl.add(handler);
   @Input()
-  set ngDragDrop(ListItem<Comparable<dynamic>> listItem) =>
-      _listItem$ctrl.add(listItem);
+  set ngDragDrop(ListItem<Comparable> listItem) => _listItem$ctrl.add(listItem);
 
   @Output()
   Stream<DropResult> get onDrop => _onDrop$ctrl.stream;
@@ -45,8 +44,8 @@ class DragDrop implements OnDestroy {
   Observable<bool> dragOver$;
   Observable<bool> dragOut$;
 
-  final StreamController<ListItem<Comparable<dynamic>>> _listItem$ctrl =
-      StreamController<ListItem<Comparable<dynamic>>>();
+  final StreamController<ListItem<Comparable>> _listItem$ctrl =
+      StreamController<ListItem<Comparable>>();
   final StreamController<ListDragDropHandler> _handler$ctrl =
       StreamController<ListDragDropHandler>();
   final StreamController<DropResult> _onDrop$ctrl =
@@ -60,9 +59,8 @@ class DragDrop implements OnDestroy {
   StreamSubscription<MouseEvent> _dragStartSubscription;
   StreamSubscription<MouseEvent> _dragEndSubscription;
   StreamSubscription<bool> _dragOutSubscription;
-  StreamSubscription<ListItem<Comparable<dynamic>>> _swapDropSubscription;
-  StreamSubscription<Tuple2<ListItem<Comparable<dynamic>>, int>>
-      _sortDropSubscription;
+  StreamSubscription<ListItem<Comparable>> _swapDropSubscription;
+  StreamSubscription<Tuple2<ListItem<Comparable>, int>> _sortDropSubscription;
 
   bool _areStreamsSet = false;
   num heightOnDragEnter = 0;
@@ -96,27 +94,25 @@ class DragDrop implements OnDestroy {
     _initSubscription = Observable.combineLatest3(
             _listItem$ctrl.stream.take(1),
             _handler$ctrl.stream.take(1),
-            Observable<bool>(_removeAllStyles$ctrl.stream).startWith(false),
+            Observable(_removeAllStyles$ctrl.stream).startWith(false),
             _updateStyles)
         .listen(null);
   }
 
-  bool _updateStyles(ListItem<Comparable<dynamic>> listItem,
-      ListDragDropHandler handler, bool removeAllStyles) {
+  bool _updateStyles(ListItem<Comparable> listItem, ListDragDropHandler handler,
+      bool removeAllStyles) {
     if (listItem != null && handler != null) {
       if (removeAllStyles) {
-        final Element element = elementRef;
-
         helpers.updateElementClasses(
-            element, dragDropService.resolveDropClassName(listItem), false);
-        helpers.updateElementClasses(element, 'ngDragDrop--drop-inside', false);
+            elementRef, dragDropService.resolveDropClassName(listItem), false);
         helpers.updateElementClasses(
-            element, 'ngDragDrop--sort-handler--above', false);
+            elementRef, 'ngDragDrop--drop-inside', false);
         helpers.updateElementClasses(
-            element, 'ngDragDrop--sort-handler--below', false);
+            elementRef, 'ngDragDrop--sort-handler--above', false);
+        helpers.updateElementClasses(
+            elementRef, 'ngDragDrop--sort-handler--below', false);
       } else {
-        final ListDragDropHandlerType type =
-            dragDropService.typeHandler(listItem);
+        final type = dragDropService.typeHandler(listItem);
 
         if (type != ListDragDropHandlerType.NONE) _setupAsDragDrop(listItem);
 
@@ -132,30 +128,30 @@ class DragDrop implements OnDestroy {
     return true;
   }
 
-  void _setupAsDragDrop(ListItem<Comparable<dynamic>> listItem) {
+  void _setupAsDragDrop(ListItem<Comparable> listItem) {
     if (_areStreamsSet) return;
 
     final Element element = elementRef;
 
     _areStreamsSet = true;
 
-    dragDetection$ = Observable<int>.merge(<Stream<int>>[
-      Observable<MouseEvent>(element.onDragEnter).doOnData((_) {
+    dragDetection$ = Observable.merge([
+      Observable(element.onDragEnter).doOnData((_) {
         heightOnDragEnter = element.client.height;
       }).map((_) => 1),
       element.onDragLeave.map((_) => -1),
       element.onDrop.map((_) => -1)
     ])
         .asBroadcastStream()
-        .scan((int acc, int value, _) => acc + value, 0)
-        .map((int result) => result > 0)
+        .scan((int acc, value, _) => acc + value, 0)
+        .map((result) => result > 0)
         .distinct();
 
-    dragOver$ = dragDetection$.where((bool value) => value);
+    dragOver$ = dragDetection$.where((value) => value);
 
-    dragOut$ = dragDetection$.where((bool value) => !value).map((_) => true);
+    dragOut$ = dragDetection$.where((value) => !value).map((_) => true);
 
-    _dragStartSubscription = element.onDragStart.listen((MouseEvent event) {
+    _dragStartSubscription = element.onDragStart.listen((event) {
       event.dataTransfer.effectAllowed = 'move';
       event.dataTransfer
           .setData('text/plain', _serializer.outgoing(<Entity>[listItem]));
@@ -163,7 +159,7 @@ class DragDrop implements OnDestroy {
       helpers.updateElementClasses(element, 'ngDragDrop--active', true);
     });
 
-    _dragEndSubscription = element.onDragEnd.listen((MouseEvent event) {
+    _dragEndSubscription = element.onDragEnd.listen((event) {
       helpers.updateElementClasses(element, 'ngDragDrop--active', false);
     });
 
@@ -171,25 +167,23 @@ class DragDrop implements OnDestroy {
   }
 
   void _createDropHandler(
-      ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
-    final Element element = elementRef;
+      ListItem<Comparable> listItem, ListDragDropHandler handler) {
+    elementRef.setAttribute('draggable', 'true');
 
-    element.setAttribute('draggable', 'true');
-
-    _sortHandlerSubscription = Observable<MouseEvent>.merge(
-            <Stream<MouseEvent>>[element.onDragOver, element.onDragLeave])
-        .listen((MouseEvent event) {
+    _sortHandlerSubscription =
+        Observable.merge([elementRef.onDragOver, elementRef.onDragLeave])
+            .listen((event) {
       event.preventDefault();
 
       helpers.updateElementClasses(
-          element,
+          elementRef,
           dragDropService.resolveDropClassName(listItem),
           _isWithinDropBounds(event.client.y));
     });
 
-    _swapDropSubscription = element.onDrop
+    _swapDropSubscription = elementRef.onDrop
         .map(_dataTransferToListItem)
-        .listen((ListItem<Comparable<dynamic>> droppedListItem) {
+        .listen((droppedListItem) {
       if (droppedListItem.compareTo(listItem) != 0) {
         handler(droppedListItem, listItem, 0);
 
@@ -201,24 +195,22 @@ class DragDrop implements OnDestroy {
   }
 
   void _createSortHandlers(
-      ListItem<Comparable<dynamic>> listItem, ListDragDropHandler handler) {
-    final Element element = elementRef;
+      ListItem<Comparable> listItem, ListDragDropHandler handler) {
+    elementRef.setAttribute('draggable', 'true');
 
-    element.setAttribute('draggable', 'true');
-
-    _dropHandlerSubscription = element.onDragOver.listen((MouseEvent event) {
+    _dropHandlerSubscription = elementRef.onDragOver.listen((event) {
       event.preventDefault();
 
-      helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--above',
-          _isSortAbove(event.client.y));
-      helpers.updateElementClasses(element, 'ngDragDrop--sort-handler--below',
-          _isSortBelow(event.client.y));
+      helpers.updateElementClasses(elementRef,
+          'ngDragDrop--sort-handler--above', _isSortAbove(event.client.y));
+      helpers.updateElementClasses(elementRef,
+          'ngDragDrop--sort-handler--below', _isSortBelow(event.client.y));
     });
 
-    _sortDropSubscription = element.onDrop
-        .map((MouseEvent event) => Tuple2<ListItem<Comparable<dynamic>>, int>(
-            _dataTransferToListItem(event), _getSortOffset(event)))
-        .listen((Tuple2<ListItem<Comparable<dynamic>>, int> tuple) {
+    _sortDropSubscription = elementRef.onDrop
+        .map((event) =>
+            Tuple2(_dataTransferToListItem(event), _getSortOffset(event)))
+        .listen((tuple) {
       if (tuple.item1.compareTo(listItem) != 0) {
         handler(tuple.item1, listItem, tuple.item2);
 
@@ -238,16 +230,16 @@ class DragDrop implements OnDestroy {
     return 0;
   }
 
-  ListItem<Comparable<dynamic>> _dataTransferToListItem(MouseEvent event) {
-    final String transferDataEncoded = event.dataTransfer.getData('text/plain');
+  ListItem<Comparable> _dataTransferToListItem(MouseEvent event) {
+    final transferDataEncoded = event.dataTransfer.getData('text/plain');
 
     if (transferDataEncoded.isEmpty) return null;
 
-    final EntityFactory<Entity> factory = EntityFactory<Entity>();
-    final List<dynamic> result =
+    final factory = EntityFactory<Entity>();
+    final result =
         factory.spawn(_serializer.incoming(transferDataEncoded), _serializer);
 
-    return result.first as ListItem<Comparable<dynamic>>;
+    return result.first as ListItem<Comparable>;
   }
 
   void _removeAllStyles(dynamic _) => _removeAllStyles$ctrl.add(true);
@@ -256,7 +248,7 @@ class DragDrop implements OnDestroy {
       clientY - element.getBoundingClientRect().top;
 
   bool _isWithinDropBounds(num clientY) {
-    final num y = _getActualOffsetY(elementRef, clientY);
+    final y = _getActualOffsetY(elementRef, clientY);
 
     return y > _OFFSET && y < heightOnDragEnter - _OFFSET;
   }
@@ -270,7 +262,7 @@ class DragDrop implements OnDestroy {
 
 class DropResult {
   final int type;
-  final ListItem<Comparable<dynamic>> listItem;
+  final ListItem<Comparable> listItem;
 
   DropResult(this.type, this.listItem);
 }

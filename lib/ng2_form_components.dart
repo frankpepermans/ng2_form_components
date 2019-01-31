@@ -1,8 +1,5 @@
 library ng2_form_components;
 
-import 'package:ng2_form_components/src/components/list_item.g.dart'
-    show ListItem;
-
 export 'package:ng2_form_components/src/components/list_item.g.dart'
     show ListItem;
 export 'src/components/internal/form_component.dart'

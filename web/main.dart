@@ -48,8 +48,7 @@ class AppComponent {
   final ChangeDetectorRef changeDetector;
   final StateService stateService;
   final Random random = new Random();
-  final TextInputAction notifyInputAction =
-      (String inputValue) => print(inputValue);
+  final TextInputAction notifyInputAction = print;
 
   Type listItemRenderer = DefaultListItemRenderer;
 
@@ -204,8 +203,7 @@ class AppComponent {
   }
 
   void startRecording() {
-    if (recordingSession == null)
-      recordingSession = stateService.startRecordingSession();
+    recordingSession ??= stateService.startRecordingSession();
   }
 
   void replayRecording() {
@@ -272,13 +270,11 @@ class AppComponent {
           ItemRendererEvent<dynamic, Comparable<dynamic>> event) =>
       print(event.type);
 
-  String listItemsAToString(List<ListItem<String>> items) => items
-      .map((ListItem<String> item) => labelHandler(item.data))
-      .join(', ');
+  String listItemsAToString(List<ListItem<String>> items) =>
+      items.map((ListItem<String> item) => labelHandler(item.data)).join(', ');
 
   String listItemsBToString(List<ListItem<domain.Person>> items) => items
-      .map((ListItem<domain.Person> item) =>
-          personLabelHandler(item.data))
+      .map((ListItem<domain.Person> item) => personLabelHandler(item.data))
       .join(', ');
 
   void handleRange(bool hasRange) {
