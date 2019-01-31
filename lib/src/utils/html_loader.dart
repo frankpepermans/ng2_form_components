@@ -10,6 +10,5 @@ class HtmlLoader {
   set innerHtml(final String rawText) =>
       _element.setInnerHtml(rawText, treeSanitizer: NodeTreeSanitizer.trusted);
 
-  HtmlLoader(@Inject(Element) final Element elementRef)
-      : _element = elementRef;
+  HtmlLoader(@Inject(Element) final Element elementRef) : _element = elementRef;
 }

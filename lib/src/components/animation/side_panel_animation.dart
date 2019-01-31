@@ -9,7 +9,6 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 
 @Directive(selector: '[panel-tween]')
 class SidePanelAnimation extends Tween implements OnInit {
-
   @override
   @Input()
   set beforeDestroyChildTrigger(StreamController<dynamic> value) {
@@ -31,7 +30,7 @@ class SidePanelAnimation extends Tween implements OnInit {
       nativeElement.style
           .setProperty(tweenStyleProperty, '${nativeElement.clientWidth}px');
 
-      new Timer(new Duration(milliseconds: duration), () {
+      Timer(Duration(milliseconds: duration), () {
         nativeElement.style.removeProperty(tweenStyleProperty);
         nativeElement.style.removeProperty('visibility');
       });
@@ -49,7 +48,7 @@ class SidePanelAnimation extends Tween implements OnInit {
     animationFrame$().take(1).listen((_) {
       nativeElement.style.setProperty(tweenStyleProperty, '0');
 
-      new Timer(new Duration(milliseconds: duration), () {
+      Timer(Duration(milliseconds: duration), () {
         nativeElement.style.removeProperty(tweenStyleProperty);
 
         beforeDestroyChildTrigger.add(true);

@@ -91,12 +91,12 @@ class Tween implements OnInit, OnDestroy {
     _openTimer?.cancel();
 
     if (hasCloseAnimation) {
-      _openTimer = new Timer(new Duration(milliseconds: duration), () {
+      _openTimer = Timer(Duration(milliseconds: duration), () {
         nativeElement.style.removeProperty(tweenStyleProperty);
         nativeElement.style.removeProperty('visibility');
       });
     } else {
-      _openTimer = new Timer(new Duration(milliseconds: duration), () {
+      _openTimer = Timer(Duration(milliseconds: duration), () {
         nativeElement.style.removeProperty('visibility');
       });
     }
@@ -113,7 +113,7 @@ class Tween implements OnInit, OnDestroy {
 
       _openTimer?.cancel();
 
-      new Timer(new Duration(milliseconds: duration), () {
+      Timer(Duration(milliseconds: duration), () {
         nativeElement.style.removeProperty(tweenStyleProperty);
 
         if (!beforeDestroyChildTrigger.isClosed)

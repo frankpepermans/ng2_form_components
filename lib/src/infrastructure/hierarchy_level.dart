@@ -9,10 +9,11 @@ abstract class HierarchyLevel implements Entity, Comparable<dynamic> {
   @Transient()
   List<HierarchyLevel> get children;
 
-  @override int compareTo(dynamic other) {
-    if (other is HierarchyLevel) return (other.label.compareTo(label) == 0) ? 0 : 1;
+  @override
+  int compareTo(dynamic other) {
+    if (other is HierarchyLevel)
+      return (other.label.compareTo(label) == 0) ? 0 : 1;
 
     return -1;
   }
-
 }

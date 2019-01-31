@@ -9,17 +9,22 @@ import 'package:ng2_form_components/src/components/list_item.g.dart';
 
 typedef String LabelHandler<T>(T data);
 
-typedef List<ListItem<Comparable<dynamic>>> ResolveChildrenHandler(int level, ListItem<Comparable<dynamic>> listItem);
-typedef ComponentFactory ResolveRendererHandler(int level, [ListItem<Comparable<dynamic>> listItem]);
+typedef List<ListItem<Comparable<dynamic>>> ResolveChildrenHandler(
+    int level, ListItem<Comparable<dynamic>> listItem);
+typedef ComponentFactory ResolveRendererHandler(int level,
+    [ListItem<Comparable<dynamic>> listItem]);
 
-abstract class FormComponent extends ComponentState implements StatefulComponent, OnDestroy {
-
+abstract class FormComponent extends ComponentState
+    implements StatefulComponent, OnDestroy {
   final Element elementRef;
-  final StreamController<bool> _onDestroy$ctrl = new StreamController<bool>.broadcast();
+  final StreamController<bool> _onDestroy$ctrl =
+      StreamController<bool>.broadcast();
 
-  @override Stream<bool> get onDestroy => _onDestroy$ctrl.stream;
+  @override
+  Stream<bool> get onDestroy => _onDestroy$ctrl.stream;
 
-  @override String stateGroup, stateId;
+  @override
+  String stateGroup, stateId;
 
   //-----------------------------
   // constructor
@@ -39,10 +44,10 @@ abstract class FormComponent extends ComponentState implements StatefulComponent
   // ng2 life cycle
   //-----------------------------
 
-  @override void ngOnDestroy() {
+  @override
+  void ngOnDestroy() {
     _onDestroy$ctrl.add(true);
 
     _onDestroy$ctrl.close();
   }
-
 }

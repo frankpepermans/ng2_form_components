@@ -23,7 +23,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       #i112ng2_form_components_lib_src_components_list_item_container;
 
   final DormProxy<String> _container =
-      new DormProxy<String>(CONTAINER, CONTAINER_SYMBOL);
+      DormProxy<String>(CONTAINER, CONTAINER_SYMBOL);
   @override
   String get container => _container.value;
   set container(String value) {
@@ -35,7 +35,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   static const Symbol DATA_SYMBOL =
       #i112ng2_form_components_lib_src_components_list_item_data;
 
-  final DormProxy<T> _data = new DormProxy<T>(DATA, DATA_SYMBOL);
+  final DormProxy<T> _data = DormProxy<T>(DATA, DATA_SYMBOL);
   @override
   T get data => _data.value;
   set data(T value) {
@@ -48,7 +48,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       #i112ng2_form_components_lib_src_components_list_item_isAlwaysOpen;
 
   final DormProxy<bool> _isAlwaysOpen =
-      new DormProxy<bool>(ISALWAYSOPEN, ISALWAYSOPEN_SYMBOL);
+      DormProxy<bool>(ISALWAYSOPEN, ISALWAYSOPEN_SYMBOL);
   @override
   bool get isAlwaysOpen => _isAlwaysOpen.value;
   set isAlwaysOpen(bool value) {
@@ -61,7 +61,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       #i112ng2_form_components_lib_src_components_list_item_parent;
 
   final DormProxy<ListItem<T>> _parent =
-      new DormProxy<ListItem<T>>(PARENT, PARENT_SYMBOL);
+      DormProxy<ListItem<T>>(PARENT, PARENT_SYMBOL);
   @override
   ListItem<T> get parent => _parent.value;
   set parent(ListItem<T> value) {
@@ -74,7 +74,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
       #i112ng2_form_components_lib_src_components_list_item_selectable;
 
   final DormProxy<bool> _selectable =
-      new DormProxy<bool>(SELECTABLE, SELECTABLE_SYMBOL);
+      DormProxy<bool>(SELECTABLE, SELECTABLE_SYMBOL);
   @override
   bool get selectable => _selectable.value;
   set selectable(bool value) {
@@ -84,39 +84,39 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
   /// DO_SCAN
   static void DO_SCAN<T extends Comparable<dynamic>>([String _R, Entity _C()]) {
     _R ??= 'i112ng2_form_components_lib_src_components_list_item';
-    _C ??= () => new ListItem<T>();
+    _C ??= () => ListItem<T>();
     Entity.DO_SCAN(_R, _C);
     Entity.ASSEMBLER.scan(_R, _C, const <PropertyData>[
-      const PropertyData(
+      PropertyData(
           symbol: ListItem.CONTAINER_SYMBOL,
           name: 'container',
           type: String,
-          metatags: const <dynamic>[
-            const DefaultValue(''),
+          metatags: <dynamic>[
+            DefaultValue(''),
           ]),
-      const PropertyData(
+      PropertyData(
           symbol: ListItem.DATA_SYMBOL,
           name: 'data',
           type: dynamic,
-          metatags: const <dynamic>[]),
-      const PropertyData(
+          metatags: <dynamic>[]),
+      PropertyData(
           symbol: ListItem.ISALWAYSOPEN_SYMBOL,
           name: 'isAlwaysOpen',
           type: bool,
-          metatags: const <dynamic>[
-            const DefaultValue(false),
+          metatags: <dynamic>[
+            DefaultValue(false),
           ]),
-      const PropertyData(
+      PropertyData(
           symbol: ListItem.PARENT_SYMBOL,
           name: 'parent',
           type: ListItem,
-          metatags: const <dynamic>[]),
-      const PropertyData(
+          metatags: <dynamic>[]),
+      PropertyData(
           symbol: ListItem.SELECTABLE_SYMBOL,
           name: 'selectable',
           type: bool,
-          metatags: const <dynamic>[
-            const DefaultValue(true),
+          metatags: <dynamic>[
+            DefaultValue(true),
           ]),
     ]);
   }
@@ -134,7 +134,7 @@ class ListItem<T extends Comparable<dynamic>> extends Entity
 
   /// Internal constructor
   static ListItem<T> construct<T extends Comparable<dynamic>>() =>
-      new ListItem<T>();
+      ListItem<T>();
 
   /// withContainer
   ListItem<T> withContainer(String value) =>

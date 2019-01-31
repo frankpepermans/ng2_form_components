@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:angular/angular.dart';
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 import 'package:tuple/tuple.dart';
 import 'package:dorm/dorm.dart';
 
@@ -13,17 +13,16 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
 import 'package:ng2_form_components/src/utils/html_helpers.dart';
 
-final SerializerJson<String> _serializer =
-    new SerializerJson<String>()
-      ..outgoing(const <dynamic>[])
-      ..addRule(
-          DateTime,
-          (int value) => (value != null)
-              ? new DateTime.fromMillisecondsSinceEpoch(value, isUtc: true)
-              : null,
-          (DateTime value) => value?.millisecondsSinceEpoch);
+final SerializerJson<String> _serializer = SerializerJson<String>()
+  ..outgoing(const <dynamic>[])
+  ..addRule(
+      DateTime,
+      (int value) => (value != null)
+          ? DateTime.fromMillisecondsSinceEpoch(value, isUtc: true)
+          : null,
+      (DateTime value) => value?.millisecondsSinceEpoch);
 
-@Directive(selector: '[ngDragDrop]', providers: const <Type>[HtmlHelpers])
+@Directive(selector: '[ngDragDrop]', providers: <Type>[HtmlHelpers])
 class DragDrop implements OnDestroy {
   static const num _OFFSET = 11;
 
@@ -42,18 +41,18 @@ class DragDrop implements OnDestroy {
   final DragDropService dragDropService;
   final HtmlHelpers helpers;
 
-  rx.Observable<bool> dragDetection$;
-  rx.Observable<bool> dragOver$;
-  rx.Observable<bool> dragOut$;
+  Observable<bool> dragDetection$;
+  Observable<bool> dragOver$;
+  Observable<bool> dragOut$;
 
   final StreamController<ListItem<Comparable<dynamic>>> _listItem$ctrl =
-      new StreamController<ListItem<Comparable<dynamic>>>();
+      StreamController<ListItem<Comparable<dynamic>>>();
   final StreamController<ListDragDropHandler> _handler$ctrl =
-      new StreamController<ListDragDropHandler>();
+      StreamController<ListDragDropHandler>();
   final StreamController<DropResult> _onDrop$ctrl =
-      new StreamController<DropResult>.broadcast();
+      StreamController<DropResult>.broadcast();
   final StreamController<bool> _removeAllStyles$ctrl =
-      new StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast();
 
   StreamSubscription<bool> _initSubscription;
   StreamSubscription<MouseEvent> _dropHandlerSubscription;
@@ -94,12 +93,10 @@ class DragDrop implements OnDestroy {
   }
 
   void _initStreams() {
-    _initSubscription = rx.Observable
-        .combineLatest3(
+    _initSubscription = Observable.combineLatest3(
             _listItem$ctrl.stream.take(1),
             _handler$ctrl.stream.take(1),
-            new rx.Observable<bool>(_removeAllStyles$ctrl.stream)
-                .startWith(false),
+            Observable<bool>(_removeAllStyles$ctrl.stream).startWith(false),
             _updateStyles)
         .listen(null);
   }
@@ -142,8 +139,8 @@ class DragDrop implements OnDestroy {
 
     _areStreamsSet = true;
 
-    dragDetection$ = new rx.Observable<int>.merge(<Stream<int>>[
-      new rx.Observable<MouseEvent>(element.onDragEnter).doOnData((_) {
+    dragDetection$ = Observable<int>.merge(<Stream<int>>[
+      Observable<MouseEvent>(element.onDragEnter).doOnData((_) {
         heightOnDragEnter = element.client.height;
       }).map((_) => 1),
       element.onDragLeave.map((_) => -1),
@@ -179,7 +176,7 @@ class DragDrop implements OnDestroy {
 
     element.setAttribute('draggable', 'true');
 
-    _sortHandlerSubscription = new rx.Observable<MouseEvent>.merge(
+    _sortHandlerSubscription = Observable<MouseEvent>.merge(
             <Stream<MouseEvent>>[element.onDragOver, element.onDragLeave])
         .listen((MouseEvent event) {
       event.preventDefault();
@@ -196,7 +193,7 @@ class DragDrop implements OnDestroy {
       if (droppedListItem.compareTo(listItem) != 0) {
         handler(droppedListItem, listItem, 0);
 
-        _onDrop$ctrl.add(new DropResult(0, listItem));
+        _onDrop$ctrl.add(DropResult(0, listItem));
       }
 
       _removeAllStyles(null);
@@ -219,15 +216,14 @@ class DragDrop implements OnDestroy {
     });
 
     _sortDropSubscription = element.onDrop
-        .map((MouseEvent event) =>
-            new Tuple2<ListItem<Comparable<dynamic>>, int>(
-                _dataTransferToListItem(event), _getSortOffset(event)))
+        .map((MouseEvent event) => Tuple2<ListItem<Comparable<dynamic>>, int>(
+            _dataTransferToListItem(event), _getSortOffset(event)))
         .listen((Tuple2<ListItem<Comparable<dynamic>>, int> tuple) {
       if (tuple.item1.compareTo(listItem) != 0) {
         handler(tuple.item1, listItem, tuple.item2);
 
-        _onDrop$ctrl.add(new DropResult(
-            tuple.item2, tuple.item2 == 0 ? listItem : tuple.item1));
+        _onDrop$ctrl.add(
+            DropResult(tuple.item2, tuple.item2 == 0 ? listItem : tuple.item1));
       }
 
       _removeAllStyles(null);
@@ -247,7 +243,7 @@ class DragDrop implements OnDestroy {
 
     if (transferDataEncoded.isEmpty) return null;
 
-    final EntityFactory<Entity> factory = new EntityFactory<Entity>();
+    final EntityFactory<Entity> factory = EntityFactory<Entity>();
     final List<dynamic> result =
         factory.spawn(_serializer.incoming(transferDataEncoded), _serializer);
 
@@ -256,22 +252,20 @@ class DragDrop implements OnDestroy {
 
   void _removeAllStyles(dynamic _) => _removeAllStyles$ctrl.add(true);
 
-  num _getActualOffsetY(Element element, num clientY) => clientY - element.getBoundingClientRect().top;
+  num _getActualOffsetY(Element element, num clientY) =>
+      clientY - element.getBoundingClientRect().top;
 
   bool _isWithinDropBounds(num clientY) {
-    final num y =
-        _getActualOffsetY(elementRef, clientY);
+    final num y = _getActualOffsetY(elementRef, clientY);
 
     return y > _OFFSET && y < heightOnDragEnter - _OFFSET;
   }
 
   bool _isSortAbove(num clientY) =>
-      _getActualOffsetY(elementRef, clientY) <=
-      _OFFSET;
+      _getActualOffsetY(elementRef, clientY) <= _OFFSET;
 
   bool _isSortBelow(num clientY) =>
-      _getActualOffsetY(elementRef, clientY) >=
-      heightOnDragEnter - _OFFSET;
+      _getActualOffsetY(elementRef, clientY) >= heightOnDragEnter - _OFFSET;
 }
 
 class DropResult {

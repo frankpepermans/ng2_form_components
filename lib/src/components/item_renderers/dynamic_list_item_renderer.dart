@@ -1,3 +1,1 @@
-abstract class DynamicListItemRenderer {
-
-}
+abstract class DynamicListItemRenderer {}

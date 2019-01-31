@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:html';
 
 import 'package:dorm/dorm.dart';
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 
 import 'package:angular/angular.dart';
 
@@ -14,16 +14,14 @@ import 'package:ng2_state/ng2_state.dart'
 @Component(
     selector: 'form-input',
     templateUrl: 'form_input.html',
-    directives: const <dynamic>[coreDirectives],
-    pipes: const <dynamic>[commonPipes],
-    providers: const <dynamic>[
-      const ExistingProvider.forToken(
-          const OpaqueToken('statefulComponent'), FormInput)
+    directives: <dynamic>[coreDirectives],
+    pipes: <dynamic>[commonPipes],
+    providers: <dynamic>[
+      ExistingProvider.forToken(OpaqueToken('statefulComponent'), FormInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class FormInput extends FormComponent
-    implements OnDestroy, AfterViewInit {
+class FormInput extends FormComponent implements OnDestroy, AfterViewInit {
   @ViewChild('textarea')
   Element textarea;
 
@@ -75,10 +73,9 @@ class FormInput extends FormComponent
   @Output()
   Stream<FocusEvent> get blur => _blurEvent$ctrl.stream;
   @Output()
-  Stream<bool> get hasValue => rx.Observable.combineLatest2(
-          new rx.Observable<String>(_value$ctrl.stream).startWith(''),
-          new rx.Observable<String>(inputValue).startWith(null),
-          (String a, String b) {
+  Stream<bool> get hasValue => Observable.combineLatest2(
+          Observable(_value$ctrl.stream).startWith(''),
+          Observable(inputValue).startWith(null), (String a, String b) {
         if (b == null) {
           if (a != null) return a.trim().isNotEmpty;
 
@@ -93,15 +90,14 @@ class FormInput extends FormComponent
   //-----------------------------
 
   final StreamController<String> _value$ctrl =
-      new StreamController<String>.broadcast();
-  final rx.BehaviorSubject<String> _inputValue$ctrl =
-      new rx.BehaviorSubject<String>();
+      StreamController<String>.broadcast();
+  final BehaviorSubject<String> _inputValue$ctrl = BehaviorSubject<String>();
   final StreamController<String> _inputType$ctrl =
-      new StreamController<String>.broadcast();
+      StreamController<String>.broadcast();
   final StreamController<FocusEvent> _focusEvent$ctrl =
-      new StreamController<FocusEvent>.broadcast();
+      StreamController<FocusEvent>.broadcast();
   final StreamController<FocusEvent> _blurEvent$ctrl =
-      new StreamController<FocusEvent>.broadcast();
+      StreamController<FocusEvent>.broadcast();
 
   StreamSubscription<String> _inputTypeSubscription;
   StreamSubscription<String> _valueSubscription;
@@ -120,11 +116,9 @@ class FormInput extends FormComponent
   //-----------------------------
 
   FormInput(@Inject(Element) Element elementRef) : super(elementRef) {
-    final Element element = elementRef;
-
-    element.style.display = 'flex';
-    element.style.flexDirection = 'column';
-    element.style.flexGrow = '1';
+    elementRef.style.display = 'flex';
+    elementRef.style.flexDirection = 'column';
+    elementRef.style.flexGrow = '1';
 
     _initStreams();
   }
@@ -134,9 +128,9 @@ class FormInput extends FormComponent
   //-----------------------------
 
   @override
-  Stream<Entity> provideState() =>
-      _inputValue$ctrl.stream.distinct().map((String inputValue) =>
-          new SerializableTuple1<String>()..item1 = inputValue);
+  Stream<Entity> provideState() => _inputValue$ctrl.stream
+      .distinct()
+      .map((inputValue) => SerializableTuple1<String>()..item1 = inputValue);
 
   @override
   void receiveState(SerializableTuple1 entity, StatePhase phase) =>
@@ -145,11 +139,10 @@ class FormInput extends FormComponent
   @override
   void ngAfterViewInit() {
     if (inputType == 'text') {
-      final TextAreaElement target = textarea as TextAreaElement;
+      final target = textarea as TextAreaElement;
 
       window.animationFrame.whenComplete(() {
-        final String newValue =
-            '${target.scrollHeight - heightCalcAdjustment}px';
+        final newValue = '${target.scrollHeight - heightCalcAdjustment}px';
 
         if (textareaHeight != newValue)
           setState(() => textareaHeight = newValue);
@@ -174,10 +167,8 @@ class FormInput extends FormComponent
   }
 
   void setFocus() {
-    final Element element = elementRef;
-
-    if (element.children.isNotEmpty) {
-      element.children.first.focus();
+    if (elementRef.children.isNotEmpty) {
+      elementRef.children.first.focus();
 
       _setFocusRequested = false;
     } else
@@ -190,11 +181,11 @@ class FormInput extends FormComponent
 
   void _initStreams() {
     _valueSubscription = _value$ctrl.stream
-        .listen((String value) => setState(() => startValue = value));
+        .listen((value) => setState(() => startValue = value));
 
-    _inputTypeSubscription = rx.Observable
-        .combineLatest2(_inputType$ctrl.stream, _inputValue$ctrl.stream,
-            (String inputType, String inputValue) {
+    _inputTypeSubscription = Observable.combineLatest2(
+        _inputType$ctrl.stream, _inputValue$ctrl.stream,
+        (String inputType, String inputValue) {
       if (inputType == 'text' ||
           inputType == 'amount' ||
           inputType == 'numeric')
@@ -203,12 +194,12 @@ class FormInput extends FormComponent
         if (_isValidDateFormat(inputValue)) return inputValue;
 
         if (inputValue != null) {
-          final List<String> parts = inputValue.split('/');
+          final parts = inputValue.split('/');
 
           if (parts.length == 3) return '${parts[2]}-${parts[1]}-${parts[0]}';
         }
       }
-    }).listen((String value) {
+    }).listen((value) {
       _value$ctrl.add(value);
 
       deliverStateChanges();
@@ -218,7 +209,7 @@ class FormInput extends FormComponent
   bool _isValidDateFormat(String value) {
     if (value == null || value.isEmpty) return false;
 
-    final List<String> parts = value.split('-');
+    final parts = value.split('-');
 
     return parts.length == 3;
   }
@@ -237,20 +228,20 @@ class FormInput extends FormComponent
     String valueToSet;
 
     if (inputType == 'text') {
-      final TextAreaElement target = event.target as TextAreaElement;
+      final target = event.target as TextAreaElement;
 
       valueToSet = target.value;
 
-      final String newValue = '${target.scrollHeight - heightCalcAdjustment}px';
+      final newValue = '${target.scrollHeight - heightCalcAdjustment}px';
 
       if (textareaHeight != newValue) setState(() => textareaHeight = newValue);
     } else if (inputType == 'amount' || inputType == 'numeric') {
-      final InputElement target = event.target as InputElement;
+      final target = event.target as InputElement;
 
       valueToSet = target.value;
     } else if (inputType == 'date') {
-      final InputElement target = event.target as InputElement;
-      final List<String> parts = target.value.split('-');
+      final target = event.target as InputElement;
+      final parts = target.value.split('-');
 
       if (parts.length == 3)
         valueToSet = '${parts[2]}/${parts[1]}/${parts[0]}';

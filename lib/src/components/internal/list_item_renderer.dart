@@ -18,9 +18,10 @@ import 'package:ng2_form_components/src/infrastructure/drag_drop_service.dart';
 
 enum ListDragDropHandlerType { NONE, SORT, SWAP, ALL }
 
-typedef void ListDragDropHandler<T extends Comparable<dynamic>>(ListItem<T> dragListItem,
-    ListItem<T> dropListItem, int offset);
-typedef bool IsSelectedHandler<T extends Comparable<dynamic>>(ListItem<T> listItem);
+typedef void ListDragDropHandler<T extends Comparable<dynamic>>(
+    ListItem<T> dragListItem, ListItem<T> dropListItem, int offset);
+typedef bool IsSelectedHandler<T extends Comparable<dynamic>>(
+    ListItem<T> listItem);
 typedef String GetHierarchyOffsetHandler<T extends Comparable<dynamic>>(
     ListItem<T> listItem);
 
@@ -120,20 +121,19 @@ class ListItemRenderer<T extends Comparable<dynamic>> extends ComponentState
         resolveRendererHandler(0, listItem);
 
     if (resolvedRendererType == null)
-      throw new ArgumentError(
+      throw ArgumentError(
           'Unable to resolve renderer for list item: ${listItem.runtimeType}');
 
     ngOnComponentLoaded(dynamicComponentLoader.loadNextToLocation<dynamic>(
         resolvedRendererType, renderTypeTarget,
         injector: ReflectiveInjector.resolveAndCreate(<Provider>[
-          new Provider<Type>(ListRendererService,
-              useValue: listRendererService),
-          new Provider<Type>(ListItem, useValue: listItem),
-          new Provider<Type>(IsSelectedHandler, useValue: isSelected),
-          new Provider<Type>(GetHierarchyOffsetHandler,
+          Provider<Type>(ListRendererService, useValue: listRendererService),
+          Provider<Type>(ListItem, useValue: listItem),
+          Provider<Type>(IsSelectedHandler, useValue: isSelected),
+          Provider<Type>(GetHierarchyOffsetHandler,
               useValue: getHierarchyOffset),
-          new Provider<Type>(LabelHandler, useValue: labelHandler),
-          new Provider<OpaqueToken<String>>(
+          Provider<Type>(LabelHandler, useValue: labelHandler),
+          Provider<OpaqueToken<String>>(
               const OpaqueToken<String>('list-item-index'),
               useValue: index)
         ], injector as HierarchicalInjector)));

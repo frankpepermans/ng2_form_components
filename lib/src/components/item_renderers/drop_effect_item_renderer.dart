@@ -2,16 +2,20 @@ import 'dart:async';
 
 import 'package:angular/angular.dart';
 
-import 'package:ng2_form_components/src/components/list_item.g.dart' show ListItem;
-import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart' show ListRendererService, ItemRendererEvent;
-import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_item_renderer.dart' show DynamicListItemRenderer;
+import 'package:ng2_form_components/src/components/list_item.g.dart'
+    show ListItem;
+import 'package:ng2_form_components/src/infrastructure/list_renderer_service.dart'
+    show ListRendererService, ItemRendererEvent;
+import 'package:ng2_form_components/src/components/item_renderers/dynamic_list_item_renderer.dart'
+    show DynamicListItemRenderer;
 
-class DropEffectItemRenderer<T extends Comparable<dynamic>> extends ComponentState implements DynamicListItemRenderer, OnDestroy {
-
+class DropEffectItemRenderer<T extends Comparable<dynamic>>
+    extends ComponentState implements DynamicListItemRenderer, OnDestroy {
   final ListRendererService listRendererService;
   final ListItem<T> listItem;
 
-  StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>> _itemRendererEventSubscription;
+  StreamSubscription<ItemRendererEvent<dynamic, Comparable<dynamic>>>
+      _itemRendererEventSubscription;
 
   bool showDropEffect = false;
 
@@ -19,26 +23,26 @@ class DropEffectItemRenderer<T extends Comparable<dynamic>> extends ComponentSta
   // constructor
   //-----------------------------
 
-  DropEffectItemRenderer(
-    @Inject(ListRendererService) this.listRendererService,
-    @Inject(ListItem) this.listItem) {
-      _initStreams();
-    }
+  DropEffectItemRenderer(@Inject(ListRendererService) this.listRendererService,
+      @Inject(ListItem) this.listItem) {
+    _initStreams();
+  }
 
-  @override void ngOnDestroy() {
+  @override
+  void ngOnDestroy() {
     _itemRendererEventSubscription?.cancel();
   }
 
   void _initStreams() {
     _itemRendererEventSubscription = listRendererService.event$
-      .listen((ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
-        if (event.type == 'dropEffect') {
-          if (!showDropEffect && listItem.compareTo(event.listItem) == 0) {
-            //final ItemRendererEvent<int, Comparable<dynamic>> eventCast = event as ItemRendererEvent<int, Comparable<dynamic>>;
+        .listen((ItemRendererEvent<dynamic, Comparable<dynamic>> event) {
+      if (event.type == 'dropEffect') {
+        if (!showDropEffect && listItem.compareTo(event.listItem) == 0) {
+          //final ItemRendererEvent<int, Comparable<dynamic>> eventCast = event as ItemRendererEvent<int, Comparable<dynamic>>;
 
-            if (!showDropEffect) setState(() => showDropEffect = true);
-          }
+          if (!showDropEffect) setState(() => showDropEffect = true);
         }
-      });
+      }
+    });
   }
 }

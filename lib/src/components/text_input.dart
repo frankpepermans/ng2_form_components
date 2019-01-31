@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:html';
 
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 import 'package:dorm/dorm.dart';
 
 import 'package:angular/angular.dart';
@@ -16,17 +16,15 @@ typedef void TextInputAction(String inputValue);
 @Component(
     selector: 'text-input',
     templateUrl: 'text_input.html',
-    directives: const <dynamic>[coreDirectives],
-    pipes: const <dynamic>[commonPipes],
-    providers: const <dynamic>[
+    directives: <dynamic>[coreDirectives],
+    pipes: <dynamic>[commonPipes],
+    providers: <dynamic>[
       StateService,
-      const ExistingProvider.forToken(
-          const OpaqueToken('statefulComponent'), TextInput)
+      ExistingProvider.forToken(OpaqueToken('statefulComponent'), TextInput)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class TextInput extends FormComponent
-    implements OnDestroy {
+class TextInput extends FormComponent implements OnDestroy {
   @ViewChild('inputField')
   Element inputField;
 
@@ -96,10 +94,10 @@ class TextInput extends FormComponent
   //-----------------------------
 
   final StreamController<String> _input$ctrl =
-          new StreamController<String>.broadcast(),
-      _action$ctrl = new StreamController<String>.broadcast();
+          StreamController<String>.broadcast(),
+      _action$ctrl = StreamController<String>.broadcast();
   final StreamController<TextInputAction> _textInputAction$ctrl =
-      new StreamController<TextInputAction>.broadcast();
+      StreamController<TextInputAction>.broadcast();
 
   StreamSubscription<String> _inputSubscription;
   StreamSubscription<KeyboardEvent> _enterKeySubscription;
@@ -127,14 +125,14 @@ class TextInput extends FormComponent
 
   @override
   Stream<Entity> provideState() =>
-      new rx.Observable<SerializableTuple2<String, bool>>.merge(<
+      Observable<SerializableTuple2<String, bool>>.merge(<
           Stream<SerializableTuple2<String, bool>>>[
         _input$ctrl.stream
-            .map((String inputValue) => new SerializableTuple2<String, bool>()
+            .map((String inputValue) => SerializableTuple2<String, bool>()
               ..item1 = inputValue
               ..item2 = false),
         _action$ctrl.stream
-            .map((String inputValue) => new SerializableTuple2<String, bool>()
+            .map((String inputValue) => SerializableTuple2<String, bool>()
               ..item1 = inputValue
               ..item2 = true)
       ]);

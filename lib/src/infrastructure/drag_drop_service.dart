@@ -8,9 +8,9 @@ import 'package:ng2_form_components/src/components/internal/list_item_renderer.d
 
 @Injectable()
 class DragDropService {
+  ListDragDropHandlerType typeHandler(ListItem<Comparable<dynamic>> listItem) =>
+      ListDragDropHandlerType.NONE;
 
-  ListDragDropHandlerType typeHandler(ListItem<Comparable<dynamic>> listItem) => ListDragDropHandlerType.NONE;
-
-  String resolveDropClassName(ListItem<Comparable<dynamic>> dropListItem) => 'ngDragDrop--drop-inside';
-
+  String resolveDropClassName(ListItem<Comparable<dynamic>> dropListItem) =>
+      'ngDragDrop--drop-inside';
 }

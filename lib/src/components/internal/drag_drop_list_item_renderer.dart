@@ -18,8 +18,8 @@ import 'package:ng2_form_components/src/utils/html_helpers.dart';
         <div #renderType></div>
       </div>
     ''',
-    directives: const <Type>[DragDrop],
-    providers: const <Type>[HtmlHelpers],
+    directives: <Type>[DragDrop],
+    providers: <Type>[HtmlHelpers],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
 class DragDropListItemRenderer<T extends Comparable<dynamic>>
@@ -58,7 +58,7 @@ class DragDropListItemRenderer<T extends Comparable<dynamic>>
 
   void handleDrop(DropResult dropResult) {
     listRendererService.triggerEvent(
-        new ItemRendererEvent<int, Comparable<dynamic>>(
+        ItemRendererEvent<int, Comparable<dynamic>>(
             'dropEffectRequest', dropResult.listItem, dropResult.type));
   }
 

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:html';
 
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 
 import 'package:angular/angular.dart';
 
@@ -14,8 +14,8 @@ enum ToastMessageType { INFO, WARNING, ERROR }
 @Component(
     selector: 'toaster',
     templateUrl: 'toaster.html',
-    directives: const <dynamic>[coreDirectives, Tween, HtmlLoader],
-    pipes: const <dynamic>[commonPipes],
+    directives: <dynamic>[coreDirectives, Tween, HtmlLoader],
+    pipes: <dynamic>[commonPipes],
     changeDetection: ChangeDetectionStrategy.OnPush,
     preserveWhitespace: false)
 class Toaster implements OnDestroy {
@@ -25,9 +25,9 @@ class Toaster implements OnDestroy {
   final ChangeDetectorRef changeDetector;
 
   final StreamController<_ToastMessage> _toastMessage$ctrl =
-      new StreamController<_ToastMessage>();
+      StreamController<_ToastMessage>();
 
-  final Queue<_ToastMessage> messageQueue = new Queue<_ToastMessage>();
+  final Queue<_ToastMessage> messageQueue = Queue<_ToastMessage>();
 
   StreamSubscription<_ToastMessage> _toastMessageSubscription;
 
@@ -44,22 +44,20 @@ class Toaster implements OnDestroy {
 
   void addMessage(String message,
           {ToastMessageType type = ToastMessageType.INFO}) =>
-      _toastMessage$ctrl.add(new _ToastMessage(
-          message, type, new Duration(milliseconds: messageDuration)));
+      _toastMessage$ctrl.add(_ToastMessage(
+          message, type, Duration(milliseconds: messageDuration)));
 
   void _initStreams() {
-    _toastMessageSubscription =
-        new rx.Observable<_ToastMessage>(_toastMessage$ctrl.stream)
-            .flatMap((_ToastMessage message) =>
-                new Stream<num>.fromFuture(window.animationFrame)
-                    .map((_) => message))
-            .flatMap((_ToastMessage message) => message.appear)
-            .doOnData(messageQueue.add)
-            .doOnData((_) => changeDetector.markForCheck())
-            .flatMap((_ToastMessage message) => message.disappear)
-            .doOnData(messageQueue.remove)
-            .doOnData((_ToastMessage message) => message.close())
-            .listen((_) => changeDetector.markForCheck());
+    _toastMessageSubscription = Observable(_toastMessage$ctrl.stream)
+        .flatMap((message) =>
+            Stream.fromFuture(window.animationFrame).map((_) => message))
+        .flatMap((message) => message.appear)
+        .doOnData(messageQueue.add)
+        .doOnData((_) => changeDetector.markForCheck())
+        .flatMap((message) => message.disappear)
+        .doOnData(messageQueue.remove)
+        .doOnData((message) => message.close())
+        .listen((_) => changeDetector.markForCheck());
   }
 
   Map<String, bool> getToastCssMap(_ToastMessage message) {
@@ -83,9 +81,9 @@ class Toaster implements OnDestroy {
 
 class _ToastMessage {
   final StreamController<_ToastMessage> _appear$ctrl =
-      new StreamController<_ToastMessage>();
+      StreamController<_ToastMessage>();
   final StreamController<_ToastMessage> _disappear$ctrl =
-      new StreamController<_ToastMessage>();
+      StreamController<_ToastMessage>();
 
   Stream<_ToastMessage> get appear => _appear$ctrl.stream;
   Stream<_ToastMessage> get disappear => _disappear$ctrl.stream;
@@ -97,7 +95,7 @@ class _ToastMessage {
   _ToastMessage(this.message, this.type, this.duration) {
     _appear$ctrl.add(this);
 
-    new Timer(duration, () => _disappear$ctrl.add(this));
+    Timer(duration, () => _disappear$ctrl.add(this));
   }
 
   void close() {

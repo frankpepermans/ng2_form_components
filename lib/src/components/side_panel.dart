@@ -3,7 +3,7 @@ library ng2_form_components.components.side_panel;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 import 'package:dorm/dorm.dart';
 import 'package:angular/angular.dart';
 
@@ -20,17 +20,15 @@ import 'package:ng2_state/ng2_state.dart'
 @Component(
     selector: 'side-panel',
     templateUrl: 'side_panel.html',
-    directives: const <dynamic>[coreDirectives, SidePanelAnimation],
-    pipes: const <dynamic>[commonPipes],
-    providers: const <dynamic>[
+    directives: <dynamic>[coreDirectives, SidePanelAnimation],
+    pipes: <dynamic>[commonPipes],
+    providers: <dynamic>[
       StateService,
-      const ExistingProvider.forToken(
-          const OpaqueToken('statefulComponent'), SidePanel)
+      ExistingProvider.forToken(OpaqueToken('statefulComponent'), SidePanel)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
-class SidePanel extends FormComponent
-    implements OnDestroy, BeforeDestroyChild {
+class SidePanel extends FormComponent implements OnDestroy, BeforeDestroyChild {
   //-----------------------------
   // input
   //-----------------------------
@@ -50,11 +48,11 @@ class SidePanel extends FormComponent
   StreamController<bool> get beforeDestroyChild => _beforeDestroyChild$ctrl;
 
   final StreamController<bool> _beforeDestroyChild$ctrl =
-      new StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast();
   final StreamController<bool> _isOpen$ctrl =
-      new StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast();
   final StreamController<bool> _toggle$ctrl =
-      new StreamController<bool>.broadcast();
+      StreamController<bool>.broadcast();
 
   StreamSubscription<bool> _beforeDestroyChildSubscription;
   StreamSubscription<bool> _toggleStateSubscription;
@@ -75,7 +73,7 @@ class SidePanel extends FormComponent
 
   @override
   Stream<Entity> provideState() => _isOpen$ctrl.stream
-      .map((bool isOpen) => new SerializableTuple1<bool>()..item1 = isOpen);
+      .map((bool isOpen) => SerializableTuple1<bool>()..item1 = isOpen);
 
   @override
   void receiveState(SerializableTuple1 entity, StatePhase phase) {
@@ -100,7 +98,7 @@ class SidePanel extends FormComponent
 
   @override
   Stream<bool> ngBeforeDestroyChild([List<dynamic> args]) async* {
-    final Completer<bool> completer = new Completer<bool>();
+    final Completer<bool> completer = Completer<bool>();
 
     beforeDestroyChild.add(true);
 
@@ -118,15 +116,13 @@ class SidePanel extends FormComponent
   //-----------------------------
 
   void _initStreams() {
-    _toggleStateSubscription =
-        new rx.Observable<bool>(_isOpen$ctrl.stream.distinct())
-            .startWith(false)
-            .switchMap((bool isOpen) =>
-                new rx.Observable<bool>(_toggle$ctrl.stream)
-                    .debounce(const Duration(milliseconds: 100))
-                    .map((_) => isOpen)
-                    .take(1))
-            .listen(_toggleState);
+    _toggleStateSubscription = Observable(_isOpen$ctrl.stream.distinct())
+        .startWith(false)
+        .switchMap((isOpen) => Observable(_toggle$ctrl.stream)
+            .debounce(const Duration(milliseconds: 100))
+            .map((_) => isOpen)
+            .take(1))
+        .listen(_toggleState);
   }
 
   void _toggleState(bool newIsOpenState) {

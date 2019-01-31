@@ -5,7 +5,7 @@ import 'package:angular/angular.dart';
 import 'package:ng2_form_components/ng2_form_components.dart'
     show WindowListeners;
 import 'package:ng2_state/ng2_state.dart';
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 import 'package:dorm/dorm.dart';
 
 import 'package:ng2_form_components/src/components/internal/form_component.dart';
@@ -13,7 +13,7 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
 @Component(
     selector: 'window-container',
     templateUrl: 'window_container.html',
-    styles: const <String>[
+    styles: <String>[
       '''
     :host {
         position: absolute;
@@ -27,9 +27,9 @@ import 'package:ng2_form_components/src/components/internal/form_component.dart'
         background: #fff;
     }'''
     ],
-    providers: const <Provider>[
-      const ExistingProvider.forToken(
-          const OpaqueToken('statefulComponent'), WindowContainer)
+    providers: <Provider>[
+      ExistingProvider.forToken(
+          OpaqueToken('statefulComponent'), WindowContainer)
     ],
     changeDetection: ChangeDetectionStrategy.Stateful,
     preserveWhitespace: false)
@@ -38,7 +38,7 @@ class WindowContainer extends FormComponent
   @ViewChild('header')
   Element headerRef;
 
-  final WindowListeners windowListeners = new WindowListeners();
+  final WindowListeners windowListeners = WindowListeners();
 
   String _headerText;
   String get headerText => _headerText;
@@ -50,10 +50,9 @@ class WindowContainer extends FormComponent
   @Output()
   Stream<bool> get close => _close$ctrl.stream;
 
-  final StreamController<bool> _close$ctrl =
-      new StreamController<bool>.broadcast();
+  final StreamController<bool> _close$ctrl = StreamController<bool>.broadcast();
   final StreamController<_DragPosition> _dragPosition$ctrl =
-      new rx.BehaviorSubject<_DragPosition>();
+      BehaviorSubject<_DragPosition>();
 
   StreamSubscription<_DragPosition> _dragSubscription, _dragCommitSubscription;
 
@@ -63,14 +62,14 @@ class WindowContainer extends FormComponent
   Stream<Entity> provideState() => _dragPosition$ctrl.stream
       .distinct((_DragPosition dA, _DragPosition dB) =>
           dA.left == dB.left && dA.top == dB.top)
-      .map((_DragPosition value) => new SerializableTuple2<num, num>()
+      .map((_DragPosition value) => SerializableTuple2<num, num>()
         ..item1 = value.left
         ..item2 = value.top);
 
   @override
   void receiveState(SerializableTuple2 state, StatePhase phase) =>
       _dragPosition$ctrl
-          .add(new _DragPosition(state.item1 as num, state.item2 as num));
+          .add(_DragPosition(state.item1 as num, state.item2 as num));
 
   @override
   void ngOnDestroy() {
@@ -88,7 +87,7 @@ class WindowContainer extends FormComponent
     final Element element = elementRef;
     final DivElement header = headerRef as DivElement;
 
-    _dragSubscription = new rx.Observable<MouseEvent>(header.onMouseDown)
+    _dragSubscription = Observable<MouseEvent>(header.onMouseDown)
         .map((MouseEvent event) {
           event.preventDefault();
 
@@ -98,16 +97,16 @@ class WindowContainer extends FormComponent
           };
         })
         .switchMap((Map<String, int> event) =>
-            new rx.Observable<MouseEvent>(document.body.onMouseMove)
-                .map((MouseEvent pos) => new _DragPosition(
+            Observable<MouseEvent>(document.body.onMouseMove)
+                .map((MouseEvent pos) => _DragPosition(
                     pos.client.x - event['left'], pos.client.y - event['top']))
                 .takeUntil(document.body.onMouseUp))
         .listen(_dragPosition$ctrl.add);
 
     _dragCommitSubscription =
-        new rx.Observable<_DragPosition>.merge(<Stream<_DragPosition>>[
+        Observable<_DragPosition>.merge(<Stream<_DragPosition>>[
       _dragPosition$ctrl.stream,
-      new rx.Observable<bool>(windowListeners.windowResize)
+      Observable<bool>(windowListeners.windowResize)
           .switchMap((_) => _dragPosition$ctrl.stream)
     ]).listen((_DragPosition position) {
       final num lMax =

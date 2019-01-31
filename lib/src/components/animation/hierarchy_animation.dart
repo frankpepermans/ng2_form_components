@@ -3,7 +3,7 @@ library ng2_form_components.components.animation.hierarchy_animation;
 import 'dart:async';
 import 'dart:html';
 
-import 'package:rxdart/rxdart.dart' as rx;
+import 'package:rxdart/rxdart.dart';
 
 import 'package:angular/angular.dart';
 
@@ -11,7 +11,6 @@ import 'package:ng2_form_components/src/components/animation/tween.dart';
 
 @Directive(selector: '[hierarchy-tween]')
 class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
-
   @override
   @Input()
   set beforeDestroyChildTrigger(StreamController<dynamic> value) {
@@ -42,7 +41,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
   static List<HierarchyAnimation> animations = <HierarchyAnimation>[];
 
   final StreamController<num> _animation$ctrl =
-      new StreamController<num>.broadcast();
+      StreamController<num>.broadcast();
 
   StreamSubscription<dynamic> _beforeDestroyChildTriggerSubscription;
   StreamSubscription<num> _openSubscription;
@@ -86,7 +85,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
 
   @override
   void tweenOpen() {
-    _openSubscription = new rx.Observable<num>(_animation$ctrl.stream)
+    _openSubscription = Observable<num>(_animation$ctrl.stream)
         .where((_) => animations.isNotEmpty && animations.first.level == level)
         .take(1)
         .listen((_) {
@@ -102,7 +101,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
 
         _openTimer?.cancel();
 
-        _openTimer = new Timer(new Duration(milliseconds: duration), () {
+        _openTimer = Timer(Duration(milliseconds: duration), () {
           nativeElement.style.removeProperty('height');
           nativeElement.style.removeProperty('visibility');
           nativeElement.style.removeProperty('position');
@@ -127,7 +126,7 @@ class HierarchyAnimation extends Tween implements OnInit, OnDestroy {
 
       _openTimer?.cancel();
 
-      new Timer(new Duration(milliseconds: duration), () {
+      Timer(Duration(milliseconds: duration), () {
         nativeElement.style.removeProperty('height');
         nativeElement.style.removeProperty('visibility');
         nativeElement.style.removeProperty('position');

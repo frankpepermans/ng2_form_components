@@ -13,8 +13,8 @@ class MutationObserverStream extends Stream<bool> {
       bool attributes = false,
       List<String> attributeFilter = null,
       bool characterData = true})
-      : controller = _buildController(
-            element, matcher, subtree, childList, attributes, attributeFilter, characterData);
+      : controller = _buildController(element, matcher, subtree, childList,
+            attributes, attributeFilter, characterData);
 
   @override
   StreamSubscription<bool> listen(void onData(bool event),
@@ -33,7 +33,7 @@ class MutationObserverStream extends Stream<bool> {
     StreamController<bool> controller;
     MutationObserver observer;
 
-    return controller = new StreamController<bool>(
+    return controller = StreamController<bool>(
         sync: true,
         onListen: () {
           void onMutation(List<dynamic> mutations, MutationObserver observer) {
@@ -45,7 +45,7 @@ class MutationObserverStream extends Stream<bool> {
             if (match != null) controller.add(true);
           }
 
-          observer = new MutationObserver(onMutation)
+          observer = MutationObserver(onMutation)
             ..observe(element,
                 subtree: subtree,
                 childList: childList,
