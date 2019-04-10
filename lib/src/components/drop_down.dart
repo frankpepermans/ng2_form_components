@@ -214,7 +214,7 @@ class DropDown extends FormComponent
   void receiveState(covariant Entity entity, StatePhase phase) {
     final tuple = entity as SerializableTuple2;
     final item1 = tuple.item1 as bool;
-    final item2 = List<Entity>.from(tuple.item2 as Iterable<Entity>);
+    final item2 = (tuple.item2 as List).cast<Entity>();
     final listCast = <ListItem<Comparable>>[];
 
     if (phase == StatePhase.REPLAY)

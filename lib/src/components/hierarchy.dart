@@ -294,8 +294,8 @@ class Hierarchy extends ListRenderer
   @override
   void receiveState(SerializableTuple3 entity, StatePhase phase) {
     final item1 = entity.item1 as int;
-    final item2 = List<Entity>.from(entity.item2 as Iterable<Entity>),
-        item3 = List<Entity>.from(entity.item3 as Iterable<Entity>);
+    final item2 = (entity.item2 as List).cast<Entity>(),
+        item3 = (entity.item3 as List).cast<Entity>();
     final listCast = <ListItem<Comparable>>[];
     final listCast2 = <ListItem<Comparable>>[];
 

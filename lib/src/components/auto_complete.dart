@@ -127,8 +127,8 @@ class AutoComplete extends DropDown implements OnDestroy, AfterViewInit {
               .startWith('')
               .distinct((String vA, String vB) => vA.compareTo(vB) == 0),
           (Entity tuple, String input) {
-        final SerializableTuple2<bool, Iterable<ListItem<Comparable>>> cast =
-            tuple;
+        final cast =
+            tuple as SerializableTuple2<bool, Iterable<ListItem<Comparable>>>;
 
         return SerializableTuple3<bool, Iterable<ListItem<Comparable>>,
             String>()
@@ -140,7 +140,7 @@ class AutoComplete extends DropDown implements OnDestroy, AfterViewInit {
   @override
   void receiveState(SerializableTuple3 entity, StatePhase phase) {
     final item1 = entity.item1 as bool;
-    final item2 = List<Entity>.from(entity.item2 as Iterable<Entity>);
+    final item2 = (entity.item2 as List).cast<Entity>();
     final item3 = entity.item3 as String;
 
     if (phase == StatePhase.REPLAY) _focus$ctrl.add(true);
